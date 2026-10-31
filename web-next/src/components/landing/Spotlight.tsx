@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Settings2, Sparkles } from "lucide-react";
-import { AnimatePresence, motion, useAnimationControls } from "motion/react";
+import { motion, useAnimationControls } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import {
   ORB,
@@ -24,10 +24,11 @@ import { ThinkingOrb, type ThinkingPhase } from "./ThinkingOrb";
 //                   field's right edge
 //   field → ready   placeholder, chips and focus arrive last
 // On submit the orb shrinks to a core and blooms into the thinking swirl
-// while the first view loads (at least MIN_THINK). Success: the swirl
-// collapses into its centre and the terminal opens already filled.
-// Failure: after the collapse the orb grows back, the field shakes and the
-// reason shows underneath.
+// while the first view loads. Success: the swirl holds for at least
+// MIN_THINK_OK, then collapses into its centre and the terminal opens
+// already filled. Failure (after MIN_THINK_FAIL): the orb grows back and
+// the field shakes; that nudge is the whole message on screen (the reason
+// is announced to screen readers only).
 
 export type SpotlightStage = "hidden" | "orb" | "field" | "ready";
 
@@ -37,7 +38,8 @@ const SIZES = {
   compact: { field: 62, btn: 48, inset: 7 },
 };
 const EASE = [0.22, 1, 0.36, 1] as const;
-const MIN_THINK = 1600;
+const MIN_THINK_OK = 5000;
+const MIN_THINK_FAIL = 1600;
 
 export function Spotlight({
   stage,
@@ -97,13 +99,13 @@ export function Spotlight({
     setError("");
     setThink("think");
     const started = performance.now();
-    const hold = () =>
+    const hold = (min: number) =>
       new Promise((r) =>
-        setTimeout(r, Math.max(0, MIN_THINK - (performance.now() - started))),
+        setTimeout(r, Math.max(0, min - (performance.now() - started))),
       );
     try {
       await preloadInvestigation(chain, v);
-      await hold();
+      await hold(MIN_THINK_OK);
       after.current = () =>
         void navigate({
           to: "/investigate/$chain/$target",
@@ -111,7 +113,7 @@ export function Spotlight({
         });
       setThink("in");
     } catch (err) {
-      await hold();
+      await hold(MIN_THINK_FAIL);
       after.current = () => {
         setThink("off");
         setError(lookupErrorMessage(err));
@@ -248,26 +250,10 @@ export function Spotlight({
         </div>
       </motion.form>
 
-      {/* Why a lookup failed, under the chips. */}
-      <div
-        className="absolute text-center"
-        style={{ left: -fieldW / 2, top: FIELD_H / 2 + 60, width: fieldW }}
-        aria-live="polite"
-      >
-        <AnimatePresence>
-          {error && (
-            <motion.p
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25, ease: EASE }}
-              className="text-[13px] text-verified/85"
-            >
-              {error}
-            </motion.p>
-          )}
-        </AnimatePresence>
-      </div>
+      {/* Why a lookup failed: announced, not shown (the shake says it). */}
+      <p className="sr-only" aria-live="polite">
+        {error}
+      </p>
 
       {/* Chips: chain and model badges left, settings right. */}
       <div
