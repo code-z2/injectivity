@@ -32,6 +32,20 @@ No key means D1-only responses with `live: false`. No wallet, ever.
   `shared` lists non-source addresses adjacent to 2+ traced nodes with their
   intermediaries. Repeat traces serve fully from cache (`live: false`).
 
+- `POST /v1/investigate` with `{ chain, address, direction?, depth?, fanout?,
+model?, reasoningEffort?, webSearch?, stream? }` and an `X-Model-Key`
+  header (BYO Muse key; `MODEL_API_KEY` env as fallback) → grounded intel
+  report `{ summary, findings: [{ claim, verdict, evidence, confidence }],
+uncertainty, nextChecks }`. The server runs intel + trace + assessment,
+  calls `https://api.meta.ai/v1/responses` (default model `muse-spark-1.3-contributor`,
+  medium reasoning, web-search grounding, strict JSON schema), then
+  validates every cited tx hash against the trace and every list ref against
+  the risk matches — unknown evidence and verified-on-inferred claims are
+  stripped and disclosed, garbage output is a 502 with nothing persisted.
+  Valid reports persist to D1 `reports`. `stream: true` returns SSE `status`
+  events plus the final validated `report` (token streaming is not exposed:
+  only validated output leaves the server). Missing key → `401`.
+
 ## Layout (mirrors knot relay-proxy)
 
 - `src/app.ts` — `createApp(options?)` factory; CORS near routes, `hono/rpc`
@@ -70,9 +84,14 @@ bun run deploy
 
 ## Env
 
-| var                 | default    | meaning                       |
-| ------------------- | ---------- | ----------------------------- |
-| `ALCHEMY_API_KEY`   | (empty)    | live calls off when empty     |
-| `DEFAULT_CHAIN`     | `ethereum` | UI default, not enforced here |
-| `CACHE_TTL_SECONDS` | `300`      | D1 transfer freshness         |
-| `DB`                | (binding)  | D1 `intel-terminal`           |
+| var                      | default                      | meaning                                               |
+| ------------------------ | ---------------------------- | ----------------------------------------------------- |
+| `ALCHEMY_API_KEY`        | (empty)                      | live calls off when empty                             |
+| `DEFAULT_CHAIN`          | `ethereum`                   | UI default, not enforced here                         |
+| `CACHE_TTL_SECONDS`      | `300`                        | D1 transfer freshness                                 |
+| `DB`                     | (binding)                    | D1 `intel-terminal`                                   |
+| `RPC_URLS`               | (empty)                      | BYOR seam: JSON `{chain:url}` overrides Alchemy bases |
+| `MODEL_API_KEY`          | (empty)                      | fallback model key when `X-Model-Key` absent          |
+| `MODEL_API_BASE_URL`     | `https://api.meta.ai/v1`     | Muse API endpoint                                     |
+| `MODEL_API_MODEL`        | `muse-spark-1.3-contributor` | default investigation model                           |
+| `MODEL_REASONING_EFFORT` | `medium`                     | default reasoning effort                              |

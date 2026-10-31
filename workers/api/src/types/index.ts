@@ -3,6 +3,11 @@ export interface Env {
   ALCHEMY_API_KEY?: string;
   DEFAULT_CHAIN?: string;
   CACHE_TTL_SECONDS?: string;
+  RPC_URLS?: string;
+  MODEL_API_KEY?: string;
+  MODEL_API_BASE_URL?: string;
+  MODEL_API_MODEL?: string;
+  MODEL_REASONING_EFFORT?: string;
 }
 
 export interface AlchemyClient {
@@ -24,4 +29,5 @@ export interface AlchemyClient {
 
 export interface CreateAppOptions {
   alchemy?: AlchemyClient;
+  modelFetch?: typeof fetch;
 }

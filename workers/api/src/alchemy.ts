@@ -9,15 +9,32 @@ function backoffMs(attempt: number): number {
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
+// BYOR seam: RPC_URLS (JSON, {chain: url}) overrides the built-in Alchemy
+// bases per chain, so UI settings can later accept a universal or per-chain
+// RPC without touching call sites. A custom URL is used as-is (it carries
+// its own credentials); built-in bases use the Alchemy key. Custom
+// endpoints must speak alchemy_getAssetTransfers.
+function overrideBase(env: Env, chain: string): string | undefined {
+  try {
+    const overrides = env.RPC_URLS ? (JSON.parse(env.RPC_URLS) as Record<string, string>) : {};
+    return overrides[chain.toLowerCase()] || undefined;
+  } catch {
+    return undefined; // Malformed RPC_URLS: fall through to built-ins.
+  }
+}
+
 async function rpc(env: Env, chain: string, method: string, params: unknown[]): Promise<unknown> {
-  const base = chainBase(chain);
-  if (!base || !env.ALCHEMY_API_KEY) throw new Error('alchemy-unavailable');
+  const custom = overrideBase(env, chain);
+  const builtin = chainBase(chain);
+  const url =
+    custom ?? (builtin && env.ALCHEMY_API_KEY ? `${builtin}/v2/${env.ALCHEMY_API_KEY}` : undefined);
+  if (!url) throw new Error('alchemy-unavailable');
   let lastErr = '';
   for (let attempt = 0; attempt < 4; attempt++) {
     if (attempt > 0) await sleep(backoffMs(attempt - 1));
     let res: Response;
     try {
-      res = await fetch(`${base}/v2/${env.ALCHEMY_API_KEY}`, {
+      res = await fetch(url, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ id: 1, jsonrpc: '2.0', method, params }),
