@@ -9,7 +9,8 @@ const LABEL: Record<ServiceStatus["state"], string> = {
   down: "Unavailable",
 };
 
-// Quiet, glanceable service status. Present, never asking for attention.
+// Quiet, glanceable service status, bottom-right in one row. Present,
+// never asking for attention.
 export function StatusBar({ show }: { show: boolean }) {
   const { rpc, agent } = useServiceStatus();
   return (
@@ -17,9 +18,10 @@ export function StatusBar({ show }: { show: boolean }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: show ? 1 : 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="fixed top-5 right-6 z-10 space-y-1 text-right text-[11px] leading-none text-ink/40 select-none"
+      className="fixed right-6 bottom-5 z-10 flex items-center gap-4 text-[11px] leading-none text-ink/40 select-none"
     >
       <Row name="RPC" s={rpc} />
+      <span aria-hidden className="h-2.5 w-px bg-ink/10" />
       <Row name="AI agent" s={agent} />
     </motion.dl>
   );
@@ -28,7 +30,7 @@ export function StatusBar({ show }: { show: boolean }) {
 function Row({ name, s }: { name: string; s: ServiceStatus }) {
   return (
     <div
-      className="flex items-center justify-end gap-1.5"
+      className="flex items-center gap-1.5"
       title={s.ms !== null ? `${name}: ${s.ms} ms` : undefined}
     >
       <dt>{name}</dt>

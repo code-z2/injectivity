@@ -69,11 +69,11 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
         )}
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-ink/20 backdrop-blur-[2px] data-[state=closed]:animate-[fade-out_150ms_ease-out] data-[state=open]:animate-[fade-in_250ms_ease-out]" />
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-ink/20 backdrop-blur-[2px] data-[state=closed]:animate-[fade-out_150ms_ease-in] data-[state=open]:animate-[fade-in_200ms_ease-out]" />
         <Dialog.Content
           className={cn(
             "fixed top-1/2 left-1/2 z-50 w-[calc(100vw-32px)] max-w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-[24px] bg-surface shadow-console outline-none",
-            "data-[state=closed]:animate-[modal-out_150ms_var(--ease-smooth-out)] data-[state=open]:animate-[modal-in_250ms_var(--ease-smooth-out)]",
+            "data-[state=closed]:animate-[fade-out_150ms_ease-in] data-[state=open]:animate-[fade-in_200ms_ease-out]",
           )}
         >
           <div className="flex items-start justify-between px-6 pt-6">

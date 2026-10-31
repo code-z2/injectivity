@@ -1,4 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { ORB } from "./orb";
 
 // "Intel Terminal" → orb, pure SVG, driven by ONE master clock (rAF) so
 // every stage overlaps the next instead of waiting on it.
@@ -7,10 +8,12 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 //   0.12–1.00s shrink   each letter condenses into an ink dot
 //   0.95–1.55s gather   dots slide together, closing the gaps
 //   1.60–3.15s wave     a ripple runs along the line; dots peel off it
-//   2.55–3.55s roll     dots roll into a spinning ring, left first
-//   2.70–3.60s colour   ink → aurora gradient while rolling in
-//   3.35–4.00s tighten  the ring closes on its centre
-//   3.55–4.30s orb      the glowing orb blooms (ORB_BLOOM)
+//   1.75–2.95s colour   ink → graphite ramp along the line, with the wave
+//   2.55–3.55s roll     dots roll into a ring, left first; five dots
+//                       merge into neighbours so the ring stays small
+//   3.55–4.00s hold     the 8-dot ring keeps spinning, a short beat
+//   4.00–4.85s tighten  the ring closes on its centre, unhurried
+//   4.30–5.00s orb      the glowing orb blooms (ORB_BLOOM)
 // Driving `state` back to "word" plays the clock backwards, faster.
 //
 // Coordinates are in a 200×40 design box, drawn at `scale`. The component
@@ -18,8 +21,8 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 // anchor (and the orb lands there); with align="start" the anchor is the
 // box's top-left corner and the orb lands at the left.
 
-export const END = 4300;
-export const ORB_BLOOM = 3550;
+export const END = 5000;
+export const ORB_BLOOM = 4300;
 export const ORB_R = 11; // design units
 
 type Rgb = [number, number, number];
@@ -34,17 +37,19 @@ const BASELINE = 28;
 const INK: Rgb = [11, 13, 18];
 const DOT_R = 2.6;
 const GAP = 7;
-const RING_R = 10;
+const RING_R = 8;
+// Dots that merge into their left neighbour while rolling, leaving 8.
+const MERGE = new Set([1, 4, 6, 9, 11]);
 const START_ORB_CX = 14;
 const START_LINE_X = 4;
 const REVERSE_SPEED = 1.5;
 
-// Aurora (pearl): emerald → sky → violet → rose.
-export const AURORA: Rgb[] = [
-  [41, 224, 163],
-  [66, 158, 255],
-  [140, 107, 255],
-  [255, 122, 199],
+// Mono ramp the dots shift into: ink → graphite. The orb is glossy black,
+// so the dots read as fragments of it (and can scatter back out of it).
+const RAMP: Rgb[] = [
+  [11, 13, 18],
+  [52, 57, 66],
+  [96, 103, 116],
 ];
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -63,9 +68,9 @@ export const rgb = (c: Rgb) =>
   `rgb(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])})`;
 
 function gradientAt(f: number): Rgb {
-  const x = clamp(f, 0, 0.9999) * (AURORA.length - 1);
+  const x = clamp(f, 0, 0.9999) * (RAMP.length - 1);
   const i = Math.floor(x);
-  return mixRgb(AURORA[i]!, AURORA[i + 1]!, x - i);
+  return mixRgb(RAMP[i]!, RAMP[i + 1]!, x - i);
 }
 
 interface Glyph {
@@ -142,6 +147,12 @@ export function WordmarkSequence({
   const paint = (t: number) => {
     if (!glyphs) return;
     const n = glyphs.length;
+    // Ring slot per kept dot, in order.
+    const slotOf: number[] = [];
+    let ringN = 0;
+    glyphs.forEach((_, k) => {
+      if (!MERGE.has(k)) slotOf[k] = ringN++;
+    });
     const lineX0 =
       align === "center" ? wordCx - ((n - 1) * GAP) / 2 : START_LINE_X;
     glyphs.forEach((g, k) => {
@@ -170,25 +181,32 @@ export function WordmarkSequence({
       const env = Math.pow(Math.sin(Math.PI * w), 2);
       y += -5 * env * Math.sin(k * 0.8 - w * Math.PI * 4.6);
 
-      // 4. roll into a spinning ring, staggered from the left
-      const spin = Math.PI * 2 * 1.6 * inOut(seg(t, 2550, END - 250));
-      const ang = (k / n) * Math.PI * 2 + Math.PI + spin;
+      // 4. roll into a spinning ring, staggered from the left. Merging
+      //    dots head for their left neighbour's slot and dissolve into it.
+      const merges = MERGE.has(k);
+      const slot = slotOf[merges ? k - 1 : k]!;
+      const spin = Math.PI * 2 * 2 * inOut(seg(t, 2550, END - 300));
+      const ang = (slot / ringN) * Math.PI * 2 + Math.PI + spin;
       const r0 = 2550 + k * 30;
       const rp = inOut(seg(t, r0, r0 + 640));
+      const fold = merges ? smooth(seg(t, r0 + 200, r0 + 640)) : 0;
 
-      // 5. ring tightens on its centre
-      const m = inOut(seg(t, 3350, 4000));
+      // 5. after a spinning beat, the ring tightens on its centre
+      const m = inOut(seg(t, 4000, 4850));
       const ringR = RING_R * (1 - m);
       x = lerp(x, orbCx + Math.cos(ang) * ringR, rp);
       y = lerp(y, MID + Math.sin(ang) * ringR, rp);
-      r *= 1 - 0.55 * m;
+      r *= (1 - 0.55 * m) * (1 - fold);
 
-      const c = smooth(seg(t, 2700, 3600));
+      const c = smooth(seg(t, 1750, 2950));
       dot.setAttribute("cx", x.toFixed(2));
       dot.setAttribute("cy", y.toFixed(2));
       dot.setAttribute("r", r.toFixed(2));
       dot.setAttribute("fill", rgb(mixRgb(INK, gradientAt(k / (n - 1)), c)));
-      dot.setAttribute("opacity", String(1 - smooth(seg(t, 3700, 4100))));
+      dot.setAttribute(
+        "opacity",
+        String((1 - fold) * (1 - smooth(seg(t, 4450, 4900)))),
+      );
     });
 
     const o = easeOut(seg(t, ORB_BLOOM, END));
@@ -268,21 +286,22 @@ export function WordmarkSequence({
         style={{ left, top, opacity: glyphs ? 1 : 0 }}
       >
         <defs>
-          <linearGradient id={`${id}-aurora`} x1="0" y1="1" x2="1" y2="0">
-            <stop offset="0" stopColor={rgb(AURORA[0]!)} />
-            <stop offset="0.4" stopColor={rgb(AURORA[1]!)} />
-            <stop offset="0.75" stopColor={rgb(AURORA[2]!)} />
-            <stop offset="1" stopColor={rgb(AURORA[3]!)} />
-          </linearGradient>
-          <radialGradient id={`${id}-light`} cx="0.34" cy="0.28" r="0.6">
-            <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
-            <stop offset="0.35" stopColor="#fff" stopOpacity="0.35" />
+          {/* Glossy black sphere: graphite key light top-left falling to
+              near-black, a soft bounce light at the base, a crisp
+              specular highlight. */}
+          <radialGradient id={`${id}-body`} cx="0.38" cy="0.32" r="0.75">
+            <stop offset="0" stopColor={ORB.key} />
+            <stop offset="0.45" stopColor={ORB.mid} />
+            <stop offset="1" stopColor={ORB.deep} />
+          </radialGradient>
+          <radialGradient id={`${id}-bounce`} cx="0.55" cy="1" r="0.55">
+            <stop offset="0" stopColor="#fff" stopOpacity="0.16" />
             <stop offset="1" stopColor="#fff" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id={`${id}-shade`} cx="0.62" cy="0.78" r="0.7">
-            <stop offset="0" stopColor="#0b0d12" stopOpacity="0" />
-            <stop offset="0.7" stopColor="#0b0d12" stopOpacity="0" />
-            <stop offset="1" stopColor="#0b0d12" stopOpacity="0.16" />
+          <radialGradient id={`${id}-light`} cx="0.34" cy="0.26" r="0.3">
+            <stop offset="0" stopColor="#fff" stopOpacity="0.85" />
+            <stop offset="0.5" stopColor="#fff" stopOpacity="0.25" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0" />
           </radialGradient>
           <filter id={`${id}-blur-lg`} x="-1" y="-1" width="3" height="3">
             <feGaussianBlur stdDeviation="5" />
@@ -313,7 +332,7 @@ export function WordmarkSequence({
               rx={ORB_R * 0.8}
               ry={2.4}
               fill="#0b0d12"
-              fillOpacity={0.22}
+              fillOpacity={ORB.shadowAlpha}
               filter={`url(#${id}-blur-sm)`}
               opacity={0}
             />
@@ -322,7 +341,8 @@ export function WordmarkSequence({
               cx={orbCx}
               cy={MID}
               r={ORB_R + 2}
-              fill={`url(#${id}-aurora)`}
+              fill="#0b0d12"
+              fillOpacity={ORB.haloAlpha}
               filter={`url(#${id}-blur-lg)`}
               opacity={0}
             />
@@ -361,16 +381,18 @@ export function WordmarkSequence({
 
         {showOrb && (
           <g ref={orbRef} opacity={0}>
+            <circle cx={orbCx} cy={MID} r={ORB_R} fill={`url(#${id}-body)`} />
+            <circle cx={orbCx} cy={MID} r={ORB_R} fill={`url(#${id}-bounce)`} />
+            <circle cx={orbCx} cy={MID} r={ORB_R} fill={`url(#${id}-light)`} />
             <circle
               cx={orbCx}
               cy={MID}
-              r={ORB_R}
-              fill={`url(#${id}-aurora)`}
-              className="animate-[spin_14s_linear_infinite]"
-              style={{ transformOrigin: `${orbCx}px ${MID}px` }}
+              r={ORB_R - 0.25}
+              fill="none"
+              stroke="#fff"
+              strokeOpacity={0.08}
+              strokeWidth={0.5}
             />
-            <circle cx={orbCx} cy={MID} r={ORB_R} fill={`url(#${id}-shade)`} />
-            <circle cx={orbCx} cy={MID} r={ORB_R} fill={`url(#${id}-light)`} />
           </g>
         )}
       </svg>

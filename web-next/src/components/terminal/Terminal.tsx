@@ -14,6 +14,7 @@ import {
 import { CHAIN_META } from "@/lib/chains";
 import { looksLikeEns, resolveEns } from "@/lib/ens";
 import { saveSettings } from "@/lib/settings";
+import { takePreloaded } from "@/lib/preload";
 import { ADDRESS_RE, fmtNative, nativeSymbol } from "@/lib/utils";
 import { HistoryTable } from "./HistoryTable";
 import { InvestigatePanel } from "./InvestigatePanel";
@@ -40,6 +41,17 @@ export function Terminal({ chain, target }: { chain: Chain; target: string }) {
   useEffect(() => saveSettings({ chain }), [chain]);
 
   useEffect(() => {
+    // Opened from the landing spotlight: data is already loaded.
+    const pre = takePreloaded(chain, target);
+    if (pre) {
+      setAddress(pre.address);
+      setIntel(pre.intel);
+      setTransfers(pre.first.transfers);
+      setPageKey(pre.first.pageKey);
+      setError("");
+      setPhase("ready");
+      return;
+    }
     let live = true;
     setPhase("resolving");
     setError("");

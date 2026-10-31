@@ -1,12 +1,20 @@
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Settings2, Sparkles } from "lucide-react";
-import { motion, useAnimationControls } from "motion/react";
+import { AnimatePresence, motion, useAnimationControls } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import {
+  ORB,
+  ORB_BODY_CSS,
+  ORB_BOUNCE_CSS,
+  ORB_SPEC_CSS,
+} from "@/components/brand/orb";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { CHAIN_META } from "@/lib/chains";
 import { looksLikeEns } from "@/lib/ens";
+import { lookupErrorMessage, preloadInvestigation } from "@/lib/preload";
 import { useSettings } from "@/lib/settings";
 import { ADDRESS_RE, cn } from "@/lib/utils";
+import { ThinkingOrb, type ThinkingPhase } from "./ThinkingOrb";
 
 // The landing spotlight. A zero-size anchor at the stage centre, where the
 // wordmark sequence lands its orb. Stages:
@@ -15,6 +23,11 @@ import { ADDRESS_RE, cn } from "@/lib/utils";
 //                   the orb grows into the send button and slides to the
 //                   field's right edge
 //   field → ready   placeholder, chips and focus arrive last
+// On submit the orb shrinks to a core and blooms into the thinking swirl
+// while the first view loads (at least MIN_THINK). Success: the swirl
+// collapses into its centre and the terminal opens already filled.
+// Failure: after the collapse the orb grows back, the field shakes and the
+// reason shows underneath.
 
 export type SpotlightStage = "hidden" | "orb" | "field" | "ready";
 
@@ -24,8 +37,7 @@ const SIZES = {
   compact: { field: 62, btn: 48, inset: 7 },
 };
 const EASE = [0.22, 1, 0.36, 1] as const;
-const AURORA_GRADIENT =
-  "linear-gradient(to top right, rgb(41 224 163) 0%, rgb(66 158 255) 40%, rgb(140 107 255) 75%, rgb(255 122 199) 100%)";
+const MIN_THINK = 1600;
 
 export function Spotlight({
   stage,
@@ -39,6 +51,9 @@ export function Spotlight({
   const settings = useSettings();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [think, setThink] = useState<ThinkingPhase>("off");
+  const [error, setError] = useState("");
+  const after = useRef<() => void>(() => {});
   const inputRef = useRef<HTMLInputElement>(null);
   const shake = useAnimationControls();
   const compact = fieldW < 480;
@@ -49,6 +64,7 @@ export function Spotlight({
   } = SIZES[compact ? "compact" : "full"];
   const open = stage === "field" || stage === "ready";
   const ready = stage === "ready";
+  const busy = think !== "off";
 
   useEffect(() => {
     if (ready && window.matchMedia("(pointer: fine)").matches) {
@@ -56,27 +72,54 @@ export function Spotlight({
     }
   }, [ready]);
 
-  function submit(e: React.FormEvent) {
+  function shakeField() {
+    // transitions.dev error shake: 8px / 6px segments.
+    void shake.start({
+      x: [0, -8, 8, -6, 6, 0],
+      transition: { duration: 0.4, ease: "easeInOut" },
+    });
+  }
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!ready) return;
+    if (!ready || busy) return;
     const v = query.trim();
     if (!v) {
       inputRef.current?.focus();
       return;
     }
     if (!ADDRESS_RE.test(v) && !looksLikeEns(v)) {
-      // transitions.dev error shake: 8px / 6px segments.
-      void shake.start({
-        x: [0, -8, 8, -6, 6, 0],
-        transition: { duration: 0.4, ease: "easeInOut" },
-      });
+      shakeField();
       inputRef.current?.focus();
       return;
     }
-    void navigate({
-      to: "/investigate/$chain/$target",
-      params: { chain: settings.chain, target: v },
-    });
+    const chain = settings.chain;
+    setError("");
+    setThink("think");
+    const started = performance.now();
+    const hold = () =>
+      new Promise((r) =>
+        setTimeout(r, Math.max(0, MIN_THINK - (performance.now() - started))),
+      );
+    try {
+      await preloadInvestigation(chain, v);
+      await hold();
+      after.current = () =>
+        void navigate({
+          to: "/investigate/$chain/$target",
+          params: { chain, target: v },
+        });
+      setThink("in");
+    } catch (err) {
+      await hold();
+      after.current = () => {
+        setThink("off");
+        setError(lookupErrorMessage(err));
+        shakeField();
+        inputRef.current?.focus();
+      };
+      setThink("back");
+    }
   }
 
   const orbBox = (d: number, x = -d / 2) => ({
@@ -114,8 +157,11 @@ export function Spotlight({
           <motion.input
             ref={inputRef}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            disabled={!ready}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              if (error) setError("");
+            }}
+            disabled={!ready || busy}
             placeholder={
               compact
                 ? "Wallet address or ENS name"
@@ -129,7 +175,7 @@ export function Spotlight({
             animate={{ opacity: ready ? 1 : 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
             className={cn(
-              "absolute inset-y-0 left-0 w-full bg-transparent text-ink outline-none placeholder:text-faint",
+              "absolute inset-y-0 left-0 w-full bg-transparent text-ink transition-colors duration-300 outline-none placeholder:text-faint disabled:text-ink/45",
               compact
                 ? "pl-5 text-[16px]"
                 : "pl-8 text-[18px] tracking-[-0.01em]",
@@ -157,20 +203,29 @@ export function Spotlight({
                     opacity: 1,
                   }
           }
-          whileHover={ready ? { scale: 1.04 } : undefined}
-          whileTap={ready ? { scale: 0.96 } : undefined}
+          whileHover={ready && !busy ? { scale: 1.04 } : undefined}
+          whileTap={ready && !busy ? { scale: 0.96 } : undefined}
           transition={
             stage === "orb"
               ? { duration: 0.75, ease: [0.16, 1, 0.3, 1] }
               : { duration: 0.9, ease: EASE }
           }
         >
-          <OrbFace />
+          {/* While thinking, the canvas draws the orb (identically) and
+              morphs it; the face here steps aside without a fade. */}
+          <OrbFace solid={!busy} shadow={!busy} />
           <motion.span
             className="absolute inset-0 flex items-center justify-center text-white"
             initial={false}
-            animate={{ opacity: open ? 1 : 0, scale: open ? 1 : 0.6 }}
-            transition={{ duration: 0.45, ease: EASE, delay: open ? 0.35 : 0 }}
+            animate={{
+              opacity: open && !busy ? 1 : 0,
+              scale: open && !busy ? 1 : 0.6,
+            }}
+            transition={{
+              duration: busy ? 0.15 : 0.45,
+              ease: EASE,
+              delay: open && !busy ? 0.3 : 0,
+            }}
           >
             <ArrowRight
               className="size-[22px] drop-shadow-[0_1px_2px_rgb(11_13_18/0.25)]"
@@ -178,7 +233,41 @@ export function Spotlight({
             />
           </motion.span>
         </motion.button>
+
+        {/* Thinking swirl, centred on the send orb. */}
+        <div
+          className="absolute top-0"
+          style={{ left: fieldW / 2 - INSET - BTN / 2 }}
+        >
+          <ThinkingOrb
+            phase={think}
+            orbD={BTN}
+            maxD={FIELD_H}
+            onCollapsed={() => after.current()}
+          />
+        </div>
       </motion.form>
+
+      {/* Why a lookup failed, under the chips. */}
+      <div
+        className="absolute text-center"
+        style={{ left: -fieldW / 2, top: FIELD_H / 2 + 60, width: fieldW }}
+        aria-live="polite"
+      >
+        <AnimatePresence>
+          {error && (
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: EASE }}
+              className="text-[13px] text-verified/85"
+            >
+              {error}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Chips: chain and model badges left, settings right. */}
       <div
@@ -247,24 +336,52 @@ function Chip({
   );
 }
 
-// The aurora orb in HTML: cast shadow, coloured glow, a slowly turning
-// gradient body, lower shade and top-left light. Matches the SVG orb.
-function OrbFace() {
+// The orb in HTML, matching the SVG orb and the thinking canvas (shared
+// palette in brand/orb.ts). The cast shadow and halo stay put while the
+// canvas morphs the orb; the face is hidden one frame after the canvas
+// has drawn its identical copy, and shown again the instant it hands back.
+function OrbFace({ solid, shadow }: { solid: boolean; shadow: boolean }) {
   return (
     <span aria-hidden className="absolute inset-0">
-      <span className="absolute inset-x-[14%] -bottom-[18%] h-[22%] rounded-full bg-ink/25 blur-[6px]" />
       <span
-        className="absolute inset-0 scale-110 rounded-full opacity-60 blur-[14px]"
-        style={{ background: AURORA_GRADIENT }}
-      />
-      <span className="absolute inset-0 overflow-hidden rounded-full">
+        className="absolute inset-0 transition-opacity duration-300"
+        style={{ opacity: shadow ? 1 : 0 }}
+      >
         <span
-          className="absolute -inset-[22%] animate-[spin_14s_linear_infinite]"
-          style={{ background: AURORA_GRADIENT }}
+          className="absolute inset-x-[14%] -bottom-[18%] h-[22%] rounded-full blur-[6px]"
+          style={{ backgroundColor: `rgb(11 13 18 / ${ORB.shadowAlpha})` }}
+        />
+        <span
+          className="absolute inset-0 scale-105 rounded-full blur-[12px]"
+          style={{ backgroundColor: `rgb(11 13 18 / ${ORB.haloAlpha})` }}
         />
       </span>
-      <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_62%_78%,transparent_60%,rgb(11_13_18/0.16))]" />
-      <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_34%_28%,rgb(255_255_255/0.95),rgb(255_255_255/0.35)_21%,transparent_60%)]" />
+      <span
+        className="absolute inset-0"
+        style={{
+          opacity: solid ? 1 : 0,
+          transition: solid ? "none" : "opacity 0s linear 40ms",
+        }}
+      >
+        <span
+          className="absolute inset-0 rounded-full"
+          style={{ background: ORB_BODY_CSS }}
+        />
+        <span
+          className="absolute inset-0 rounded-full"
+          style={{ background: ORB_BOUNCE_CSS }}
+        />
+        <span
+          className="absolute inset-0 rounded-full"
+          style={{ background: ORB_SPEC_CSS }}
+        />
+        <span
+          className="absolute inset-0 rounded-full"
+          style={{
+            boxShadow: `inset 0 0 0 1px rgb(255 255 255 / ${ORB.rimAlpha})`,
+          }}
+        />
+      </span>
     </span>
   );
 }
