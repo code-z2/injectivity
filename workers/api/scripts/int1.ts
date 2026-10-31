@@ -1,89 +1,15 @@
 // INT-1: end-to-end investigation loop over pinned fixtures.
 // seed -> lookup -> trace -> screen -> explain -> export.
 // Offline by default (no keys in env): explain asserts the 401 BYO-key gate;
-// set INT1_LIVE=1 with MODEL_API_KEY (+ALCHEMY_API_KEY) to run live explain.
+// set INT1_LIVE=1 with MODEL_API_KEY to run the live explain pass.
 // Export/PDF is INFRA-2 and reported pending, not failed.
 // Run: bun run int1
-import { Database } from 'bun:sqlite';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createApp } from '@/app';
+import { FIX, get as tget, lo, makeTestEnv } from '../test/harness';
 
-const DIR = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(DIR, '..');
-
-// Pinned fixtures: one sanctioned, one exploit-linked, one clean.
-const FIX = {
-  sanctioned: {
-    address: '0x0330070FD38Ec3bB94F58FA55D40368271E9e54A',
-    chain: 'ethereum',
-    list: 'OFAC SDN',
-    role: 'sanctioned',
-  },
-  exploit: {
-    address: '0x8B1b6c9A6DB1304000412dd21Ae6A70a82d60D3b',
-    chain: 'ethereum',
-    list: 'exploit',
-    role: 'attacker',
-  },
-  clean: {
-    address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-    chain: 'ethereum',
-  },
-  // Synthetic 2-hop bridge: sanctioned -> MID -> exploit. Asserted label-free
-  // before wiring, so the screen step proves the verified/inferred split.
-  mid: { address: '0x0000000000000000000000000000000000000002', chain: 'ethereum' },
-} as const;
-
-// In-memory DB from the committed schema + seed: loop never touches real D1.
-const db = new Database(':memory:');
-db.exec(readFileSync(join(ROOT, 'sql', 'schema.sql'), 'utf8'));
-db.exec(readFileSync(join(ROOT, 'sql', 'seed.sql'), 'utf8'));
-
-// Minimal D1 stub over node:sqlite.
-const DB = {
-  prepare(sql: string) {
-    const stmt = db.prepare(sql);
-    return {
-      bind(...p: unknown[]) {
-        return {
-          async all() {
-            return { results: stmt.all(...(p as [])) };
-          },
-          async first() {
-            return stmt.get(...(p as [])) ?? null;
-          },
-          async run() {
-            return { success: true };
-          },
-        };
-      },
-    };
-  },
-  async batch(stmts: { run(): Promise<unknown> }[]) {
-    for (const s of stmts) await s.run();
-    return [];
-  },
-};
-
-// Offline proof: any live Alchemy call throws loudly instead of hitting net.
-const offlineAlchemy = new Proxy(
-  {},
-  {
-    get: () => () => {
-      throw new Error('INT-1 offline: live Alchemy call attempted');
-    },
-  },
-);
-
-const app = createApp({ alchemy: offlineAlchemy as never });
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const env = { DB } as any;
+const { app, env, db } = makeTestEnv();
 
 async function get(path: string) {
-  const res = await app.fetch(new Request(`http://int1${path}`), env);
-  return { status: res.status, body: (await res.json()) as Record<string, unknown> };
+  return tget(app, env, path);
 }
 
 async function post(path: string, json: unknown, headers: Record<string, string> = {}) {
@@ -103,8 +29,6 @@ function check(name: string, ok: boolean, detail = '') {
   results.push([name, ok, detail]);
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}${detail ? ` — ${detail}` : ''}`);
 }
-
-const lo = (s: string) => s.toLowerCase();
 
 // Wire the 2-hop fixture graph (lowercase, matching store normalization).
 for (const [hash, from, to] of [

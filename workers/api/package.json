@@ -15,6 +15,7 @@
     "format:check": "prettier --check .",
     "gen:seed": "bun scripts/make_seed.ts",
     "int1": "bun scripts/int1.ts",
+    "test": "bun test",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "migrate": "wrangler d1 execute intel-terminal --local --file=./sql/schema.sql",

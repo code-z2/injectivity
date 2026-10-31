@@ -494,3 +494,9 @@ Living record of what was built. Update on every completed item.
 
 ## 2026-10-31 — INT-1 typecheck fix (`bun-types`)
 - `bun run check` failed on `bun:sqlite` import (TS2307). Fixed with `bun-types` dev dep + `"bun-types"` in tsconfig `types` (note: entry is the package name `bun-types`, not `bun`). Check + format + `bun run int1` all green after.
+
+## 2026-10-31 — TST-1 contract + regression suite (15/15 green)
+- **What:** `workers/api/test/` with `bun test` (`bun run test`): `trace.test.ts` (depth>2 rejected, 2-hop offline path, empty-cache 502, bad chain), `risk.test.ts` (exact→verified, R1→inferred with `via`, clean→none, inferred never in `labels`), `transfers.test.ts` (fresh hit, stale+keyless, TTL override, empty cache), `fixtures.test.ts` (3 pinned fixtures).
+- **How:** New shared `test/harness.ts` (`makeTestEnv`: in-memory DB from committed schema+seed, D1 stub, throwing offline Alchemy); `scripts/int1.ts` refactored onto it — one seam, still 8/8. No live keys anywhere: the throwing stub makes a live leak fail loudly, satisfying "no live-key tests in CI".
+- **Why:** DESIGN.md quality gate before wiring the INT-1 loop closed; runtime-native `bun test` adds no framework. tsconfig `include` extended to `test/**/*.ts`.
+- **Importance:** First maintained suite; fixtures now have a regression net for TST-1/INT-1/INFRA-2 work. Remaining: INFRA-2 PDF, INT-1 live pass.
