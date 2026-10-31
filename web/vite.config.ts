@@ -7,7 +7,10 @@ const rootDir = new URL(".", import.meta.url).pathname;
 export default defineConfig({
   plugins: [
     stylex.vite({
-      unstable_moduleResolution: { type: "experimental_crossFileParsing", rootDir },
+      unstable_moduleResolution: {
+        type: "experimental_crossFileParsing",
+        rootDir,
+      },
     }),
     vue(),
   ],

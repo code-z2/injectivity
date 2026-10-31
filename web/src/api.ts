@@ -66,6 +66,85 @@ export interface TransfersPage {
   cached: boolean;
 }
 
+export interface TraceNode {
+  address: string;
+  depth: number;
+  labels: Label[];
+}
+
+export interface TraceEdge {
+  from: string;
+  to: string;
+  hash: string;
+  asset: string;
+  value: string;
+  blockNumber: number;
+  hop: number;
+  dir: "out" | "in";
+}
+
+export interface SharedCounterparty {
+  address: string;
+  labels: Label[];
+  via: string[];
+}
+
+export interface TraceResult {
+  nodes: TraceNode[];
+  edges: TraceEdge[];
+  pathsOut: string[][];
+  pathsIn: string[][];
+  shared: SharedCounterparty[];
+  pathsTruncated: boolean;
+  stats: { expansions: number; liveCalls: number; cacheHits: number };
+  live: boolean;
+  cached: boolean;
+}
+
+export type TraceDirection = "in" | "out" | "both";
+
+export function fetchTrace(
+  chain: string,
+  address: string,
+  direction: TraceDirection,
+  depth: 1 | 2,
+  fanout: number,
+): Promise<TraceResult> {
+  const q = `direction=${direction}&depth=${depth}&fanout=${fanout}`;
+  return get<TraceResult>(`/v1/trace/${chain}/${address}?${q}`);
+}
+
+export interface Finding {
+  claim: string;
+  verdict: "verified" | "inferred";
+  evidence: { txHashes: string[]; listRefs: string[] };
+  confidence: "high" | "medium" | "low";
+}
+
+export interface IntelReport {
+  summary: string;
+  findings: Finding[];
+  uncertainty: string[];
+  nextChecks: string[];
+}
+
+export interface StoredReport {
+  id: number;
+  title: string;
+  created_at: string;
+  address: string | null;
+  chain: string | null;
+  report: IntelReport;
+}
+
+export function fetchReport(id: number): Promise<StoredReport> {
+  return get<StoredReport>(`/v1/reports/${id}`);
+}
+
+export function reportPdfUrl(id: number): string {
+  return `${BASE}/v1/reports/${id}?format=pdf`;
+}
+
 export interface ReportSummary {
   summary: string;
   verdictCounts: Record<"verified" | "inferred", number>;

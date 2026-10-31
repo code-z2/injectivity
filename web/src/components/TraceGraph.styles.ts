@@ -1,0 +1,91 @@
+import * as stylex from "@stylexjs/stylex";
+
+export const styles = stylex.create({
+  box: {
+    marginTop: 16,
+  },
+  head: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: 12,
+    marginBottom: 12,
+  },
+  title: {
+    color: "var(--text)",
+    fontSize: 15,
+    fontWeight: 600,
+    margin: 0,
+  },
+  controls: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+  select: {
+    backgroundColor: "var(--bg)",
+    color: "var(--text)",
+    borderColor: "var(--panel-edge)",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: 6,
+    padding: "6px 8px",
+    fontSize: 13,
+  },
+  button: {
+    backgroundColor: "var(--accent)",
+    color: "#0a0e12",
+    borderStyle: "none",
+    borderRadius: 6,
+    padding: "7px 14px",
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+  canvas: {
+    height: 420,
+    borderColor: "var(--panel-edge)",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: 8,
+    backgroundColor: "var(--bg)",
+  },
+  meta: {
+    color: "var(--muted)",
+    fontSize: 12,
+    margin: "8px 0 0",
+  },
+  status: {
+    color: "var(--muted)",
+    fontSize: 13,
+    margin: "12px 0 0",
+  },
+  error: {
+    color: "var(--verified)",
+    fontSize: 13,
+    margin: "12px 0 0",
+  },
+  detail: {
+    marginTop: 12,
+    padding: "10px 12px",
+    borderColor: "var(--panel-edge)",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: 8,
+    fontSize: 13,
+    color: "var(--text)",
+  },
+  link: {
+    color: "var(--accent)",
+  },
+  tag: {
+    display: "inline-block",
+    borderRadius: 4,
+    padding: "1px 6px",
+    fontSize: 11,
+    fontWeight: 700,
+    marginRight: 8,
+  },
+});

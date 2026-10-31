@@ -35,8 +35,13 @@
         >
       </p>
     </div>
+    <ReportView
+      v-if="result && result.reportId !== null"
+      :report-id="result.reportId"
+      :chain="props.chain"
+    />
     <p v-else-if="!running" v-bind="stylex.attrs(styles.hint)">
-      Full findings render in the risk panel (UI-3).
+      Findings, uncertainty, and the PDF export render here.
     </p>
   </div>
 </template>
@@ -46,6 +51,7 @@ import * as stylex from "@stylexjs/stylex";
 import { styles } from "./InvestigatePanel.styles";
 import { ref, watch } from "vue";
 import { runInvestigation, type ReportSummary } from "../api";
+import ReportView from "./ReportView.vue";
 
 const props = defineProps<{ chain: string; address: string }>();
 

@@ -1,0 +1,95 @@
+import * as stylex from "@stylexjs/stylex";
+
+export const styles = stylex.create({
+  box: {
+    marginTop: 12,
+    borderRadius: 8,
+    borderColor: "var(--panel-edge)",
+    borderWidth: 1,
+    borderStyle: "solid",
+    padding: "12px 14px",
+  },
+  summary: {
+    fontSize: 14,
+    color: "var(--text)",
+    margin: "0 0 10px",
+  },
+  actions: {
+    display: "flex",
+    gap: 8,
+    flexWrap: "wrap",
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "var(--bg)",
+    color: "var(--text)",
+    borderColor: "var(--panel-edge)",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: 6,
+    padding: "6px 12px",
+    fontSize: 13,
+    cursor: "pointer",
+  },
+  link: {
+    color: "var(--accent)",
+    fontSize: 13,
+    alignSelf: "center",
+  },
+  finding: {
+    margin: "10px 0 0",
+    padding: "8px 10px",
+    borderRadius: 6,
+    borderColor: "var(--panel-edge)",
+    borderWidth: 1,
+    borderStyle: "solid",
+  },
+  claim: {
+    fontSize: 13,
+    color: "var(--text)",
+    margin: "0 0 6px",
+  },
+  tag: {
+    display: "inline-block",
+    borderRadius: 4,
+    padding: "1px 6px",
+    fontSize: 11,
+    fontWeight: 700,
+    marginRight: 6,
+  },
+  evidence: {
+    fontSize: 12,
+    color: "var(--muted)",
+    margin: "4px 0 0",
+  },
+  list: {
+    fontSize: 13,
+    color: "var(--muted)",
+    margin: "6px 0 0",
+    paddingLeft: 18,
+  },
+  head: {
+    fontSize: 12,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    color: "var(--faint)",
+    margin: "12px 0 0",
+  },
+  status: {
+    fontSize: 13,
+    color: "var(--muted)",
+  },
+  error: {
+    fontSize: 13,
+    color: "var(--verified)",
+  },
+  savedRow: {
+    display: "flex",
+    gap: 8,
+    alignItems: "center",
+    fontSize: 13,
+    color: "var(--text)",
+    margin: "6px 0 0",
+  },
+});

@@ -48,6 +48,11 @@
           </span>
         </div>
 
+        <RiskPanel
+          :matches="intel.risk.matches"
+          :screened="intel.risk.screened"
+        />
+
         <div v-if="intel.balances" v-bind="stylex.attrs(styles.balances)">
           <span v-bind="stylex.attrs(styles.balance, layout.mono)"
             >{{ nativeSymbol(intel.chain) }}
@@ -75,12 +80,12 @@
         />
       </section>
 
-      <section v-bind="stylex.attrs([layout.panel, styles.graphStub])">
-        <p v-bind="stylex.attrs(styles.stubTitle)">Mesh graph</p>
-        <p v-bind="stylex.attrs(styles.stubText)">
-          Wallet mesh arrives in UI-2. The trace engine behind it is live.
-        </p>
-      </section>
+      <TraceGraph
+        v-if="intel"
+        :key="`graph-${intel.address}`"
+        :chain="intel.chain"
+        :address="intel.address"
+      />
     </div>
   </div>
 </template>
@@ -94,7 +99,9 @@ import { looksLikeEns, resolveEns } from "./ens";
 import HistoryTable from "./components/HistoryTable.vue";
 import InvestigatePanel from "./components/InvestigatePanel.vue";
 import RiskBadge from "./components/RiskBadge.vue";
+import RiskPanel from "./components/RiskPanel.vue";
 import SearchBar from "./components/SearchBar.vue";
+import TraceGraph from "./components/TraceGraph.vue";
 
 type Phase = "idle" | "resolving" | "loading" | "ready" | "error";
 

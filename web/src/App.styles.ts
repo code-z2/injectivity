@@ -58,14 +58,4 @@ export const styles = stylex.create({
     letterSpacing: 1.5,
     margin: "22px 0 6px",
   },
-  graphStub: { marginTop: 16 },
-  stubTitle: {
-    fontSize: 13,
-    fontWeight: 700,
-    color: "var(--faint)",
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-    margin: "0 0 6px",
-  },
-  stubText: { color: "var(--muted)", fontSize: 13, margin: 0 },
 });
