@@ -180,9 +180,13 @@ export async function runInvestigation(
   address: string,
   modelKey: string,
 ): Promise<ReportSummary> {
+  // BYO key is optional: sent only when provided, otherwise the API falls
+  // back to its configured key (401 only when neither exists).
+  const headers: Record<string, string> = { "content-type": "application/json" };
+  if (modelKey.trim()) headers["x-model-key"] = modelKey.trim();
   const res = await fetch(`${BASE}/v1/investigate`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-model-key": modelKey },
+    headers,
     body: JSON.stringify({
       chain,
       address,

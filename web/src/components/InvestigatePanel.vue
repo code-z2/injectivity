@@ -5,12 +5,12 @@
         v-model="key"
         type="password"
         v-bind="stylex.attrs(styles.key)"
-        placeholder="Muse key (X-Model-Key, stored only in this browser)"
+        placeholder="Optional Muse key override (stored only in this browser)"
         autocomplete="off"
       />
       <button
         v-bind="stylex.attrs(styles.run)"
-        :disabled="running || !key.trim()"
+        :disabled="running"
         @click="run"
       >
         {{ running ? "Investigating…" : "Investigate" }}

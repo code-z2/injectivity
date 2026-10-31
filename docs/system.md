@@ -523,3 +523,6 @@ Living record of what was built. Update on every completed item.
 - **How:** `wrangler d1 create intel-terminal` (uuid 36e5e5b8…; wired into `wrangler.toml`, top-level stray `migrations_dir` removed), schema + seed applied remote (866 risk rows verified), `ALCHEMY_API_KEY` + `MODEL_API_KEY` set from `.dev.vars`, `wrangler deploy` -> https://intel-terminal-api.anyaogupeter601.workers.dev, web built with `VITE_API_BASE` pinned to it, `pages project create` + `pages deploy` -> https://intel-terminal.pages.dev.
 - **Bumps:** schema upload failed once on wrangler's own FileHandle GC bug — retry passed (atomic, DB untouched); `pages deploy` cannot create a project in one step — explicit `project create` first.
 - **Verified live:** `/health` 200, OFAC lookup `verified` + `live:true`, KelpDAO trace `live:true` with real nodes, production Pages 200 serving the app shell with the prod API baked in.
+
+## 2026-10-31 — BYO key made truly optional in UI
+- User correction: `X-Model-Key` is fallback-only, yet the Investigate button stayed disabled without one. Fixed: button gates on `running` only; header sent only when the field is non-empty; placeholder now reads as an override. API fallback (env `MODEL_API_KEY`, already set remotely) covers the empty case; 401 only when neither exists. Rebuilt + redeployed to Pages.
