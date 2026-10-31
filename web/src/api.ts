@@ -179,10 +179,13 @@ export async function runInvestigation(
   chain: string,
   address: string,
   modelKey: string,
+  opts: { model?: string; effort?: "low" | "medium" | "high" } = {},
 ): Promise<ReportSummary> {
   // BYO key is optional: sent only when provided, otherwise the API falls
   // back to its configured key (401 only when neither exists).
-  const headers: Record<string, string> = { "content-type": "application/json" };
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+  };
   if (modelKey.trim()) headers["x-model-key"] = modelKey.trim();
   const res = await fetch(`${BASE}/v1/investigate`, {
     method: "POST",
@@ -193,6 +196,8 @@ export async function runInvestigation(
       direction: "both",
       depth: 2,
       fanout: 25,
+      ...(opts.model ? { model: opts.model } : {}),
+      ...(opts.effort ? { reasoningEffort: opts.effort } : {}),
     }),
   });
   if (res.status === 401) throw new Error("missing-model-key");

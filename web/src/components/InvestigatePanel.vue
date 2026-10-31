@@ -51,17 +51,19 @@ import * as stylex from "@stylexjs/stylex";
 import { styles } from "./InvestigatePanel.styles";
 import { ref, watch } from "vue";
 import { runInvestigation, type ReportSummary } from "../api";
+import { loadSettings, saveSettings } from "../settings";
 import ReportView from "./ReportView.vue";
 
 const props = defineProps<{ chain: string; address: string }>();
 
-const KEY_SLOT = "intel-model-key";
-const key = ref<string>(localStorage.getItem(KEY_SLOT) ?? "");
+// One settings source: the panel field mirrors the Settings-menu key;
+// model name and reasoning effort come from that same store.
+const key = ref<string>(loadSettings().modelKey);
 const running = ref(false);
 const error = ref("");
 const result = ref<ReportSummary | null>(null);
 
-watch(key, (v) => localStorage.setItem(KEY_SLOT, v));
+watch(key, (v) => saveSettings({ ...loadSettings(), modelKey: v }));
 watch(
   () => props.address,
   () => {
@@ -75,10 +77,12 @@ async function run(): Promise<void> {
   error.value = "";
   result.value = null;
   try {
+    const s = loadSettings();
     result.value = await runInvestigation(
       props.chain,
       props.address,
       key.value.trim(),
+      { model: s.model || undefined, effort: s.effort },
     );
   } catch (e) {
     error.value =

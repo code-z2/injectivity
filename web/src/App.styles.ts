@@ -20,6 +20,15 @@ export const layout = stylex.create({
 });
 
 export const styles = stylex.create({
+  back: {
+    backgroundColor: "transparent",
+    color: "var(--accent-deep)",
+    border: "none",
+    padding: "0 0 12px",
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer",
+  },
   head: { marginBottom: 24 },
   title: {
     fontSize: 28,

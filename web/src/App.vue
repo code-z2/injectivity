@@ -1,6 +1,11 @@
 <template>
-  <div v-bind="stylex.attrs(layout.page)">
+  <LandingConsole v-if="view === 'console'" @search="fromConsole" />
+  <div v-else v-bind="stylex.attrs(layout.page)" class="vt-enter-deep">
     <div v-bind="stylex.attrs(layout.wrap)">
+      <button v-bind="stylex.attrs(styles.back)" @click="view = 'console'">
+        ← New investigation
+      </button>
+
       <header v-bind="stylex.attrs(styles.head)">
         <h1 v-bind="stylex.attrs(styles.title)">Intel Terminal</h1>
         <p v-bind="stylex.attrs(styles.sub)">
@@ -97,6 +102,7 @@ import { ref } from "vue";
 import { fetchIntel, fetchTransfers, type Intel, type Transfer } from "./api";
 import { looksLikeEns, resolveEns } from "./ens";
 import HistoryTable from "./components/HistoryTable.vue";
+import LandingConsole from "./components/LandingConsole.vue";
 import InvestigatePanel from "./components/InvestigatePanel.vue";
 import RiskBadge from "./components/RiskBadge.vue";
 import RiskPanel from "./components/RiskPanel.vue";
@@ -105,7 +111,13 @@ import TraceGraph from "./components/TraceGraph.vue";
 
 type Phase = "idle" | "resolving" | "loading" | "ready" | "error";
 
+const view = ref<"console" | "terminal">("console");
 const phase = ref<Phase>("idle");
+
+function fromConsole(query: string, chain: string): void {
+  view.value = "terminal";
+  void inspect(query, chain);
+}
 const error = ref("");
 const intel = ref<Intel | null>(null);
 const transfers = ref<Transfer[]>([]);
