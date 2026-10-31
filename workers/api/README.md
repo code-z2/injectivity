@@ -49,8 +49,8 @@ attacker address returns its labels with `live: false`.
 
 ```bash
 bunx wrangler d1 create intel-terminal   # put the id in wrangler.toml
-bunx wrangler d1 execute intel-terminal --remote --file=./schema.sql
-bunx wrangler d1 execute intel-terminal --remote --file=./seed.sql
+bunx wrangler d1 execute intel-terminal --remote --file=./sql/schema.sql
+bunx wrangler d1 execute intel-terminal --remote --file=./sql/seed.sql
 bunx wrangler secret put ALCHEMY_API_KEY
 bun run deploy
 ```

@@ -382,3 +382,10 @@ Living record of what was built. Update on every completed item.
 - **Why:** Single toolchain, faster installs, one lockfile per package; keeps generated/secret files out of history going forward.
 - **Importance:** Prevents a repeat of the 3,106-file node_modules commit; deploy path (`bun run deploy`) matches local dev.
 - **Metadata:** hygiene changes staged but NOT committed — commit pending explicit user approval.
+
+## 2026-10-31 — SQL consolidated to workers/api/sql/
+- **What:** `schema.sql` + `seed.sql` moved to `workers/api/sql/` (`git mv`, renames staged). References updated: `package.json` migrate/seed scripts, `scripts/make_seed.py` output path, README deploy commands. `migrations/` deliberately left separate.
+- **How:** One `git mv` per file with `ls` verification between steps; regenerated seed via `make_seed.py` (123 OFAC + 752 exploit rows, byte-identical content at new path); re-ran offline harness 8/8 green.
+- **Why:** Single home for SQL artifacts. `migrations/` stays apart because wrangler auto-applies everything in `migrations_dir` on deploy — seed INSERTs must never become a migration.
+- **Importance:** Keeps deploy (`migrations/`) vs dev/seed (`sql/`) concerns from mixing; next reader finds all SQL in one place.
+- **Metadata:** safe point `2a8fcc3` (clean tree before moves); commit pending.

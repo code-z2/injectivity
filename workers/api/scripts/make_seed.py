@@ -39,5 +39,5 @@ out.append(f"INSERT OR REPLACE INTO seed_versions VALUES ('OFAC SDN',{q(ofac_v)}
 out.append(f"INSERT OR REPLACE INTO seed_versions VALUES ('exploit',{q(ex_v)},{q(ex_v)},{len(rows_ex)});")
 out.extend(rows_ofac)
 out.extend(rows_ex)
-open(R + '/workers/api/seed.sql', 'w').write('\n'.join(out) + '\n')
+open(R + '/workers/api/sql/seed.sql', 'w').write('\n'.join(out) + '\n')
 print(f'seed.sql: {len(rows_ofac)} ofac + {len(rows_ex)} exploit rows')
