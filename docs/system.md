@@ -526,3 +526,8 @@ Living record of what was built. Update on every completed item.
 
 ## 2026-10-31 — BYO key made truly optional in UI
 - User correction: `X-Model-Key` is fallback-only, yet the Investigate button stayed disabled without one. Fixed: button gates on `running` only; header sent only when the field is non-empty; placeholder now reads as an override. API fallback (env `MODEL_API_KEY`, already set remotely) covers the empty case; 401 only when neither exists. Rebuilt + redeployed to Pages.
+
+## 2026-11-01 — INT-1 live pass closed (production, no key header)
+- **What:** Full loop proven against production with no `X-Model-Key` header: investigate (KelpDAO hacker, depth 1) -> 200, 4 findings (1 verified/high exact exploit match, 2 inferred fund-flow, 0 stripped) -> report #1 -> PDF export 200 (6,777 bytes).
+- **How:** Server fallback to env `MODEL_API_KEY` covered the missing header end to end. Headless browser verification remains impossible in this sandbox (Chromium SIGABRT/Mach denial on both headless-shell and full builds, retried); substituted with bundle proof — the deployed Pages asset contains the new "Optional Muse key override" placeholder — plus user eyes for the button state.
+- **Importance:** INT-1 done-when is now fully met (offline 9/9 + live + PDF sections). Sequence remaining: trace-symptom fix (awaiting user detail), visual remake (deferred).
