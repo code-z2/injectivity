@@ -403,3 +403,24 @@ Living record of what was built. Update on every completed item.
 - **Why:** Last Python file in the deploy-adjacent tree; single-language repo (TS + SQL) per the Cloudflare direction — one toolchain, prettier covers the script, typechecker covers it too.
 - **Importance:** Removes the "why is there Python here" question for every future reader; seed regen is now `bun run gen:seed`.
 - **Metadata:** `bun run check`, `format:check`, `gen:seed` (zero-diff regen) all green. Batch NOT committed — pending approval.
+
+## 2026-10-31 — API-2 fund-flow tracing (BFS depth 2)
+- **What:** `GET /v1/trace/:chain/:address` (`src/routes/trace.ts` + `src/stores/trace.ts`, mounted in `app.ts`). BFS forward/backward to depth ≤ 2 (default 2, hard max 2), fanout cap (default 25, max 100, top-value-first, drops reported per address), `minValue`/`asset` filters, `pathsOut`/`pathsIn` serialization, and `shared` counterparty detection (non-source addresses adjacent to 2+ traced nodes, with intermediaries) — in the API per decision, not the UI. Nodes carry seed risk labels. New `expansions(chain,address)` table (`migrations/0002_expansions.sql`, mirrored in `sql/schema.sql`) records completed visits with wideness (`both` covers later `in`/`out`) under the cache TTL.
+- **How:** Reuses `cachedTransfers`/`storeTransfers` per expansion and `riskLabels` per node; injected `AlchemyClient` keeps it offline-testable. Two real bugs found by the harness and fixed: (1) cache rows where the address is only a counterparty falsely marked it explored — fixed with the expansions table; (2) re-fetched known edges consumed fanout slots and starved discoveries — fixed by excluding recorded edges before the cap.
+- **Why:** API-2 unblocks LLM-1 and UI-2; depth fixed at 2 and API-side shared detection per explicit decisions. Cache-first per hop keeps repeat traces at $0.
+- **Importance:** Core investigation primitive: every edge links to a tx hash, every node to seed labels — the exact material the graph, assistant, and PDF report consume.
+- **Metadata:** offline harness now 14 assertions (8 API-1 + 6 API-2: full 7-node/7-edge graph, cache repeat with 0 live calls, fanout drops, minValue pruning, 502 offline-empty, 400 depth cap) — all green. `bun run check` clean. NOT committed — pending approval.
+
+## 2026-10-31 — LIVE proof: API-1 + API-2 on mainnet (Alchemy ethereum enabled)
+- **What:** First live run against real Alchemy (key from local alchemy CLI config, used in-process, never printed). Target: KelpDAO hacker `0x8B1b…60D3b` (ethereum, seeded attacker). Harness `/tmp/live_test.mjs` = production bundle + file-backed sqlite standing in for D1.
+- **How:** `GET /v1/address/...` → `GET .../transfers` → `GET /v1/trace/...?direction=both&depth=2&fanout=5`, all observed over the wire.
+- **Observed:** intel 200 `live:true` labels `["exploit/attacker"]` + real native/token balances; transfers 200 `live:true` 11 rows with real hashes; trace 200 `live:true stale:false` 18 nodes / 20 edges / 11 out-paths / 1 in-path / 5 shared counterparties in 4.7s (6 expansions, 6 live calls — bounded, no runaway); DB persisted 161 transfer rows, 6 expansion records, 1 risk hit.
+- **Why:** "Not completed until proven" — this closes the standing live-verification gap for API-1 and proves API-2 against mainnet on the first attempt.
+- **Importance:** Confirms the cache-first + expansions design works against real fan-out; 5 shared counterparties on a real hacker address is genuine intel output.
+
+## 2026-10-31 — API-3 risk screening (verified vs inferred)
+- **What:** `assessRisk` in `src/stores/risk.ts`, wired into `GET /v1/address/:chain/:address` as a `risk` object (`{ level, matches, screened, source, note? }`). Per settled decisions: intel response extended (no new endpoint), R1 1-hop only, live fill on thin cache when keyed. Exact seed hits → `verified` (`exact`, rule/via null); direct counterparties of verified addresses → `inferred` (`inferred:R1`, rule id + verified address in `via`); otherwise `none` with a note. `labels` carries exact hits only — inferred can never leak into the verified field. Both hit kinds logged to `risk_hits`.
+- **How:** Counterparties from `cachedTransfers('both')`, one live `getTransfers` fill when cache is empty and keyed (rows persisted via `storeTransfers`), then per-counterparty `riskLabels` lookup. Reuses the existing hit-logging path.
+- **Why:** The verified-vs-inferred contract the whole terminal depends on: UI badges, assistant wording, and reports all key off `level` + `match_type`, so a neighbor of an attacker can never render as an attacker.
+- **Importance:** Closes the API surface — intel, tracing, and screening are all live-proven primitives ready for LLM-1 and UI-1.
+- **Metadata:** harness now 18 assertions (+4 API-3: verified shape, cached R1 with labels kept clean + hit logged, none+note on thin cache, keyed live fill persisted) — all green. NOT committed — pending approval.

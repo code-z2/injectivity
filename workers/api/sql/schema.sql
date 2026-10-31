@@ -58,5 +58,12 @@ CREATE TABLE IF NOT EXISTS reports (
   body       TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT ''
 );
+CREATE TABLE IF NOT EXISTS expansions (
+  chain      TEXT NOT NULL,
+  address    TEXT NOT NULL,
+  direction  TEXT NOT NULL,
+  fetched_at TEXT NOT NULL,
+  PRIMARY KEY (chain, address)
+);
 CREATE INDEX IF NOT EXISTS idx_risk_lists_addr ON risk_lists(address);
 CREATE INDEX IF NOT EXISTS idx_transfers_addrs ON transfers(from_addr, to_addr);

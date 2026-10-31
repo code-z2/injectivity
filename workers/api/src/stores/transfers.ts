@@ -11,7 +11,7 @@ export function ttlSeconds(env: Env): number {
   return Number.isFinite(n) && n > 0 ? n : 300;
 }
 
-function fresh(fetchedAt: string, env: Env): boolean {
+export function fresh(fetchedAt: string, env: Env): boolean {
   if (!fetchedAt) return false;
   const age = (Date.now() - Date.parse(fetchedAt)) / 1000;
   return age >= 0 && age < ttlSeconds(env);

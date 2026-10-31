@@ -6,10 +6,16 @@ No key means D1-only responses with `live: false`. No wallet, ever.
 ## Endpoints
 
 - `GET /v1/address/:chain/:address`
-  → `{ address, chain, live, cached, fetched_at, labels, balances }`.
+  → `{ address, chain, live, cached, fetched_at, labels, risk, balances }`.
   `labels` are exact matches from the seeded risk lists
-  (OFAC SDN + exploit attackers/victims). Each label hit is logged
-  to `risk_hits` with list name + version + `exact`.
+  (OFAC SDN + exploit attackers/victims). `risk` is the API-3 assessment:
+  `{ level: verified|inferred|none, matches, screened, source, note? }`.
+  Exact hits are `verified` (`match_type: exact`); 1-hop counterparties of
+  verified addresses are `inferred` (`match_type: inferred:R1`,
+  `rule: R1-direct-counterparty`, verified address in `via`). Inferred never
+  appears in `labels`. Counterparties read cache, or fill live once when
+  keyed; thin cache + no key → `none` with a note, never a guess. Every hit
+  (exact and inferred) is logged to `risk_hits` with list name + version.
 - `GET /v1/address/:chain/:address/transfers?direction=in|out|both&pageKey=`
   → `{ address, chain, live, cached, stale?, fetched_at, transfers, pageKey? }`.
   Fresh D1 rows serve without a live call. A miss (or `pageKey`)
@@ -18,6 +24,13 @@ No key means D1-only responses with `live: false`. No wallet, ever.
   with no cache and no key it answers 502.
 - Validation: `zod` + `@hono/zod-validator`; bad chain/address → `400`
   with field errors (see `src/routes/address.ts`).
+- `GET /v1/trace/:chain/:address?direction=both&depth=2&fanout=25&minValue=&asset=`
+  → `{ nodes, edges, pathsOut, pathsIn, shared, truncatedNodes, stats }`.
+  BFS to depth ≤ 2, cache-first per expansion (an `expansions` table records
+  completed visits — a cached row alone doesn't prove an address was
+  explored). Fanout cap keeps top-value edges, drops reported per address.
+  `shared` lists non-source addresses adjacent to 2+ traced nodes with their
+  intermediaries. Repeat traces serve fully from cache (`live: false`).
 
 ## Layout (mirrors knot relay-proxy)
 

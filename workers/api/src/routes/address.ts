@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { alchemyClient } from '@/alchemy';
 import { chainBase } from '@/constants/chains';
 import { cachedTransfers, nowIso, storeTransfers } from '@/stores/transfers';
-import { recordRiskHit, riskLabels } from '@/stores/risk';
+import { assessRisk } from '@/stores/risk';
 import type { AlchemyClient, Env } from '@/types';
 
 const addressParam = z.object({
@@ -24,7 +24,7 @@ export function createAddressRoutes(client: AlchemyClient = alchemyClient) {
   routes.get('/v1/address/:chain/:address', zValidator('param', addressParam), async (c) => {
     const { chain, address } = c.req.valid('param');
     if (!chainBase(chain)) return c.json({ error: `unsupported chain: ${chain}` }, 400);
-    const labels = await riskLabels(c.env, address);
+    const assessment = await assessRisk(c.env, client, chain, address);
     const live = Boolean(c.env.ALCHEMY_API_KEY);
     let balances: { native: string; tokens: unknown[] } | null = null;
     if (live) {
@@ -38,16 +38,16 @@ export function createAddressRoutes(client: AlchemyClient = alchemyClient) {
         // Live failed: fall through to cached-only response.
       }
     }
-    for (const l of labels) {
-      await recordRiskHit(c.env, address, l.list_name, l.version, 'exact').catch(() => undefined);
-    }
     return c.json({
       address: address.toLowerCase(),
       chain,
       live,
       cached: !live || balances === null,
       fetched_at: nowIso(),
-      labels,
+      labels: assessment.matches
+        .filter((m) => m.match_type === 'exact')
+        .map(({ list_name, role, label, version }) => ({ list_name, role, label, version })),
+      risk: assessment,
       balances,
     });
   });
