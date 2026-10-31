@@ -1,0 +1,27 @@
+{
+  "name": "intel-terminal-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "predev": "rm -rf node_modules/.vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview --port 5199 --strictPort",
+    "check": "vue-tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "viem": "^2.43.7",
+    "vue": "^3.5.22"
+  },
+  "devDependencies": {
+    "@stylexjs/stylex": "^0.19.1",
+    "@stylexjs/unplugin": "^0.19.1",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "prettier": "^3.9.1",
+    "typescript": "^5.9.3",
+    "vite": "^6.3.6",
+    "vue-tsc": "^2.2.12"
+  }
+}

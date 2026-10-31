@@ -7,7 +7,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
-    "types": ["@cloudflare/workers-types/2023-07-01", "node"],
+    "types": ["@cloudflare/workers-types/2023-07-01", "node", "bun-types"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
