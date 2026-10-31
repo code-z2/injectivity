@@ -326,3 +326,45 @@ Living record of what was built. Update on every completed item.
 - Why: superset rebuild (nothing wrongly excluded); losses isolated to early-batch curation.
 - Importance: file untouched; curation partially degraded; new rule adopted (commit safe-point + approval before any mv/rm).
 - Metadata: master 764 rows; recovered holds 7/15, partials 29/71, scoped 21/54; ~350 ledger rows unreviewed (never in original 421); early-batch notes/user-only rows need re-entry from conversation on request.
+
+## 2026-10-31 — Safe-point commit + user rows re-entered
+- What: committed 19bc129 (strict+master+OFAC+INFRA-1+docs). Re-entered WOOFi (victim+tx), Ribbon (6 addrs), Bunni V2 (hub) from conversation verbatim with re-entry provenance tags.
+- How: user-approved commit naming changed files only; fill script asserted address formats.
+- Why: safe point before any further moves; user data restored first.
+- Importance: your 3 rows are back; Payy/mMamo/UXLINK still need your input (below).
+- Metadata: commit 19bc129.
+
+## 2026-10-31 — Manual pile reconciled to 88 + 28 named-lost + scope restored
+- What: separated true manual rows from rebuild artifacts using system.md batch logs as evidence. Re-marked 19 documented scope-outs (CoW Swap, AirDAO, ReHold, Agentic FoF, Kalax, ZEROBASE, Polycule, MetaDragon, MetaSea, LayerSwap, StepHeroNFTs, PlayDapp, Gala, Somesing, Gamee, Remilia, EigenLayer, NoOnes, Triple-A). Tagged 11 known-early rows whose data was lost (Seedify, Demex, 42DAO, BarnBridge, BCE, ChainConnect, Astera.fi, Aethir, Lava, SquidMulticall, Holograph).
+- How: log-evidence cross-check; scope only where row empty + unique + unfiled; no file rows touched; conflicts kept (Garden, Limit Break, zkSync Airdrop, Moonwell Lending — later evidence wins).
+- Why: rebuild mixed 325 unreviewed ledger rows into the pile; the 122 must be membership-accurate for the user's sort.
+- Importance: manual pile now 85 classified (7/12/20/46); 28 named rows unrecoverable from data (list in chat report); ~9 early note-only rows unidentifiable from surviving evidence.
+- Metadata: scoped count 73; unreviewed rebuild rows 295, quarantined out of manual.
+
+## 2026-10-31 — Manual pile finalized at 95; 122 fully accounted
+- What: verified recount (structure-checked): manual 95 = 7 full + 12 attacker-only + 20 victim-only + 56 none. Tagged Polymarket Nov-2025 (logged hacker lost). ZKsync ledger row confirmed same incident via DeFiLlama description, duped out. Axelar/Polyhedra/Aerodrome/Predict Fun scope restored from 25b/25c logs.
+- How: log-evidence cross-check + ledger description check; no file rows touched.
+- Why: close the 122 with evidence, not estimates.
+- Importance: manual pile final and sortable; gap is 27 (4 confirmed-gone + YO ambiguity + ~20 unidentifiable early note-only rows).
+- Metadata: file 271 rows (270 names); master 716; scoped 46; unreviewed 284 quarantined.
+
+## 2026-10-31 — API-1 done: address intelligence Worker (offline-verified)
+- What: workers/api (TS Worker + D1): GET /v1/address/:chain/:addr (balances when keyed, seed labels always) and /transfers (cache-first, Alchemy getAssetTransfers on miss, stale-cache fallback). D1 schema ports INFRA-1 + fetched_at; seed.sql generated from versioned seeds. tsc --noEmit clean.
+- How: esbuild bundle + node:sqlite harness exercising the real handler + real SQL (sandbox blocks loopback listen, so wrangler dev/d1-local can't run here). 7 assertions: listed attacker labels live:false, clean address unlabeled, empty-cache stale response, 400/404 paths, seeded-transfer cache hit, risk-hit logging. 866 risk rows, version pins 123/752.
+- Why: Worker-direct (AI Gateway routes AI providers, not data APIs); cache-first keeps $0 idle and offline usable; no-key mode degrades honestly instead of failing.
+- Importance: UI-1 can build against this response shape now.
+- Metadata: not verified here: live Alchemy calls (no key), wrangler deploy/remote D1 (no account, sandbox listen blocked). node_modules + package-lock untracked, left for commit decision.
+
+## 2026-10-31 — API-1 hardened with alchemy skills; live blocked on key networks
+- What: installed alchemyplatform/skills (global; workspace .agents blocked by sandbox). Applied alchemy-api guidance to Worker: 429/5xx exponential backoff with jitter (4 attempts), base-URL and endpoint usage already matched cheat sheet. Re-verified: tsc clean, offline harness green.
+- How: CLI doctor showed rpc_data complete, but evm gas smoke tests return NETWORK_NOT_ENABLED for eth/base/bnb — key valid, no networks enabled on the app.
+- Why: backoff is mandatory per skill failure-modes; live verification needs a network-enabled key (user dashboard action).
+- Importance: API-1 code is skill-aligned; only live-call proof outstanding.
+- Metadata: needs ALCHEMY_API_KEY with eth-mainnet enabled (minimum) to complete live verification.
+
+## 2026-10-31 — API-1 migrated to Hono, re-verified
+- What: replaced hand-rolled regex router with Hono (cors middleware on /v1/*). Same routes, same status codes, same response shapes.
+- How: npm i hono; rewrote src/index.ts only; alchemy.ts/db.ts untouched. Same esbuild + node:sqlite harness, all 7 assertions green.
+- Why: CORS for the Pages frontend, validator-ready params for API-2/3, hono/rpc typed client for Vue later. Growth migration, not a fix.
+- Importance: UI-1 can call with CORS working; router scales from here.
+- Metadata: contract unchanged (balances key stays `tokens`).

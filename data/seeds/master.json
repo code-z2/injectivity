@@ -31,7 +31,7 @@
     "0x36438165d701c883fd9a03631ee0cdeec35a138153720006ab59264db7e075c1"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs PoC",
    "verification": {}
   },
   {
@@ -53,8 +53,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: non-DeFi scope-out (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -250,14 +250,17 @@
    "bridgeHack": false,
    "defillamaId": null,
    "sources": [
-    "https://api.llama.fi/hacks"
+    "https://api.llama.fi/hacks",
+    "https://www.quadrigainitiative.com/hackfraudscam/mintrisespriceswmrpreentrancypricemanipulationattack.php"
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
+   "victim_addresses": [
+    "0xA0Ba9d82014B33137B195b5753F3BC8Bf15700a3"
+   ],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: attacker + tx never published",
    "verification": {}
   },
   {
@@ -696,8 +699,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Hunt Nov 2026: OUT-OF-SCOPE NFT gaming | Re-marked Nov 2026: 25g out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -821,7 +824,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "Hunt Nov 2026: PARTIAL nothing published (second hunt, same result); revisit on disclosures",
+   "research_notes": "Hunt Nov 2026: PARTIAL nothing published (second hunt, same result); revisit on disclosures Hunt Nov 2026: NOT-FOUND no addrs published",
    "verification": {}
   },
   {
@@ -1203,7 +1206,7 @@
     "0xfab5912f858b3768b7b7d312abcc02b64af7b1e1b62c4f29a2c1a2d1568e9fa2"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: TenArmorAlert + DeFiHackLabs PoC",
    "verification": {}
   },
   {
@@ -1282,7 +1285,7 @@
     "0x957bcfa47657a198b683feb455f7957e8e6d912b5584a5af510f4ff8a41f4f5a"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs; Old BOC entry in seed",
    "verification": {}
   },
   {
@@ -1353,7 +1356,7 @@
     "0xa3f9b46e4ecc1767ec40f3ad880fac793cef5fbd7b1d5bbe4fb670640d4ddc20"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: Quadriga-cited Etherscan tx; dedicated attack-contract unconfirmed",
    "verification": {}
   },
   {
@@ -1376,7 +1379,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -1508,8 +1511,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: scope-out (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -1597,7 +1600,7 @@
     "0x352065378c4a41b77e5b6a1e5b5616cd2886c3e1a2c87ed3db8e5ddddc23823d"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: sigintzero + Blockscout; BSC/Base later waves in seed",
    "verification": {}
   },
   {
@@ -1960,8 +1963,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: no-contract class-out (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -2168,8 +2171,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: no-contract class-out (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -2245,7 +2248,7 @@
     "0x585d8be6a0b07ca2f94cfa1d7542f1a62b0d3af5fab7823cbcf69fb243f271f8"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: helios-tt report",
    "verification": {}
   },
   {
@@ -3058,7 +3061,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND only 0xb58 prefix known, excluded per no-guess",
+   "research_notes": "Hunt Nov 2026: NOT-FOUND only 0xb58 prefix known, excluded per no-guess Hunt Nov 2026: NOT-FOUND only truncated 0xb58 prefix",
    "verification": {}
   },
   {
@@ -3368,7 +3371,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -3787,8 +3790,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: no-contract class-out (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -3891,10 +3894,12 @@
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
+   "victim_addresses": [
+    "0x07C64bd1B23b7C9B0ABf80b8613f58e5B00ED5dD"
+   ],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: attacker + tx unpublished; Wormhole dev-key vector",
    "verification": {}
   },
   {
@@ -3938,8 +3943,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25b out-of-scope (log evidence).",
    "verification": {}
   },
   {
@@ -3955,14 +3960,19 @@
    "bridgeHack": false,
    "defillamaId": "4197",
    "sources": [
-    "https://api.llama.fi/hacks"
+    "https://api.llama.fi/hacks",
+    "https://github.com/SunWeb3Sec/DeFiHackLabs/pull/1239"
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
+   "victim_addresses": [
+    "0xb74749b2213916b1da3b869e41c7c57f1db69393"
+   ],
+   "exploit_txs": [
+    "0xcd6159860783d8d481cc4bf4dceddc88acdca6bb08f6445525b2904cfd75b1da"
+   ],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs; attacker was OOG-reverted, drain by coffeebabe",
    "verification": {}
   },
   {
@@ -3995,7 +4005,7 @@
    ],
    "exploit_txs": [],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: team post-mortem; relay txs unpublished",
    "verification": {}
   },
   {
@@ -4590,7 +4600,7 @@
     "0xb4c89845d95fd721e6931dd223e24e8b78a9de8c3b4428251a36d9213e44c496"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs PR #1231",
    "verification": {}
   },
   {
@@ -4699,7 +4709,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -4751,7 +4761,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -5007,7 +5017,7 @@
     "0x614da880bd46e98131accd9a83917abf3d56dac94caf13ae98eeff504eea3704"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs PoC; BSC only",
    "verification": {}
   },
   {
@@ -5177,7 +5187,7 @@
    ],
    "exploit_txs": [],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: PandaSecurity citing Blockaid/SlowMist; payout tx unpublished",
    "verification": {}
   },
   {
@@ -5194,7 +5204,8 @@
    "defillamaId": null,
    "sources": [
     "https://api.llama.fi/hacks",
-    "https://quadrigainitiative.com/casestudy/autochainglobalcontracthacked.php"
+    "https://quadrigainitiative.com/casestudy/autochainglobalcontracthacked.php",
+    "https://quadrigainitiative.com/cryptocurrencyhackscamfraudwiki/index.php?title=AutoChain_Global_Contract_Hacked"
    ],
    "official_sources": [],
    "hacker_addresses": [],
@@ -5203,7 +5214,7 @@
     "0xe64530857e64e9be1c5ef669ed883770edc6cef005e9464eeb54072ee925ebba"
    ],
    "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND only artifact tx banked; no addrs",
+   "research_notes": "Hunt Nov 2026: NOT-FOUND only artifact tx banked; no addrs Hunt Nov 2026: suspected tx only; explorer bot-walled",
    "verification": {}
   },
   {
@@ -5293,8 +5304,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25f GameFi out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -5618,7 +5629,7 @@
     "0xf42a8fe556d5e4ab59b0b7675ccbcd1425e7e2a6a8e0c9775fc6cd7c48ff55a1"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs PoC + CertiK ground truth",
    "verification": {}
   },
   {
@@ -5657,14 +5668,20 @@
    "bridgeHack": false,
    "defillamaId": null,
    "sources": [
-    "https://api.llama.fi/hacks"
+    "https://api.llama.fi/hacks",
+    "https://hackmd.io/@yesthatdog/oct-24-post-mortem"
    ],
    "official_sources": [],
-   "hacker_addresses": [],
+   "hacker_addresses": [
+    "0x1d8b0Ee375750839567f266FA75f6FBc9D6B977c",
+    "0xf3f521ee74debaa28fd0ea1e8ca2fd8d6c110d8b"
+   ],
    "victim_addresses": [],
-   "exploit_txs": [],
+   "exploit_txs": [
+    "0xb91c4e0debaf0feb1f20c979eebc1282c8024ae299ef5903591badcf1f4938bb"
+   ],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: team post-mortem + QuillAudits; per-pool FeeDistributors unnamed",
    "verification": {}
   },
   {
@@ -5888,7 +5905,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -6057,7 +6074,7 @@
     "0x7cbe0b4349513fed6d03ba8bf9ed708e10e07a501d10b5f344a25ae10595599b"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: sender match via Phalcon; Etherscan-labeled victim",
    "verification": {}
   },
   {
@@ -6644,8 +6661,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25d out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -6884,8 +6901,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Hunt Nov 2026: OUT-OF-SCOPE gaming/NFT, no incident found | Re-marked Nov 2026: 25g out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -6931,7 +6948,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -7011,8 +7028,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "DUP of file row zkSync Airdrop (same Apr-15-2025 incident, ledger-name variant).",
    "verification": {}
   },
   {
@@ -7185,8 +7202,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25c out-of-scope (log evidence).",
    "verification": {}
   },
   {
@@ -7401,7 +7418,7 @@
     "0x40f3bdd0a3a8d0476ae6aa2875dc2ec60b80812e2a394b67a88260df57c65522"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs PoC; attack contract 0xa4fd33f56f35427ecbbb8f9e2ce0d650b9a4dc1 is 39 chars as reported (seed-only); copycat tx in seed",
    "verification": {}
   },
   {
@@ -7722,8 +7739,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25-class: frontend/key theft (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -7770,7 +7787,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND no addrs (private-key breach); revisit",
+   "research_notes": "Hunt Nov 2026: NOT-FOUND no addrs (private-key breach); revisit Hunt Nov 2026: NOT-FOUND no full-length addrs published",
    "verification": {}
   },
   {
@@ -7794,8 +7811,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: scope-out (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -7839,10 +7856,12 @@
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
+   "victim_addresses": [
+    "0x0000000000ca73A6df4C58b84C5B4b847FE8Ff39"
+   ],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: ~242-tx drain; attacker EOA + tx unpublished",
    "verification": {}
   },
   {
@@ -8538,7 +8557,7 @@
     "0xa6aef05387f5b86b1fd563256fc9223f3c22f74292d66ac796d3f08fd311d940"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: team RCA; distinct from Mar-2026 dTRINITY dLEND ethereum incident",
    "verification": {}
   },
   {
@@ -8776,14 +8795,19 @@
    "bridgeHack": false,
    "defillamaId": null,
    "sources": [
-    "https://api.llama.fi/hacks"
+    "https://api.llama.fi/hacks",
+    "https://raw.githubusercontent.com/SunWeb3Sec/DeFiHackLabs/main/src/test/2024-05/EXcommunity_exp.sol"
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
+   "victim_addresses": [
+    "0xb1de93DAe1CDdF429eEc9DB30b78759d17495758"
+   ],
+   "exploit_txs": [
+    "0x5446bf2b57749abdab01813a50ce36246177f3437599f3a56bc1554f596b2c3a"
+   ],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: exploiter EOA unpublished (PoC harness as attacker)",
    "verification": {}
   },
   {
@@ -9078,7 +9102,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -9238,7 +9262,7 @@
     "0x6439d63cc57fb68a32ea8ffd8f02496e8abad67292be94904c0b47a4d14ce90d"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: QuillAudits + txray; truncated helpers in seed",
    "verification": {}
   },
   {
@@ -10107,7 +10131,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -10207,7 +10231,7 @@
     "0x840b0dc64dbb91e8aba524f67189f639a0bc94ee9256c57d79083bb3fd46ec91"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs; copycat label in seed",
    "verification": {}
   },
   {
@@ -10335,7 +10359,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -10427,8 +10451,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Hunt Nov 2026: OUT-OF-SCOPE Munchables-Blast collateral, vault not drained",
    "verification": {}
   },
   {
@@ -11792,7 +11816,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -11904,8 +11928,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25d out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -12297,10 +12321,17 @@
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
+   "victim_addresses": [
+    "0xb5711dAeC960c9487d95bA327c570a7cCE4982c0",
+    "0x1a1e7B7776a03d3def2e969ecd44BAc31bBF2f8f",
+    "0x3f79EA3e682d7eC639d99d42bb9172F94A86a4c2",
+    "0xB78E96750497e319bb6a09a8Dc7c75fE32937ADA",
+    "0xa4aC089B972206021EceB50a494d60B1c74E534e",
+    "0xF2Df028a81682375b27967d6de36ADA049cBDFf7"
+   ],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Oracle + proxies + vault: user labels; roles unconfirmed. | User-provided (re-entered Oct 2026 after rebuild).",
    "verification": {}
   },
   {
@@ -12524,7 +12555,7 @@
     "0x491cf8b2a5753fdbf3096b42e0a16bc109b957dc112d6537b1ed306e483d0744"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: Verichains + team post-mortem",
    "verification": {}
   },
   {
@@ -12708,14 +12739,15 @@
    "bridgeHack": false,
    "defillamaId": null,
    "sources": [
-    "https://api.llama.fi/hacks"
+    "https://api.llama.fi/hacks",
+    "https://cointelegraph.com/news/layerswap-website-hack-100k-loss"
    ],
    "official_sources": [],
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Hunt Nov 2026: OUT-OF-SCOPE GoDaddy DNS hijack | Re-marked Nov 2026: 25g out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -12980,7 +13012,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND second hunt, still nothing (whitehat frontrun); revisit only on new disclosures",
+   "research_notes": "Hunt Nov 2026: NOT-FOUND second hunt, still nothing (whitehat frontrun); revisit only on new disclosures Hunt Nov 2026: NOT-FOUND whitehat frontran, zero net loss, no addrs",
    "verification": {}
   },
   {
@@ -13130,8 +13162,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25b out-of-scope (log evidence).",
    "verification": {}
   },
   {
@@ -13191,7 +13223,7 @@
     "0xcc71a3bb131c73462b0f25533070113a63c85e942a22e18bc945eec184eb5799"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs; 2nd victim in seed",
    "verification": {}
   },
   {
@@ -13215,7 +13247,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: NOT-FOUND no addrs published (v1 addrs are different incident)",
    "verification": {}
   },
   {
@@ -13237,8 +13269,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25b out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -13326,7 +13358,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early row; attacker was banked (log: hacker_only) but lost in Oct-31 rebuild. Treat as manual-none; attacker needs re-source.",
    "verification": {}
   },
   {
@@ -13425,7 +13457,7 @@
     "0x554c9e4067e3bc0201ba06fc2cfeeacd178d7dd9c69f9b211bc661bb11296fde"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: BackwardLabs + Quadriga",
    "verification": {}
   },
   {
@@ -13602,7 +13634,7 @@
     "0x56818a63077f5ba8bfc0bc0877ac33502a5d65cc79dbf5dfaac2a0b8545216a8"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs PR #1273",
    "verification": {}
   },
   {
@@ -13927,8 +13959,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: non-DeFi scope-out (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -13988,14 +14020,19 @@
    "bridgeHack": false,
    "defillamaId": "6216",
    "sources": [
-    "https://api.llama.fi/hacks"
+    "https://api.llama.fi/hacks",
+    "https://paragraph.com/@revertfinance/post\u2011mortem-aerodrome-lend-vault-incident-on-base"
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
+   "victim_addresses": [
+    "0x22CE292d882C7799183949509B011512352454cB"
+   ],
+   "exploit_txs": [
+    "0x10429eaeb479f9149854e4aeb978a35ac02d9688f6e22371712b3878c63a64ab"
+   ],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: attacker EOAs unnamed; 2nd tx in seed",
    "verification": {}
   },
   {
@@ -14141,7 +14178,7 @@
     "0x9b9a6dd05526a8a4b40e5e1a74a25df6ecccae6ee7bf045911ad89a1dd3f0814"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: Verichains",
    "verification": {}
   },
   {
@@ -14318,7 +14355,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -14449,7 +14486,7 @@
     "0x7b8d641d76affcc029fd0e0f06ab81ad675b1da21ef79b82e1343016040ba359"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: evm-hack-registry; attacker contract 0x44d47ec7397cfdaea87f317882f81e58bb92b02 is 39 chars as reported (seed-only); 3 victim proxies, primary reported",
    "verification": {}
   },
   {
@@ -14550,7 +14587,7 @@
     "0xb4c00e8f3ba815b6c70f45026f8794d2c1f079646a89919077688ce60692193f"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: TenArmor/yinhui; router victim per SlowMist/Defimon",
    "verification": {}
   },
   {
@@ -14683,7 +14720,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -15940,7 +15977,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -15963,7 +16000,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -16195,14 +16232,19 @@
    "bridgeHack": false,
    "defillamaId": null,
    "sources": [
-    "https://api.llama.fi/hacks"
+    "https://api.llama.fi/hacks",
+    "https://github.com/backwardlabs/q1-2026/blob/HEAD/test/2026-01/pgnlz/README.md"
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
+   "victim_addresses": [
+    "0x6b923cf1d592e6aa07ea7249d817a843c30ac69e"
+   ],
+   "exploit_txs": [
+    "0xc7270212846136f3d103d1802a30cdaa6f8f280c4bce02240e99806101e08121"
+   ],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: BlockSec/SlowMist; attacker unknown contract",
    "verification": {}
   },
   {
@@ -16257,8 +16299,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25b out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -16320,14 +16362,19 @@
    "bridgeHack": false,
    "defillamaId": null,
    "sources": [
-    "https://api.llama.fi/hacks"
+    "https://api.llama.fi/hacks",
+    "https://olympixai.medium.com/incident-analysis-price-manipulation-exploit-in-citadel-one-afab79e349fd"
    ],
    "official_sources": [],
-   "hacker_addresses": [],
+   "hacker_addresses": [
+    "0xfcf88e5e1314ca3b6be7eed851568834233f8b49"
+   ],
    "victim_addresses": [],
-   "exploit_txs": [],
+   "exploit_txs": [
+    "0xf52a681bc76df1e3a61d9266e3a66c7388ef579d62373feb4fd0991d36006855"
+   ],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: Olympix + Forta #504; Redemption addr unpublished",
    "verification": {}
   },
   {
@@ -16347,10 +16394,14 @@
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
+   "victim_addresses": [
+    "0xeff23b4be1091b53205e35f3afcd9c7182bf3062"
+   ],
+   "exploit_txs": [
+    "0xe80a16678b5008d5be1484ec6e9e77dc6307632030553405863ffb38c1f94266"
+   ],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "User-provided (re-entered Oct 2026 after rebuild).",
    "verification": {}
   },
   {
@@ -16564,7 +16615,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -16597,7 +16648,7 @@
     "0xf13d281d4aa95f1aca457bd17f2531581b0ce918c90905d65934c9e67f6ae0ec"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: Verichains",
    "verification": {}
   },
   {
@@ -16674,7 +16725,7 @@
     "0x03543ef96c26d6c79ff6c24219c686ae6d0eb5453b322e54d3b6a5ce456385e5"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: Verichains",
    "verification": {}
   },
   {
@@ -16745,8 +16796,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: non-DeFi scope-out (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -16791,8 +16842,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25e out-of-scope (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -16815,7 +16866,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -17103,7 +17154,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -17464,7 +17515,7 @@
    ],
    "exploit_txs": [],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: txray RCA; exploit tx hashes unpublished",
    "verification": {}
   },
   {
@@ -17487,7 +17538,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25c/25d-era partial or NOT-FOUND); banked data lost in Oct-31 rebuild. Treat as manual-none.",
    "verification": {}
   },
   {
@@ -17601,7 +17652,7 @@
     "0x96edeeb3d49d7a54c60d227bedce5bf64df5d52effd9fd80334175a9553db3bb"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: evm-hack-registry table",
    "verification": {}
   },
   {
@@ -17683,7 +17734,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -17879,7 +17930,7 @@
    "victim_addresses": [],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "Early-batch row (25/25b/25c-era partial or NOT-FOUND); banked data + notes lost in Oct-31 rebuild. Treat as manual-none; re-hunt only.",
    "verification": {}
   },
   {
@@ -18030,8 +18081,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25-class: frontend/key theft, no victim contract (system.md evidence; markers lost in rebuild).",
    "verification": {}
   },
   {
@@ -18289,7 +18340,7 @@
     "0xb2ca76dfbfe571742b4b66465b777ab1e06988a8632be1631bef9654cc64d169"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: DeFiHackLabs; handler1 reported, handler2 + setup tx in seed",
    "verification": {}
   },
   {
@@ -18335,8 +18386,8 @@
    "hacker_addresses": [],
    "victim_addresses": [],
    "exploit_txs": [],
-   "scope": "",
-   "research_notes": "",
+   "scope": "out",
+   "research_notes": "Re-marked Nov 2026: 25b out-of-scope (log evidence).",
    "verification": {}
   },
   {
@@ -18659,10 +18710,12 @@
    ],
    "official_sources": [],
    "hacker_addresses": [],
-   "victim_addresses": [],
+   "victim_addresses": [
+    "0x000000000049C7bcBCa294E63567b4D21EB765f1"
+   ],
    "exploit_txs": [],
    "scope": "",
-   "research_notes": "",
+   "research_notes": "BuniHub (unichain+ethereum same address); role unconfirmed. | User-provided (re-entered Oct 2026 after rebuild).",
    "verification": {}
   },
   {
@@ -19063,7 +19116,7 @@
     "0x9adbd62355eb72b4ff6c58716a503133672ed9317ab930a4c6aa31c7a1a8f938"
    ],
    "scope": "in",
-   "research_notes": "",
+   "research_notes": "Hunt Nov 2026: evm-hack-registry REVLoans",
    "verification": {}
   },
   {
@@ -19999,1273 +20052,6 @@
     "tier": "team",
     "note": "Official zkSync post-mortem; 3 victims; airdrop distributor exploit on ZKsync Era; kinds unverified"
    }
-  },
-  {
-   "protocol": "AutoChain Global",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://quadrigainitiative.com/cryptocurrencyhackscamfraudwiki/index.php?title=AutoChain_Global_Contract_Hacked"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [
-    "0xe64530857e64e9be1c5ef669ed883770edc6cef005e9464eeb54072ee925ebba"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: suspected tx only; explorer bot-walled",
-   "verification": {}
-  },
-  {
-   "protocol": "WXETA",
-   "date": null,
-   "chain": [
-    "bsc"
-   ],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/SunWeb3Sec/DeFiHackLabs/main/src/test/2024-09/WXETA_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x57ecf40b596274a985967e3f698437ae0a9600a0",
-    "0x11bffb96daa9b0c47fef01401eb089549e87604e"
-   ],
-   "victim_addresses": [
-    "0x05c2dd9cf547c6cccf91245346e6e1bc9926cae7"
-   ],
-   "exploit_txs": [
-    "0x614da880bd46e98131accd9a83917abf3d56dac94caf13ae98eeff504eea3704"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs PoC; BSC only",
-   "verification": {}
-  },
-  {
-   "protocol": "MetaSea",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: OUT-OF-SCOPE gaming/NFT, no incident found",
-   "verification": {}
-  },
-  {
-   "protocol": "SteamSwap",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/stevevip/defihacklabs/main/src/test/2026-06/SteamSwap_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xb2d546547168f61debf0a780210b5591e4dd39a8"
-   ],
-   "victim_addresses": [
-    "0xb7d0a1adafa3e9e8d8e244c20b6277bee17a09b6"
-   ],
-   "exploit_txs": [
-    "0x40f3bdd0a3a8d0476ae6aa2875dc2ec60b80812e2a394b67a88260df57c65522"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs PoC; attack contract 0xa4fd33f56f35427ecbbb8f9e2ce0d650b9a4dc1 is 39 chars as reported (seed-only); copycat tx in seed",
-   "verification": {}
-  },
-  {
-   "protocol": "Secured Finance Lending",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://github.com/SunWeb3Sec/DeFiHackLabs/pull/1239"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [
-    "0xb74749b2213916b1da3b869e41c7c57f1db69393"
-   ],
-   "exploit_txs": [
-    "0xcd6159860783d8d481cc4bf4dceddc88acdca6bb08f6445525b2904cfd75b1da"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs; attacker was OOG-reverted, drain by coffeebabe",
-   "verification": {}
-  },
-  {
-   "protocol": "Huma",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/sanbir/evm-hack-registry/main/2026-05-HumaCreditApprovalBypass_exp/HumaCreditApprovalBypass_exp.md"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x13B44e416e0f66359502E843AF2e1191f1260DaF"
-   ],
-   "victim_addresses": [
-    "0x3EBc1f0644A69c565957EF7cEb5AEafE94Eb6FcE"
-   ],
-   "exploit_txs": [
-    "0x7b8d641d76affcc029fd0e0f06ab81ad675b1da21ef79b82e1343016040ba359"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: evm-hack-registry; attacker contract 0x44d47ec7397cfdaea87f317882f81e58bb92b02 is 39 chars as reported (seed-only); 3 victim proxies, primary reported",
-   "verification": {}
-  },
-  {
-   "protocol": "QuantMaster",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND only truncated 0xb58 prefix",
-   "verification": {}
-  },
-  {
-   "protocol": "PGNLZ",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://github.com/backwardlabs/q1-2026/blob/HEAD/test/2026-01/pgnlz/README.md"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [
-    "0x6b923cf1d592e6aa07ea7249d817a843c30ac69e"
-   ],
-   "exploit_txs": [
-    "0xc7270212846136f3d103d1802a30cdaa6f8f280c4bce02240e99806101e08121"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: BlockSec/SlowMist; attacker unknown contract",
-   "verification": {}
-  },
-  {
-   "protocol": "OPSEC",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND no full-length addrs published",
-   "verification": {}
-  },
-  {
-   "protocol": "LayerSwap",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://cointelegraph.com/news/layerswap-website-hack-100k-loss"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: OUT-OF-SCOPE GoDaddy DNS hijack",
-   "verification": {}
-  },
-  {
-   "protocol": "PRXVT",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://github.com/SunWeb3Sec/DeFiHackLabs/blob/main/src/test/2026-01/PRXVT_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x7407f9bdc4140d5e284ea7de32a9de6037842f45",
-    "0x702980b1ed754c214b79192a4d7c39106f19bce9"
-   ],
-   "victim_addresses": [
-    "0xDAc30a5e2612206E2756836Ed6764EC5817e6Fff"
-   ],
-   "exploit_txs": [
-    "0xf42a8fe556d5e4ab59b0b7675ccbcd1425e7e2a6a8e0c9775fc6cd7c48ff55a1"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs PoC + CertiK ground truth",
-   "verification": {}
-  },
-  {
-   "protocol": "Alkimiya",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://blog.verichains.io/p/alkimiya-hack-analysis"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xF6ffBa5cbF285824000daC0B9431032169672B6e",
-    "0x80bf7db69556d9521c03461978b8fc731dbbd4e4"
-   ],
-   "victim_addresses": [
-    "0xf3f84ce038442ae4c4dcb6a8ca8bacd7f28c9bde"
-   ],
-   "exploit_txs": [
-    "0x9b9a6dd05526a8a4b40e5e1a74a25df6ecccae6ee7bf045911ad89a1dd3f0814"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: Verichains",
-   "verification": {}
-  },
-  {
-   "protocol": "warp.green",
-   "date": null,
-   "chain": [
-    "base"
-   ],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://blog.kuhi.to/warpdotgreen-erc20bridge-post-mortem"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x5D629E63f3BDDfA24A980Eaa17F7Ec4c7bD60BFA"
-   ],
-   "victim_addresses": [
-    "0x8412f06e811b858Ea9edcf81a5E5882dbf70aC96"
-   ],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: team post-mortem; relay txs unpublished",
-   "verification": {}
-  },
-  {
-   "protocol": "Ramses Exchange",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://hackmd.io/@yesthatdog/oct-24-post-mortem"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x1d8b0Ee375750839567f266FA75f6FBc9D6B977c",
-    "0xf3f521ee74debaa28fd0ea1e8ca2fd8d6c110d8b"
-   ],
-   "victim_addresses": [],
-   "exploit_txs": [
-    "0xb91c4e0debaf0feb1f20c979eebc1282c8024ae299ef5903591badcf1f4938bb"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: team post-mortem + QuillAudits; per-pool FeeDistributors unnamed",
-   "verification": {}
-  },
-  {
-   "protocol": "Citadel.one",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://olympixai.medium.com/incident-analysis-price-manipulation-exploit-in-citadel-one-afab79e349fd"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xfcf88e5e1314ca3b6be7eed851568834233f8b49"
-   ],
-   "victim_addresses": [],
-   "exploit_txs": [
-    "0xf52a681bc76df1e3a61d9266e3a66c7388ef579d62373feb4fd0991d36006855"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: Olympix + Forta #504; Redemption addr unpublished",
-   "verification": {}
-  },
-  {
-   "protocol": "WAX Multi-Chain Bridge",
-   "date": null,
-   "chain": [
-    "ethereum"
-   ],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://www.panda-security.xyz/blog/wax-bridge-negative-fee-exploit/"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x01664E199991b2F3fe412c2DE5B9b7A0dcDc5070"
-   ],
-   "victim_addresses": [
-    "0x24b22B031Ae1B5a6b09F9a0FD33613a40e0d70e6"
-   ],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: PandaSecurity citing Blockaid/SlowMist; payout tx unpublished",
-   "verification": {}
-  },
-  {
-   "protocol": "StepHeroNFTs",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: OUT-OF-SCOPE NFT gaming",
-   "verification": {}
-  },
-  {
-   "protocol": "Affine Protocol",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://blog.verichains.io/p/lack-of-validation-in-input-data"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x09f6be2a7d0d2789f01ddfaf04d4eaa94efc0857"
-   ],
-   "victim_addresses": [
-    "0xcd6ca2f0d0c182c5049d9a1f65cde51a706ae142"
-   ],
-   "exploit_txs": [
-    "0x03543ef96c26d6c79ff6c24219c686ae6d0eb5453b322e54d3b6a5ce456385e5"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: Verichains",
-   "verification": {}
-  },
-  {
-   "protocol": "UNCX Network V2",
-   "date": null,
-   "chain": [
-    "ethereum"
-   ],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://sigintzero.com/blog/uncx-vesting-v2-1-49m-share-double-debit"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x78c9b11853e4f183a34c63ffd1924d2319a2f5b3"
-   ],
-   "victim_addresses": [
-    "0xa98f06312b7614523d0f5e725e15fd20fb1b99f5"
-   ],
-   "exploit_txs": [
-    "0x352065378c4a41b77e5b6a1e5b5616cd2886c3e1a2c87ed3db8e5ddddc23823d"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: sigintzero + Blockscout; BSC/Base later waves in seed",
-   "verification": {}
-  },
-  {
-   "protocol": "CheckoutPool",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/SunWeb3Sec/DeFiHackLabs/main/src/test/2026-03/unverified_1304_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x6fF2bE5D0E5B3974a818731E3FF6EEEc8cd9D970",
-    "0x9A5fe6e6A27f7eacE0782b89e6b216849d871E4f"
-   ],
-   "victim_addresses": [
-    "0x1929347E025D4F5F8D6B2Bd2261e2f4EfcAcd215"
-   ],
-   "exploit_txs": [
-    "0x957bcfa47657a198b683feb455f7957e8e6d912b5584a5af510f4ff8a41f4f5a"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs; Old BOC entry in seed",
-   "verification": {}
-  },
-  {
-   "protocol": "BTC24H",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/BackwardLabs/report-public/main/cases/049_btc24h/report.md"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xde0a99fb39e78efd3529e31d78434f7645601163",
-    "0x3cb2452c615007b9ef94d5814765eb48b71ae520"
-   ],
-   "victim_addresses": [
-    "0x968e1c984a431f3d0299563f15d48c395f70f719"
-   ],
-   "exploit_txs": [
-    "0x554c9e4067e3bc0201ba06fc2cfeeacd178d7dd9c69f9b211bc661bb11296fde"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: BackwardLabs + Quadriga",
-   "verification": {}
-  },
-  {
-   "protocol": "Matez",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/SunWeb3Sec/DeFiHackLabs/main/src/test/2024-11/Matez_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xd4f04374385341da7333b82b230cd223143c4d62",
-    "0x0ad02ce1b8eb978fd8dc4abec5bf92dfa81ed705"
-   ],
-   "victim_addresses": [
-    "0x326FB70eF9e70f8f4c38CFbfaF39F960A5C252fa"
-   ],
-   "exploit_txs": [
-    "0x840b0dc64dbb91e8aba524f67189f639a0bc94ee9256c57d79083bb3fd46ec91"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs; copycat label in seed",
-   "verification": {}
-  },
-  {
-   "protocol": "BeatXswap",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/SunWeb3Sec/DeFiHackLabs/main/src/test/2026-09/BeatXswap_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x67B2f08683A735cfE6f6E57fA86909b62218C2a1"
-   ],
-   "victim_addresses": [
-    "0x1e647FAADb05f2124BFCcFC003EDc06D1A90bf5D"
-   ],
-   "exploit_txs": [
-    "0xcc71a3bb131c73462b0f25533070113a63c85e942a22e18bc945eec184eb5799"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs; 2nd victim in seed",
-   "verification": {}
-  },
-  {
-   "protocol": "Spectra Finance",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://blog.verichains.io/p/spectra-protocol-exploit-arbitrary"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x53635bf7b92b9512f6de0eb7450b26d5d1ad9a4c",
-    "0xba8ce86147ded54c0879c9a954f9754a472704aa"
-   ],
-   "victim_addresses": [
-    "0x3d20601ac0ba9cae4564ddf7870825c505b69f1a"
-   ],
-   "exploit_txs": [
-    "0x491cf8b2a5753fdbf3096b42e0a16bc109b957dc112d6537b1ed306e483d0744"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: Verichains + team post-mortem",
-   "verification": {}
-  },
-  {
-   "protocol": "Kipseli",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://github.com/sanbir/evm-hack-registry/blob/HEAD/2026-04-KipseliPropAMM_exp/KipseliPropAMM_exp.md"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x2352a1FcA90182509dCa9c12B2CAd582a38E8b82",
-    "0x74513519689b1fb427747624a4dd87b3849d39cd"
-   ],
-   "victim_addresses": [
-    "0xd35C6717cCa1E04696B694DCb1643Ac3620D2152"
-   ],
-   "exploit_txs": [
-    "0x96edeeb3d49d7a54c60d227bedce5bf64df5d52effd9fd80334175a9553db3bb"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: evm-hack-registry table",
-   "verification": {}
-  },
-  {
-   "protocol": "SmartCredit",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND no addrs published",
-   "verification": {}
-  },
-  {
-   "protocol": "Dream Health Chain",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://github.com/SunWeb3Sec/DeFiHackLabs/pull/1231"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xD3A8D0A9F55cf679fff6F277E49AfC95B49D2B07",
-    "0x226923D34A10f3D54B57b9F4b685E82c6Cba968A"
-   ],
-   "victim_addresses": [
-    "0xe2A047aADbac51b0116Af1cE91eBDAe4B4202094"
-   ],
-   "exploit_txs": [
-    "0xb4c89845d95fd721e6931dd223e24e8b78a9de8c3b4428251a36d9213e44c496"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs PR #1231",
-   "verification": {}
-  },
-  {
-   "protocol": "Wise Lending V2",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND no addrs published (v1 addrs are different incident)",
-   "verification": {}
-  },
-  {
-   "protocol": "MainnetSettler",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://x.com/TenArmorAlert/status/1859416451473604902"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x3A38877312D1125d2391663CBa9f7190953Bf2d9"
-   ],
-   "victim_addresses": [
-    "0x70bf6634eE8Cb27D04478f184b9b8BB13E5f4710"
-   ],
-   "exploit_txs": [
-    "0xfab5912f858b3768b7b7d312abcc02b64af7b1e1b62c4f29a2c1a2d1568e9fa2"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: TenArmorAlert + DeFiHackLabs PoC",
-   "verification": {}
-  },
-  {
-   "protocol": "Custom sAVAX Rebalancer",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: NOT-FOUND whitehat frontran, zero net loss, no addrs",
-   "verification": {}
-  },
-  {
-   "protocol": "Grizzifi",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://github.com/SunWeb3Sec/DeFiHackLabs/blob/main/src/test/2025-08/Grizzifi_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xe2336b08a43f87a4ac8de7707ab7333ba4dbaf7c",
-    "0xEd35746F389177eCD52A16987b2aaC74AA0c1128"
-   ],
-   "victim_addresses": [
-    "0x21ab8943380B752306aBF4D49C203B011A89266B"
-   ],
-   "exploit_txs": [
-    "0x36438165d701c883fd9a03631ee0cdeec35a138153720006ab59264db7e075c1"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs PoC",
-   "verification": {}
-  },
-  {
-   "protocol": "MintRisesPrices",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://www.quadrigainitiative.com/hackfraudscam/mintrisespriceswmrpreentrancypricemanipulationattack.php"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [
-    "0xA0Ba9d82014B33137B195b5753F3BC8Bf15700a3"
-   ],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: attacker + tx never published",
-   "verification": {}
-  },
-  {
-   "protocol": "CoW",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://github.com/zyy0530/txraydefihacklabsevaluation/blob/HEAD/2024-11_CoW/root_cause_report.md"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x00baD13FA32E0000E35B8517E19986B93F000034"
-   ],
-   "victim_addresses": [
-    "0x9008D19f58AAbD9eD0D60971565AA8510560ab41"
-   ],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: txray RCA; exploit tx hashes unpublished",
-   "verification": {}
-  },
-  {
-   "protocol": "dTRINITY",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/dtrinity/sonic-solidity-contracts/HEAD/contracts/dlend/periphery/adapters/RCA.md"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x0a69C298ece97fb50a00ace91c79182184423933"
-   ],
-   "victim_addresses": [
-    "0x9ee939DdC8eaAAc72d3cAE793b12a09D92624E4a"
-   ],
-   "exploit_txs": [
-    "0xa6aef05387f5b86b1fd563256fc9223f3c22f74292d66ac796d3f08fd311d940"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: team RCA; distinct from Mar-2026 dTRINITY dLEND ethereum incident",
-   "verification": {}
-  },
-  {
-   "protocol": "Juice Finance",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: OUT-OF-SCOPE Munchables-Blast collateral, vault not drained",
-   "verification": {}
-  },
-  {
-   "protocol": "Pythia",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://etherscan.io/tx/0xa3f9b46e4ecc1767ec40f3ad880fac793cef5fbd7b1d5bbe4fb670640d4ddc20"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xd861e6F1760d014D6EE6428cF7F7d732563c74c0"
-   ],
-   "victim_addresses": [
-    "0x542533536e314180e1b9f00b2c046f6282eb3647"
-   ],
-   "exploit_txs": [
-    "0xa3f9b46e4ecc1767ec40f3ad880fac793cef5fbd7b1d5bbe4fb670640d4ddc20"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: Quadriga-cited Etherscan tx; dedicated attack-contract unconfirmed",
-   "verification": {}
-  },
-  {
-   "protocol": "Juicebox V3",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/sanbir/evm-hack-registry/HEAD/2026-04-JuiceboxREVLoans_exp/JuiceboxREVLoans_exp.md"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x23245F620d1e910ad76e6B6De4f8284A53C9Ad2d"
-   ],
-   "victim_addresses": [
-    "0x1880D832aa283d05b8eAB68877717E25FbD550Bb"
-   ],
-   "exploit_txs": [
-    "0x9adbd62355eb72b4ff6c58716a503133672ed9317ab930a4c6aa31c7a1a8f938"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: evm-hack-registry REVLoans",
-   "verification": {}
-  },
-  {
-   "protocol": "Nimiq",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/SunWeb3Sec/DeFiHackLabs/main/src/test/2026-09/Nimiq_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x2258491525C21f334c5a2dc22CE55e55023FC45D"
-   ],
-   "victim_addresses": [
-    "0x0cFD862bE942846Cebad797d7c1BC6e47714959b"
-   ],
-   "exploit_txs": [
-    "0xb2ca76dfbfe571742b4b66465b777ab1e06988a8632be1631bef9654cc64d169"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs; handler1 reported, handler2 + setup tx in seed",
-   "verification": {}
-  },
-  {
-   "protocol": "Revert Lend",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://paragraph.com/@revertfinance/post\u2011mortem-aerodrome-lend-vault-incident-on-base"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [
-    "0x22CE292d882C7799183949509B011512352454cB"
-   ],
-   "exploit_txs": [
-    "0x10429eaeb479f9149854e4aeb978a35ac02d9688f6e22371712b3878c63a64ab"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: attacker EOAs unnamed; 2nd tx in seed",
-   "verification": {}
-  },
-  {
-   "protocol": "Bonfire",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://www.rektradar.xyz/web3-daily-exploits-16-sep-2026-bonfire-50k-approval-drain/"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x2b5bf7d9d9dc1eec68f40c6b7a8f197e65f9731a",
-    "0x28E976Ea7b83553d6D1D45CE81334156A2632127"
-   ],
-   "victim_addresses": [
-    "0x17e801e17cefc6334059189c178d4783830e03d3"
-   ],
-   "exploit_txs": [
-    "0xb4c00e8f3ba815b6c70f45026f8794d2c1f079646a89919077688ce60692193f"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: TenArmor/yinhui; router victim per SlowMist/Defimon",
-   "verification": {}
-  },
-  {
-   "protocol": "ether.fi Liquid",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://www.cryptotimes.io/2026/09/11/ether-fi-loses-15-45-eth-in-legacy-atomicqueue-exploit-ceo-pledges-full-user-reimbursement/"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xa5cc6e490bce9185fa47b421f2eac677a83b64ea"
-   ],
-   "victim_addresses": [
-    "0xD45884B592E316eB816199615A95C182F75dea07"
-   ],
-   "exploit_txs": [
-    "0x7cbe0b4349513fed6d03ba8bf9ed708e10e07a501d10b5f344a25ae10595599b"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: sender match via Phalcon; Etherscan-labeled victim",
-   "verification": {}
-  },
-  {
-   "protocol": "Usual USD0",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/helios-tt/report-public/HEAD/cases/030_usualmoney/report.md"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0x2ae2f691642bb18cd8deb13a378a0f95a9fee933"
-   ],
-   "victim_addresses": [
-    "0xe033cb1bb400c0983fa60ce62f8ecdf6a16fce09"
-   ],
-   "exploit_txs": [
-    "0x585d8be6a0b07ca2f94cfa1d7542f1a62b0d3af5fab7823cbcf69fb243f271f8"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: helios-tt report",
-   "verification": {}
-  },
-  {
-   "protocol": "Sorra Finance",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://www.quillaudits.com/blog/hack-analysis/sorra-finance-hack-smart-contract-exploit"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xdc8076c21365a93aac0850b67e4ca5fdec5fab9b",
-    "0xfa39257c629f9a5da2c0559debe2011eef7c1e9f"
-   ],
-   "victim_addresses": [
-    "0x5d16b8ba2a9a4eca6126635a6ffbf05b52727d50"
-   ],
-   "exploit_txs": [
-    "0x6439d63cc57fb68a32ea8ffd8f02496e8abad67292be94904c0b47a4d14ce90d"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: QuillAudits + txray; truncated helpers in seed",
-   "verification": {}
-  },
-  {
-   "protocol": "DIMO",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [
-    "0x07C64bd1B23b7C9B0ABf80b8613f58e5B00ED5dD"
-   ],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: attacker + tx unpublished; Wormhole dev-key vector",
-   "verification": {}
-  },
-  {
-   "protocol": "Asterix",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [
-    "0x0000000000ca73A6df4C58b84C5B4b847FE8Ff39"
-   ],
-   "exploit_txs": [],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: ~242-tx drain; attacker EOA + tx unpublished",
-   "verification": {}
-  },
-  {
-   "protocol": "Mosca2",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://blog.verichains.io/p/unveiling-the-flawed-logic-in-the"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xe763da20e25103da8e6afa84b6297f87de557419"
-   ],
-   "victim_addresses": [
-    "0xd8791f0c10b831b605c5d48959eb763b266940b9"
-   ],
-   "exploit_txs": [
-    "0xf13d281d4aa95f1aca457bd17f2531581b0ce918c90905d65934c9e67f6ae0ec"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: Verichains",
-   "verification": {}
-  },
-  {
-   "protocol": "EXcommunity",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://raw.githubusercontent.com/SunWeb3Sec/DeFiHackLabs/main/src/test/2024-05/EXcommunity_exp.sol"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [],
-   "victim_addresses": [
-    "0xb1de93DAe1CDdF429eEc9DB30b78759d17495758"
-   ],
-   "exploit_txs": [
-    "0x5446bf2b57749abdab01813a50ce36246177f3437599f3a56bc1554f596b2c3a"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: exploiter EOA unpublished (PoC harness as attacker)",
-   "verification": {}
-  },
-  {
-   "protocol": "DoinGud",
-   "date": null,
-   "chain": [],
-   "loss_usd": null,
-   "technique": "",
-   "classification": "",
-   "targetType": "",
-   "bridgeHack": null,
-   "defillamaId": null,
-   "sources": [
-    "https://api.llama.fi/hacks",
-    "https://github.com/SunWeb3Sec/DeFiHackLabs/pull/1273"
-   ],
-   "official_sources": [],
-   "hacker_addresses": [
-    "0xb8C717239BCACE558c3a8Dc471c16E07bF57a1Eb"
-   ],
-   "victim_addresses": [
-    "0xE3A161EdD679fC5ce2dB2316a4B6f7ab33a8eD6A"
-   ],
-   "exploit_txs": [
-    "0x56818a63077f5ba8bfc0bc0877ac33502a5d65cc79dbf5dfaac2a0b8545216a8"
-   ],
-   "scope": "",
-   "research_notes": "Hunt Nov 2026: DeFiHackLabs PR #1273",
-   "verification": {}
   },
   {
    "protocol": "Binance-linked wallets (unconfirmed, ongoing)",

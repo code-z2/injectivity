@@ -1,0 +1,15 @@
+name = "intel-terminal-api"
+main = "src/index.ts"
+compatibility_date = "2025-10-01"
+compatibility_flags = ["nodejs_compat"]
+migrations_dir = "migrations"
+
+[vars]
+DEFAULT_CHAIN = "ethereum"
+CACHE_TTL_SECONDS = "300"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "intel-terminal"
+database_id = "local-dev-placeholder"
+migrations_dir = "migrations"
