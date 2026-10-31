@@ -59,7 +59,11 @@ export async function cachedTransfers(
   return { rows: transfers, fresh: isFresh };
 }
 
-export async function storeTransfers(env: Env, chain: string, transfers: Transfer[]): Promise<void> {
+export async function storeTransfers(
+  env: Env,
+  chain: string,
+  transfers: Transfer[],
+): Promise<void> {
   const at = nowIso();
   const stmts = transfers.map((t) =>
     env.DB.prepare(

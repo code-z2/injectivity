@@ -12,9 +12,7 @@ export function createApp(options: CreateAppOptions = {}) {
 
   app.use('/v1/*', cors());
 
-  app.get('/', (c) =>
-    c.json({ ok: true, service: 'intel-terminal-api', version: 1 }),
-  );
+  app.get('/', (c) => c.json({ ok: true, service: 'intel-terminal-api', version: 1 }));
   app.get('/health', (c) => c.json({ ok: true }));
 
   app.route('/', createAddressRoutes(options.alchemy));

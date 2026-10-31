@@ -389,3 +389,17 @@ Living record of what was built. Update on every completed item.
 - **Why:** Single home for SQL artifacts. `migrations/` stays apart because wrangler auto-applies everything in `migrations_dir` on deploy — seed INSERTs must never become a migration.
 - **Importance:** Keeps deploy (`migrations/`) vs dev/seed (`sql/`) concerns from mixing; next reader finds all SQL in one place.
 - **Metadata:** safe point `2a8fcc3` (clean tree before moves); commit pending.
+
+## 2026-10-31 — infra/ retired; prettier + format-before-push enforced
+- **What:** Deleted `infra/store.py` (+ `__pycache__`, `infra/` dir removed) — zero consumers; schema/seed now owned by `workers/api/sql/` + `make_seed.py` + TS stores. Added prettier (dev dep), `.prettierrc.json` (single-quote, semi, 100-col), `.prettierignore` (excludes generated `sql/seed.sql`, `bun.lock`), `format` / `format:check` scripts. Baseline formatted (4 files). Local pre-push hook blocks unformatted pushes; AGENT.md records the rule.
+- **How:** Safe-point commit `ef06131` before deletion; `git rm` + `rmdir` with verification between steps. `bun add -d prettier` needed `--cache-dir /tmp/bun-cache` (sandbox blocks bun's default tempdir). Verified: `format` → `check` clean → esbuild bundle → harness 8/8 green; `git push --dry-run` passes the hook.
+- **Why:** One language in the deploy path (TS); Python stays data-side only. Formatting enforced mechanically, not by memory.
+- **Importance:** Kills the last duplicate schema; every future push is auto-checked for style.
+- **Metadata:** local main 5 ahead of origin/main (nothing pushed); this batch NOT committed — pending approval.
+
+## 2026-10-31 — make_seed ported Python → TypeScript
+- **What:** `scripts/make_seed.py` rewritten as `scripts/make_seed.ts` (bun-native, `node:` stdlib only); `.py` deleted. `gen:seed` script added; README updated. `tsconfig` now includes `scripts/**/*.ts` with `@types/node` alongside workers-types. Bonus fix: repo root is derived from the script path instead of the hardcoded `/Users/peter/Developer/...` absolute path the Python version carried.
+- **How:** Ported the quoting/row logic 1:1, including a `pyList` helper replicating Python `json.dumps` separators so chain-list columns stay identical. Proved with `diff`: TS output is byte-identical to the Python output (123 OFAC + 752 exploit rows, committed `seed.sql` untouched by regen).
+- **Why:** Last Python file in the deploy-adjacent tree; single-language repo (TS + SQL) per the Cloudflare direction — one toolchain, prettier covers the script, typechecker covers it too.
+- **Importance:** Removes the "why is there Python here" question for every future reader; seed regen is now `bun run gen:seed`.
+- **Metadata:** `bun run check`, `format:check`, `gen:seed` (zero-diff regen) all green. Batch NOT committed — pending approval.

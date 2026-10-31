@@ -37,7 +37,7 @@ No key means D1-only responses with `live: false`. No wallet, ever.
 bun install
 bun run check        # tsc --noEmit
 bun run migrate      # schema into local D1 (Miniflare)
-python3 scripts/make_seed.py
+bun run gen:seed
 bun run seed         # 123 OFAC + 752 exploit screening rows
 bun run dev          # http://127.0.0.1:8787
 ```
@@ -57,9 +57,9 @@ bun run deploy
 
 ## Env
 
-| var | default | meaning |
-|---|---|---|
-| `ALCHEMY_API_KEY` | (empty) | live calls off when empty |
-| `DEFAULT_CHAIN` | `ethereum` | UI default, not enforced here |
-| `CACHE_TTL_SECONDS` | `300` | D1 transfer freshness |
-| `DB` | (binding) | D1 `intel-terminal` |
+| var                 | default    | meaning                       |
+| ------------------- | ---------- | ----------------------------- |
+| `ALCHEMY_API_KEY`   | (empty)    | live calls off when empty     |
+| `DEFAULT_CHAIN`     | `ethereum` | UI default, not enforced here |
+| `CACHE_TTL_SECONDS` | `300`      | D1 transfer freshness         |
+| `DB`                | (binding)  | D1 `intel-terminal`           |

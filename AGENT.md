@@ -15,6 +15,11 @@ No item counts as done without this entry.
 Default to `bun` for JS/TS work (`bun install`, `bun run <script>`,
 `bunx <bin>`). No `npm`/`npx` unless bun cannot do the job.
 
+## Format before push
+Run `bun run format` in `workers/api` before every push; pushes are
+blocked by a local pre-push hook (`format:check`) when unformatted.
+Never push with `--no-verify`.
+
 ## Git hygiene
 `node_modules/`, `.wrangler/`, `dist/`, `.dev.vars`, `*.db`,
 `__pycache__/` are gitignored — never force-add them. Commit lockfiles

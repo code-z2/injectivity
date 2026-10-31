@@ -1,6 +1,8 @@
 {
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251001.0",
+    "@types/node": "^26.6.6",
+    "prettier": "^3.9.10",
     "typescript": "^5.9.3",
     "wrangler": "^3.114.0"
   },
@@ -8,6 +10,9 @@
   "private": true,
   "scripts": {
     "check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "gen:seed": "bun scripts/make_seed.ts",
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "migrate": "wrangler d1 execute intel-terminal --local --file=./sql/schema.sql",
