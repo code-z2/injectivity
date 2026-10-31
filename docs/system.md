@@ -368,3 +368,17 @@ Living record of what was built. Update on every completed item.
 - Why: CORS for the Pages frontend, validator-ready params for API-2/3, hono/rpc typed client for Vue later. Growth migration, not a fix.
 - Importance: UI-1 can call with CORS working; router scales from here.
 - Metadata: contract unchanged (balances key stays `tokens`).
+
+## 2026-10-31 — API-1 restructured to Hono factory + stores (knot relay-proxy pattern)
+- **What:** Reorganized `workers/api/src` to mirror `~/Developer/knot...rpc_proxy`: `app.ts` (`createApp(options?)` factory with CORS + route mounting), `routes/address.ts` (two endpoints, zod-validated), `stores/risk.ts` (label lookup + `risk_hits`), `stores/transfers.ts` (cache read/write + live fetch + sweep-cap), `alchemy.ts` (`AlchemyClient` class + injectable), `constants/chains.ts`, `types/` (Env, AppType for `hono/rpc`). Deleted dead `src/db.ts`. Added `migrations/0001_initial.sql` + `nodejs_compat` + `migrations_dir` in wrangler.toml. Validation via `zod` + `@hono/zod-validator` (bad chain/address now 400, was 404).
+- **How:** Compared knot layout (`src/index.ts` → `createApp`, `utils/*`, `constants/*`, `types/*`); ported modules one at a time; `tsc --noEmit` clean; esbuild bundle; extended `/tmp/verify_api1.mjs` to 8 assertions incl. factory injection test (`createApp({ alchemy: fake })` → `live:true` + row persisted).
+- **Why:** Factory + options bag makes routes unit-testable without network/env (matches knot precedent); zod validators replace ad-hoc checks; D1 migrations replace raw schema.sql for deploys.
+- **Importance:** API-1 now has the exact seam API-2 (fund-flow tracing, 1–2 hops) needs: `getTransfers` client injectable, cache stores isolated per concern; UI can type its client via `AppType`.
+- **Metadata:** offline harness 8/8 passing (`API-1 OFFLINE VERIFIED`); exploit seed 752 rows, OFAC 123; live Alchemy still needs network-enabled key. Note: safe-point commit `3f9775c` accidentally included `workers/api/node_modules` (3106 files) — unstaged via `git rm --cached`, removal commit pending user approval.
+
+## 2026-10-31 — Tooling default bun; git hygiene cleanup
+- **What:** `bun` (1.2.19) is now the default JS/TS toolchain. `bun install` migrated `package-lock.json` → `bun.lock`; `package-lock.json` removed. `.gitignore` extended (`node_modules/`, `.wrangler/`, `dist/`, `.dev.vars`, `*.tsbuildinfo`); `workers/api/node_modules` (accidentally committed in `3f9775c`) fully unstaged. README commands switched to `bun`/`bunx`; AGENT.md gained Tooling + Git hygiene rules.
+- **How:** `bun install` (auto-migrated lockfile, 110 packages, no changes); `git rm` for package-lock; verified with `bun run check`, `bunx esbuild` bundle, and the 8-assertion offline harness — all green.
+- **Why:** Single toolchain, faster installs, one lockfile per package; keeps generated/secret files out of history going forward.
+- **Importance:** Prevents a repeat of the 3,106-file node_modules commit; deploy path (`bun run deploy`) matches local dev.
+- **Metadata:** hygiene changes staged but NOT committed — commit pending explicit user approval.

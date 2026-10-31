@@ -16,16 +16,30 @@ No key means D1-only responses with `live: false`. No wallet, ever.
   calls `alchemy_getAssetTransfers`, stores rows, then responds.
   Live failure falls back to cache with `stale: true`;
   with no cache and no key it answers 502.
+- Validation: `zod` + `@hono/zod-validator`; bad chain/address → `400`
+  with field errors (see `src/routes/address.ts`).
+
+## Layout (mirrors knot relay-proxy)
+
+- `src/app.ts` — `createApp(options?)` factory; CORS near routes, `hono/rpc`
+  client type exported from `src/types/`.
+- `src/routes/address.ts` — the two endpoints, thin (parse → store → respond).
+- `src/stores/risk.ts` — label lookup + `risk_hits` logging.
+- `src/stores/transfers.ts` — cache read/write, sweep-cap, live fetch.
+- `src/alchemy.ts` — `AlchemyClient` + `alchemyClient`; inject a fake via
+  `createApp({ alchemy })` for offline tests.
+- `src/constants/chains.ts`, `src/types/` — chain table, shared env/types.
+- `migrations/0001_initial.sql` — D1 schema (wrangler `migrations_dir`).
 
 ## Local dev (no Cloudflare account needed)
 
 ```bash
-npm install
-npm run check        # tsc --noEmit
-npm run migrate      # schema into local D1 (Miniflare)
+bun install
+bun run check        # tsc --noEmit
+bun run migrate      # schema into local D1 (Miniflare)
 python3 scripts/make_seed.py
-npm run seed         # 123 OFAC + 752 exploit screening rows
-npm run dev          # http://127.0.0.1:8787
+bun run seed         # 123 OFAC + 752 exploit screening rows
+bun run dev          # http://127.0.0.1:8787
 ```
 
 Try offline (no `ALCHEMY_API_KEY` in `.dev.vars`): an exploit-listed
@@ -34,11 +48,11 @@ attacker address returns its labels with `live: false`.
 ## Deploy
 
 ```bash
-npx wrangler d1 create intel-terminal   # put the id in wrangler.toml
-npx wrangler d1 execute intel-terminal --remote --file=./schema.sql
-npx wrangler d1 execute intel-terminal --remote --file=./seed.sql
-npx wrangler secret put ALCHEMY_API_KEY
-npm run deploy
+bunx wrangler d1 create intel-terminal   # put the id in wrangler.toml
+bunx wrangler d1 execute intel-terminal --remote --file=./schema.sql
+bunx wrangler d1 execute intel-terminal --remote --file=./seed.sql
+bunx wrangler secret put ALCHEMY_API_KEY
+bun run deploy
 ```
 
 ## Env

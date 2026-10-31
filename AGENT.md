@@ -11,6 +11,15 @@ After each work or feature, add an entry to docs/system.md with:
 what it is, how it was done, why it was done that way, its importance, and any metadata.
 No item counts as done without this entry.
 
+## Tooling
+Default to `bun` for JS/TS work (`bun install`, `bun run <script>`,
+`bunx <bin>`). No `npm`/`npx` unless bun cannot do the job.
+
+## Git hygiene
+`node_modules/`, `.wrangler/`, `dist/`, `.dev.vars`, `*.db`,
+`__pycache__/` are gitignored — never force-add them. Commit lockfiles
+(`bun.lock`); never commit two lockfiles for one package.
+
 ## Destructive filesystem ops (mv, rm, overwrite)
 
 Post-incident rule, 2026-10-31: an `mv` overwrote the master seed.
