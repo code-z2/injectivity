@@ -8,7 +8,7 @@ import { ADDRESS_RE } from "./utils";
 // resolution fans out to several calls and slow networks otherwise trip
 // viem's default. viem loads on first resolution only, keeping it out of
 // the landing bundle.
-function rpcUrl(): string {
+export function rpcUrl(): string {
   const custom = loadSettings().ensRpcUrl.trim();
   if (custom) return custom;
   return import.meta.env.VITE_ENS_RPC_URL ?? "https://ethereum.publicnode.com";

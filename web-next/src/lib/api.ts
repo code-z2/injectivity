@@ -229,3 +229,12 @@ export async function runInvestigation(
     liveTrace: b.meta.liveTrace,
   };
 }
+
+// Liveness of the investigation API (the AI agent service). Says the
+// service answers, not that the upstream model provider is healthy.
+export async function fetchHealth(signal?: AbortSignal): Promise<boolean> {
+  const res = await fetch(`${BASE}/health`, { signal });
+  if (!res.ok) return false;
+  const body = (await res.json()) as { ok?: boolean };
+  return body.ok === true;
+}

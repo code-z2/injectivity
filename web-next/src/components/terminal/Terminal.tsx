@@ -3,7 +3,6 @@ import { ArrowLeft, Copy, Check } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Console } from "@/components/Console";
-import { Brand } from "@/components/Mark";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import {
   fetchIntel,
@@ -97,12 +96,12 @@ export function Terminal({ chain, target }: { chain: Chain; target: string }) {
   return (
     <div className="min-h-svh">
       <div className="sticky top-0 z-30 border-b border-line/70 bg-canvas/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-[1080px] items-center justify-between px-4 sm:px-5">
+        <div className="flex h-14 items-center justify-between px-5">
           <div className="flex items-center gap-4">
-            <Brand />
+            {/* Brand orb is the root-layout Wordmark, fixed over this slot. */}
+            <span aria-hidden className="w-6 shrink-0" />
             <Link
               to="/"
-              viewTransition
               className="hidden items-center gap-1.5 text-[13px] font-medium text-muted transition-colors hover:text-ink sm:inline-flex"
             >
               <ArrowLeft className="size-3.5" />
