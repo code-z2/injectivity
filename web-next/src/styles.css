@@ -1,0 +1,237 @@
+/* Intel Terminal — brand system v2 (light).
+   Ink on cool paper; Ion blue is the single brand accent (focus, links,
+   the trace root). Primary actions are ink pills, never blue fills.
+   Aurora/mint exist only inside the hero field. Risk colors are
+   semantic and appear only on data, never as decoration. Mono type is
+   reserved for on-chain data (addresses, hashes, values). */
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Neutrals */
+  --color-canvas: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-subtle: #f1f3f6;
+  --color-line: #e6e8ec;
+  --color-line-strong: #d4d8df;
+  --color-ink: #0b0d12;
+  --color-ink-soft: #3b414b;
+  --color-muted: #69707c;
+  --color-faint: #9aa1ac;
+
+  /* Brand: Ion */
+  --color-ion-50: #eef2ff;
+  --color-ion-100: #e0e7ff;
+  --color-ion-200: #c5d2ff;
+  --color-ion-400: #6d8cff;
+  --color-ion-500: #4b70ff;
+  --color-ion-600: #2f5bff;
+  --color-ion-700: #2246d8;
+  --color-ion-800: #1c39ad;
+
+  /* Hero-only atmosphere */
+  --color-aurora: #9edcff;
+  --color-mint: #c4f1df;
+  --color-lilac: #d9d4ff;
+
+  /* Risk semantics */
+  --color-verified: #e5484d;
+  --color-verified-soft: #fdeceb;
+  --color-inferred: #c56a06;
+  --color-inferred-soft: #fdf3e4;
+  --color-clean: #129f74;
+  --color-clean-soft: #e7f7f1;
+
+  /* Elevation */
+  --shadow-hairline: 0 0 0 1px rgb(11 13 18 / 0.06);
+  --shadow-card:
+    0 0 0 1px rgb(11 13 18 / 0.05), 0 1px 2px rgb(11 13 18 / 0.04),
+    0 4px 12px -4px rgb(11 13 18 / 0.06);
+  --shadow-float:
+    0 0 0 1px rgb(11 13 18 / 0.05), 0 2px 4px rgb(11 13 18 / 0.04),
+    0 12px 32px -8px rgb(11 13 18 / 0.12);
+  --shadow-console:
+    0 0 0 1px rgb(11 13 18 / 0.06), 0 1px 2px rgb(11 13 18 / 0.04),
+    0 10px 30px -10px rgb(11 13 18 / 0.14),
+    0 30px 80px -24px rgb(47 91 255 / 0.18);
+  --shadow-focus: 0 0 0 4px rgb(47 91 255 / 0.14);
+
+  --radius-console: 22px;
+
+  /* Motion tokens (transitions.dev scale) */
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+
+  --animate-shimmer: t-shimmer 2000ms linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+}
+
+:root {
+  color-scheme: light;
+  --duration-stagger: 40ms;
+  --duration-micro: 80ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+}
+
+@layer base {
+  html {
+    background: var(--color-canvas);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-canvas font-sans text-ink;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    background: var(--color-ion-100);
+    color: var(--color-ion-800);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ion-600);
+    outline-offset: 2px;
+  }
+}
+
+@utility display {
+  font-weight: 320;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+@utility glass {
+  background: rgb(255 255 255 / 0.66);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+}
+
+/* transitions.dev — shimmer text (status lines while work runs). */
+.t-shimmer {
+  position: relative;
+  display: inline-block;
+  color: var(--color-faint);
+}
+.t-shimmer::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    var(--color-ink) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 400% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: var(--animate-shimmer);
+}
+@keyframes t-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+/* transitions.dev menu-dropdown / modal scales. */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+@keyframes menu-out {
+  to {
+    opacity: 0;
+    transform: scale(0.99);
+  }
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+@keyframes modal-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Console -> terminal: the browser morphs the shared search surface
+   (view-transition-name: console) while the rest cross-fades. */
+::view-transition-group(console) {
+  animation-duration: var(--duration-very-slow);
+  animation-timing-function: var(--ease-smooth-out);
+}
+::view-transition-old(root) {
+  animation: vt-out var(--duration-medium) var(--ease-smooth-out) both;
+}
+::view-transition-new(root) {
+  animation: vt-in var(--duration-very-slow) var(--ease-smooth-out) both;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-shimmer::before {
+    animation: none !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
