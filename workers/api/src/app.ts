@@ -14,6 +14,8 @@ export function createApp(options: CreateAppOptions = {}) {
   const app = new Hono<{ Bindings: Env }>();
 
   app.use('/v1/*', cors());
+  // Browser status indicator on the landing page reads /health.
+  app.use('/health', cors());
 
   app.get('/', (c) => c.json({ ok: true, service: 'intel-terminal-api', version: 1 }));
   app.get('/health', (c) => c.json({ ok: true }));
