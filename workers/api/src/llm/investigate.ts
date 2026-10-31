@@ -302,7 +302,11 @@ export async function investigate(
     )
       .bind(
         `Intel: ${params.address.toLowerCase()} (${params.chain})`,
-        JSON.stringify(report),
+        JSON.stringify({
+          address: params.address.toLowerCase(),
+          chain: params.chain,
+          report,
+        }),
         new Date().toISOString(),
       )
       .run()) as unknown as { success: boolean; meta?: { last_row_id?: number } };

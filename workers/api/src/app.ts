@@ -6,6 +6,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { createAddressRoutes } from '@/routes/address';
 import { createInvestigateRoutes } from '@/routes/investigate';
+import { createReportsRoutes } from '@/routes/reports';
 import { createTraceRoutes } from '@/routes/trace';
 import type { CreateAppOptions, Env } from '@/types';
 
@@ -23,6 +24,7 @@ export function createApp(options: CreateAppOptions = {}) {
     '/',
     createInvestigateRoutes({ client: options.alchemy, modelFetch: options.modelFetch }),
   );
+  app.route('/', createReportsRoutes(options.alchemy));
 
   app.notFound((c) =>
     c.json({ error: 'not found. try GET /v1/address/:chain/:address[/transfers]' }, 404),

@@ -152,9 +152,44 @@ if (process.env.INT1_LIVE === '1' && process.env.MODEL_API_KEY) {
 }
 
 // 10. export: PDF path is INFRA-2
-console.log(
-  'pending export-pdf (INFRA-2: report template + graph snapshot + risk split + sources)',
-);
+// 10. export: saved investigation renders a PDF with all four sections
+{
+  const hashB = `0x${'b'.repeat(64)}`;
+  db.prepare('INSERT INTO reports (title, body, created_at) VALUES (?,?,?)').run(
+    `Intel: ${lo(FIX.exploit.address)} (ethereum)`,
+    JSON.stringify({
+      address: lo(FIX.exploit.address),
+      chain: 'ethereum',
+      report: {
+        summary: 'INT-1 fixture report over the sanctioned -> MID -> exploit path.',
+        findings: [
+          {
+            claim: 'Exploit address received funds one hop from an OFAC-sanctioned address.',
+            verdict: 'verified',
+            evidence: { txHashes: [hashB], listRefs: ['exploit/attacker'] },
+            confidence: 'high',
+          },
+        ],
+        uncertainty: ['Coverage limited to seeded cache.'],
+        nextChecks: ['Re-run trace as fresh transfers arrive.'],
+      },
+    }),
+    new Date().toISOString(),
+  );
+  const id = db.query('SELECT last_insert_rowid() AS id').get() as { id: number };
+  const res = await app.fetch(new Request(`http://int1/v1/reports/${id.id}?format=pdf`), env);
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  await Bun.write('/tmp/int1-report.pdf', bytes);
+  const magic = String.fromCharCode(...bytes.slice(0, 4));
+  check(
+    'export-pdf',
+    res.status === 200 &&
+      res.headers.get('content-type') === 'application/pdf' &&
+      magic === '%PDF' &&
+      bytes.length > 2000,
+    `status=${res.status} bytes=${bytes.length} (artifact: /tmp/int1-report.pdf)`,
+  );
+}
 
 const failed = results.filter(([, ok]) => !ok);
 console.log(`\nINT-1: ${results.length - failed.length}/${results.length} green`);
