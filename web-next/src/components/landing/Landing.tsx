@@ -19,6 +19,12 @@ const FIELD_TO_READY = 750;
 
 const DRIFT = 40; // underlay overscan for the parallax drift
 
+// The intro plays once per page load. Returning to "/" from another page
+// (same JS session) opens straight onto the ready spotlight; a reload
+// plays it again. Set when the intro completes, so React StrictMode's
+// double effect in dev cannot mark it played before it has run.
+let introPlayed = false;
+
 function useViewport(): { w: number; h: number } {
   const [v, setV] = useState(() => ({ w: innerWidth, h: innerHeight }));
   useEffect(() => {
@@ -40,15 +46,19 @@ export function Landing() {
   usePeekLens(artRef, driftRef);
   const scale = Math.min(2.2, Math.max(1.3, (vw - 48) / 175));
   const fieldW = Math.min(720, vw - 32);
-  const [seq, setSeq] = useState<"word" | "orb">("word");
-  const [stage, setStage] = useState<SpotlightStage>("hidden");
+  const [seq, setSeq] = useState<"word" | "orb">(introPlayed ? "orb" : "word");
+  const [stage, setStage] = useState<SpotlightStage>(
+    introPlayed ? "ready" : "hidden",
+  );
   const timers = useRef<number[]>([]);
 
   useEffect(() => {
+    if (introPlayed) return;
     const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (reduce) {
+      introPlayed = true;
       setSeq("orb");
       setStage("ready");
       return;
@@ -64,7 +74,10 @@ export function Landing() {
     setStage((s) => (s === "hidden" ? "orb" : s));
     timers.current.push(
       window.setTimeout(() => setStage("field"), ORB_TO_FIELD),
-      window.setTimeout(() => setStage("ready"), ORB_TO_FIELD + FIELD_TO_READY),
+      window.setTimeout(() => {
+        introPlayed = true;
+        setStage("ready");
+      }, ORB_TO_FIELD + FIELD_TO_READY),
     );
   }
 

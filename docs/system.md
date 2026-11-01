@@ -567,3 +567,9 @@ Living record of what was built. Update on every completed item.
 - **How:** `landing/usePeekLens.ts` masks the art layer (not the sky) with a gaussian-like radial falloff (~320px, swells to ~390px with speed), eased follow, slight counter-parallax, hidden until the pointer moves and when it leaves; writes styles directly and sleeps when settled; mouse/trackpad only. Art has no background, so it takes the sky's tint.
 - **Why:** User direction: make the page a curiosity. First pass revealed an opaque paper underlay through a hole in the sky, which always showed a rim; matching Gloam meant revealing the art itself with a long falloff over the gradient.
 - **Verified:** `tsc`, `vite build`, Prettier; underlay rendered alone; real-cursor hovers over violet and mint regions show tinted, edgeless reveals; timing of the success hold measured in-browser.
+
+## 2026-11-01 — Landing intro plays once per page load
+- **What:** The wordmark → orb → field intro runs only on the first load; returning to `/` in the same session (orb link, back/forward) opens on the ready spotlight. A reload plays it again.
+- **How:** Module-level `introPlayed` flag in `landing/Landing.tsx`, set when the intro reaches "ready" (not at start, so StrictMode's double effect cannot skip the first run); initial `seq`/`stage` state read it.
+- **Why:** User request; chosen over a single state-driven view to keep shareable `/investigate/...` URLs and native history.
+- **Verified:** `tsc`, `vite build`, Prettier; first load plays; search → orb home shows the ready field in <0.4s; back/forward likewise.
