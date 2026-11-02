@@ -27,7 +27,8 @@ import { spoofOf } from "./spoof";
 // macOS-dock width, collapsed until a node is interacted with, leaving room for the
 // address chain (left) and the AI dock (right). Three detents: collapsed
 // (header strip with counts, All/In/Out and any active filters), half,
-// and full (covers the canvas and slides under the address chain). Drag
+// and full (covers the canvas and slides under the address chain and the
+// agent dock). Drag
 // the header to resize; it snaps to the nearest detent. Filters are chips
 // that open small popovers. Rows are windowed, so long ledgers stay light,
 // and more pages load as you near the end.
@@ -36,6 +37,7 @@ type Detent = "collapsed" | "half" | "full";
 
 const RAIL_W = 340; // address chain column
 const SIDE_ROOM = 360; // keep clear on both sides (chain left, AI dock right)
+const AGENT_W = 340; // agent dock (right), at the same inset as this dock
 const MAX_W = 880;
 const MIN_W = 600; // narrowest dock that still fits a full row
 const GAP = 12;
@@ -120,6 +122,8 @@ export function Dock({
   const width = full ? vw - GAP * 2 : dockW;
   const height = dragH ?? heights[detent];
   const padLeft = full && vw > RAIL_W + 520 ? RAIL_W - GAP : 0;
+  // Full, it also slides under the agent dock on the right.
+  const padRight = full && vw > RAIL_W + AGENT_W + 520 ? AGENT_W + GAP : 0;
 
   // Drag the header to resize; release snaps to the nearest detent.
   const drag = useRef<{ y: number; h: number } | null>(null);
@@ -150,7 +154,13 @@ export function Dock({
       aria-label="Transfers"
       className="@container absolute bottom-3 left-1/2 z-10 flex flex-col overflow-hidden rounded-[22px] border border-white bg-white/80 shadow-console backdrop-blur-xl"
       initial={false}
-      animate={{ width, height, x: "-50%", paddingLeft: padLeft }}
+      animate={{
+        width,
+        height,
+        x: "-50%",
+        paddingLeft: padLeft,
+        paddingRight: padRight,
+      }}
       transition={
         dragH !== null || reduce
           ? { duration: 0 }

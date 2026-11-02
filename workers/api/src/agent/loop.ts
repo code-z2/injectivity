@@ -18,7 +18,7 @@ export const TURN_BUDGET: Budget = { toolCalls: 25, ms: 4 * 60_000 };
 export type LoopEvent =
   | { type: 'tool'; name: string; args: Record<string, unknown> }
   | { type: 'tool_done'; name: string; ok: boolean; sources: number }
-  | { type: 'search'; results: number }
+  | { type: 'search'; results: number; sources: { url: string; title: string }[] }
   | { type: 'thinking' };
 
 export interface LoopResult extends Verified {
@@ -61,11 +61,17 @@ export async function runResearch(opts: {
         excerpt: c.quote ?? c.title,
         url: c.url,
       });
-    if (t.citations.length) opts.onEvent?.({ type: 'search', results: t.citations.length });
+    if (t.citations.length)
+      opts.onEvent?.({
+        type: 'search',
+        results: t.citations.length,
+        sources: t.citations.map((c) => ({ url: c.url, title: c.title })),
+      });
     messages.push(t.message);
   };
 
   while (!final) {
+    if (opts.signal?.aborted) throw new Error('stopped');
     if (calls >= budget.toolCalls || Date.now() > deadline) {
       budgetHit = true;
       break;
@@ -85,6 +91,7 @@ export async function runResearch(opts: {
       break;
     }
     for (const call of turn.toolCalls) {
+      if (opts.signal?.aborted) throw new Error('stopped');
       if (calls >= budget.toolCalls) {
         messages.push({
           role: 'tool',

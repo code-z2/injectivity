@@ -10,6 +10,10 @@
 @import "@fontsource/instrument-serif/400.css";
 @import "@fontsource/instrument-serif/400-italic.css";
 
+/* Light-only app: dark: utilities (from vendor components) apply only under
+   an explicit .dark class, never from the OS theme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Wordmark only: editorial serif for the brand name. */
   --font-brand: "Instrument Serif", ui-serif, Georgia, serif;

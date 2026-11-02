@@ -6,6 +6,7 @@
 //   { type: 'workspace', workspace }          → ok
 //   { type: 'ask', text, model?, rpcUrl? }    → status / step… then answer | declined | error
 //   { type: 'report', model?, rpcUrl? }       → status / step… then report { reportId } | error
+//   { type: 'stop' }                          → the running ask/report ends with error "stopped"
 // model is the visitor's custom model { baseUrl, model, key, effort? }; it
 // rides on each ask and is never stored.
 import { DurableObject } from 'cloudflare:workers';
@@ -122,6 +123,10 @@ export class Investigation extends DurableObject<Env> {
       if (msg.type === 'workspace' && msg.workspace) {
         await this.core.setWorkspace(msg.workspace);
         return send({ type: 'ok' });
+      }
+      if (msg.type === 'stop') {
+        this.core.stop();
+        return;
       }
       if (msg.type === 'report')
         return await this.core.report({ model: msg.model, rpcUrl: msg.rpcUrl, onEvent: send });

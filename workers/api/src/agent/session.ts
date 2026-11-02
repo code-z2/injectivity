@@ -80,6 +80,7 @@ const KEEP_TOOL_CHARS = 1500;
 
 export class SessionCore {
   private busy = false;
+  private running: AbortController | null = null;
 
   constructor(
     private store: SessionStore,
@@ -138,13 +139,29 @@ export class SessionCore {
     const emit = opts.onEvent ?? (() => undefined);
     if (this.busy) return emit({ type: 'error', error: 'still working on the previous request' });
     this.busy = true;
+    const controller = new AbortController();
+    this.running = controller;
+    opts.signal = opts.signal
+      ? AbortSignal.any([opts.signal, controller.signal])
+      : controller.signal;
     try {
       await run(emit);
     } catch (err) {
-      emit({ type: 'error', error: err instanceof Error ? err.message : 'unknown error' });
+      const error = controller.signal.aborted
+        ? 'stopped'
+        : err instanceof Error
+          ? err.message
+          : 'unknown error';
+      emit({ type: 'error', error });
     } finally {
       this.busy = false;
+      this.running = null;
     }
+  }
+
+  /** Stop the answer or report in progress; nothing from it is stored. */
+  stop() {
+    this.running?.abort();
   }
 
   /** Research model and its capabilities, falling back to the server's when a custom one can't call tools. */

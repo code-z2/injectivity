@@ -3,7 +3,8 @@
 import { healthFromNote, reportRpc, type RpcHealth } from "./rpcSignal";
 import { customRpc } from "./settings";
 
-const BASE: string = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8787";
+export const BASE: string =
+  import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8787";
 
 export type Chain =
   "ethereum" | "base" | "bsc" | "polygon" | "arbitrum" | "optimism";

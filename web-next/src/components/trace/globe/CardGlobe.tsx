@@ -674,7 +674,7 @@ export function CardGlobe({
           />
         </div>
       ))}
-      <p className="pointer-events-none absolute top-6 right-6 z-[2000] text-right text-[11.5px] text-muted">
+      <p className="pointer-events-none absolute bottom-24 left-1/2 z-[2000] -translate-x-1/2 text-center text-[11.5px] text-muted">
         {overflow > 0 && (
           <span className="block">+{overflow} more counterparties</span>
         )}

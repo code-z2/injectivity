@@ -9,6 +9,7 @@ import { usePrices } from "@/lib/prices";
 import { CardGlobe } from "./globe/CardGlobe";
 import type { NodeStat } from "./globe/molecule";
 import { useOuterRing } from "./globe/useOuterRing";
+import { AgentPanel } from "./agent/AgentPanel";
 import { Dock } from "./dock/Dock";
 import { Toast, type ToastMessage } from "./Toast";
 import { nameFromLabel, roleFromLabel, type ChainLink } from "./types";
@@ -18,7 +19,8 @@ import { useLedger } from "./useLedger";
 // address chain; selecting a link makes it active. Centre: the card globe,
 // the active address's molecule; clicking a card follows it (cutting any
 // links after the active one, undoable) and opens the dock. Bottom: the
-// dock, the active address's ledger, floating over the globe.
+// dock, the active address's ledger, floating over the globe. Right: the
+// agent panel (node brief, cited conversation, report).
 
 const RING1_MAX = 14; // atoms around the active address
 const RING2_PARENTS = 10; // ring-1 addresses whose own counterparties are fetched
@@ -312,6 +314,20 @@ function Workspace({
         onHoverCounterparty={setLit}
         openKey={openKey}
         collapseKey={collapseKey}
+      />
+      <AgentPanel
+        active={active.address}
+        chain={chain}
+        inspected={inspect}
+        inspectedName={
+          inspect ? nameFromLabel(globeLabels[inspect]) : undefined
+        }
+        inspectedRole={roleFromLabel(
+          inspect ? globeLabels[inspect] : undefined,
+        )}
+        links={shownLinks}
+        openKey={openKey}
+        root={root}
       />
       <Toast toast={toast} onDone={clearToast} />
     </>

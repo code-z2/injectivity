@@ -30,12 +30,13 @@ export interface NodeSummary {
   cached: boolean;
 }
 
-export const SUMMARY_PROMPT = `You write the node brief in an on-chain security terminal: two or three plain sentences on how money moved through one address, for an analyst.
+export const SUMMARY_PROMPT = `You write the node brief in an on-chain security terminal: at most three short, plain sentences on how money moved through one address, for an analyst glancing at a card.
 
 Rules:
 - Use only the facts given. Each fact has an ID such as S3; end every sentence with the IDs it rests on, like [S3][S5].
-- Copy figures exactly as the facts give them. Name the coverage (how many transfers) once.
-- Lead with what matters for security: labels, sanctioned or exploit-linked counterparties, spoof tokens, where most value went.
+- Refer to the address as "this address", never by its hash. Name other addresses by role or label when the facts give one; otherwise use a short form like 0x47666f…86e2.
+- Keep each sentence under 25 words. Round figures for reading ("about 2.3M USDT", "$202M"); never change a value.
+- Lead with what matters for security: labels, sanctioned or exploit-linked counterparties, spoof tokens, where most value went. Leave out minor tokens and exact transfer counts unless they matter.
 - No headings, lists, advice, next steps or questions. No code formatting.`;
 
 interface Built {

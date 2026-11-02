@@ -1,0 +1,410 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronUp, FileText } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import AIInputSearch, {
+  type SearchSource,
+} from "@/components/kokonutui/ai-input-search";
+import AILoadingState, {
+  type AgentStep,
+} from "@/components/kokonutui/ai-loading";
+import type { Chain } from "@/lib/api";
+import {
+  type AgentSocket,
+  askExtras,
+  connectSession,
+  type Entry,
+  forgetSession,
+  reportPdf,
+  type ServerFrame,
+  type Source,
+  sessionFor,
+  type Workspace,
+} from "@/lib/agent";
+import { cn } from "@/lib/utils";
+import type { AddressRole, ChainLink } from "../types";
+import { Answer } from "./Answer";
+import { NodeBrief } from "./NodeBrief";
+import { fail, finish, onStage, onStep } from "./steps";
+
+// The agent dock (right): a collapsible panel matching the bottom dock.
+// Open, it holds the node brief, the investigation conversation (each
+// answer verified and cited), then Generate and the composer; collapsed,
+// just its header. Inspecting a card opens it. One agent session per trace
+// root, kept across reloads.
+
+const HEADER_H = 60;
+const GAP = 12;
+const EASE = [0.22, 1, 0.36, 1] as const;
+const OPEN_KEY = "intel-terminal:agent-dock-open";
+
+function useViewportHeight() {
+  const [h, setH] = useState(() => innerHeight);
+  useEffect(() => {
+    const on = () => setH(innerHeight);
+    addEventListener("resize", on);
+    return () => removeEventListener("resize", on);
+  }, []);
+  return h;
+}
+
+interface Run {
+  kind: "ask" | "report";
+  steps: AgentStep[];
+}
+
+export function AgentPanel({
+  chain,
+  root,
+  links,
+  active,
+  inspected,
+  inspectedName,
+  inspectedRole,
+  openKey,
+}: {
+  chain: Chain;
+  root: string;
+  links: ChainLink[];
+  active: string;
+  inspected: string | null;
+  inspectedName?: string;
+  inspectedRole: AddressRole;
+  /** Changes when a card is inspected: the dock opens. */
+  openKey: number;
+}) {
+  const reduce = useReducedMotion();
+  const vh = useViewportHeight();
+  const [open, setOpenState] = useState(() => {
+    try {
+      return localStorage.getItem(OPEN_KEY) !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const setOpen = (v: boolean) => {
+    setOpenState(v);
+    try {
+      localStorage.setItem(OPEN_KEY, v ? "1" : "0");
+    } catch {
+      // Not remembered.
+    }
+  };
+  useEffect(() => {
+    if (openKey > 0) setOpenState(true);
+  }, [openKey]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [connected, setConnected] = useState(false);
+  const [transcript, setTranscript] = useState<Entry[]>([]);
+  const [sources, setSources] = useState<Map<string, Source>>(new Map());
+  const [run, setRun] = useState<Run | null>(null);
+  // Steps of finished turns, by the index of the entry they produced.
+  const [traces, setTraces] = useState<Record<number, AgentStep[]>>({});
+  const [failure, setFailure] = useState<string | null>(null);
+  const socket = useRef<AgentSocket | null>(null);
+  const pending = useRef<{
+    resolve: () => void;
+    onSource: (s: SearchSource) => void;
+  } | null>(null);
+  const scroller = useRef<HTMLDivElement>(null);
+
+  // Session for this trace root.
+  useEffect(() => {
+    let live = true;
+    sessionFor(chain, root)
+      .then((id) => live && setSessionId(id))
+      .catch(() => live && setFailure("The agent is unavailable right now."));
+    return () => {
+      live = false;
+    };
+  }, [chain, root]);
+
+  // Frames from the session.
+  useEffect(() => {
+    if (!sessionId) return;
+    const settle = () => {
+      pending.current?.resolve();
+      pending.current = null;
+    };
+    const onFrame = (f: ServerFrame) => {
+      switch (f.type) {
+        case "state":
+          setTranscript(f.transcript);
+          setSources(new Map(f.sources.map((s) => [s.id, s])));
+          break;
+        case "status":
+          setRun((r) => (r ? { ...r, steps: onStage(r.steps, f.stage) } : r));
+          break;
+        case "step":
+          if (f.step.type === "search")
+            for (const s of f.step.sources) {
+              let domain = "";
+              try {
+                domain = new URL(s.url).hostname;
+              } catch {
+                continue;
+              }
+              pending.current?.onSource({ domain, title: s.title });
+            }
+          setRun((r) => (r ? { ...r, steps: onStep(r.steps, f.step) } : r));
+          break;
+        case "answer":
+        case "declined":
+          setSources((m) => {
+            const next = new Map(m);
+            if (f.type === "answer")
+              for (const s of f.sources) next.set(s.id, s);
+            return next;
+          });
+          setTranscript((t) => {
+            setRun((r) => {
+              if (r) setTraces((x) => ({ ...x, [t.length]: finish(r.steps) }));
+              return null;
+            });
+            return [...t, f.entry];
+          });
+          settle();
+          break;
+        case "report":
+          setTranscript((t) => [...t, f.entry]);
+          break;
+        case "memory":
+          setRun(null);
+          settle();
+          break;
+        case "error":
+          setRun((r) => (r ? { ...r, steps: fail(r.steps) } : r));
+          setFailure(
+            f.error === "stopped"
+              ? "Stopped."
+              : f.error === "session not initialised"
+                ? "This session expired. Reload to start a new one."
+                : f.error,
+          );
+          if (f.error === "session not initialised") forgetSession(chain, root);
+          setTimeout(() => setRun(null), 1500);
+          settle();
+          break;
+      }
+    };
+    const s = connectSession(sessionId, { onFrame, onStatus: setConnected });
+    socket.current = s;
+    return () => {
+      s.close();
+      socket.current = null;
+    };
+  }, [sessionId, chain, root]);
+
+  // Keep the agent's view of the workspace current.
+  const workspace = useMemo<Workspace>(
+    () => ({
+      chain,
+      links: links.map((l) => ({
+        address: l.address,
+        role: l.role,
+        ...(l.label ? { label: l.label } : {}),
+      })),
+      active,
+      inspected,
+    }),
+    [chain, links, active, inspected],
+  );
+  useEffect(() => {
+    if (connected) socket.current?.send({ type: "workspace", workspace });
+  }, [connected, workspace]);
+
+  // Follow the conversation as it grows.
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  }, [transcript.length, run?.steps.length]);
+
+  const busy = run !== null;
+
+  const ask = (
+    query: string,
+    opts: { signal: AbortSignal; onSource: (s: SearchSource) => void },
+  ) =>
+    new Promise<void>((resolve) => {
+      setFailure(null);
+      if (
+        !socket.current?.send({ type: "ask", text: query, ...askExtras(chain) })
+      ) {
+        setFailure("Not connected to the agent.");
+        return resolve();
+      }
+      setTranscript((t) => [
+        ...t,
+        { role: "user", text: query, at: new Date().toISOString() },
+      ]);
+      setRun({ kind: "ask", steps: [] });
+      pending.current = { resolve, onSource: opts.onSource };
+      opts.signal.addEventListener(
+        "abort",
+        () => socket.current?.send({ type: "stop" }),
+        {
+          once: true,
+        },
+      );
+    });
+
+  const generate = () => {
+    setFailure(null);
+    if (!socket.current?.send({ type: "report", ...askExtras(chain) })) {
+      setFailure("Not connected to the agent.");
+      return;
+    }
+    setRun({ kind: "report", steps: [] });
+    pending.current = { resolve: () => undefined, onSource: () => undefined };
+  };
+
+  // The server echoes the user's message in the transcript only on reload,
+  // so a live turn shows the local copy; a state frame replaces both.
+  const answered = transcript.some(
+    (e) => e.role === "assistant" && !e.declined && !e.reportId,
+  );
+
+  const status = !connected
+    ? "Connecting…"
+    : run?.kind === "report"
+      ? "Writing the report…"
+      : run
+        ? "Researching…"
+        : answered
+          ? plural(
+              transcript.filter((e) => e.role === "user").length,
+              "question",
+            )
+          : "Ask about this trace";
+
+  return (
+    <motion.section
+      animate={{ height: open ? vh - GAP * 2 : HEADER_H }}
+      aria-label="Agent"
+      className="absolute top-3 right-3 z-20 flex w-[340px] flex-col overflow-hidden rounded-[22px] border border-white bg-white/80 shadow-console backdrop-blur-xl"
+      initial={false}
+      transition={reduce ? { duration: 0 } : { duration: 0.5, ease: EASE }}
+    >
+      <header
+        className="flex shrink-0 cursor-pointer items-center gap-3 px-4 select-none"
+        onClick={() => setOpen(!open)}
+        style={{ height: HEADER_H }}
+      >
+        <div className="min-w-0 flex-1">
+          <h2 className="text-[13.5px] font-medium text-ink">Agent</h2>
+          <p className="truncate text-[11.5px] text-faint">{status}</p>
+        </div>
+        <button
+          aria-expanded={open}
+          aria-label={open ? "Collapse" : "Expand"}
+          className="flex size-8 items-center justify-center rounded-full text-muted transition-colors hover:bg-ink/5 hover:text-ink"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpen(!open);
+          }}
+          type="button"
+        >
+          <ChevronUp
+            className={cn(
+              "size-4 transition-transform duration-300",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+      </header>
+
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="shrink-0 px-3">
+          <NodeBrief
+            address={inspected}
+            chain={chain}
+            name={inspectedName}
+            role={inspectedRole}
+          />
+        </div>
+
+        <div
+          className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-2"
+          ref={scroller}
+        >
+          {transcript.length === 0 && !run && (
+            <div className="px-1 pt-1 text-[13px] leading-6 text-muted">
+              <p className="text-ink">Ask about this trace.</p>
+              <p className="mt-1">
+                Who an address is, where funds went, how the exploit worked.
+                Every answer cites the transactions, datasets or pages it rests
+                on.
+              </p>
+            </div>
+          )}
+          <div className="flex flex-col gap-4">
+            {transcript.map((e, i) =>
+              e.role === "user" ? (
+                <div className="flex justify-end" key={i}>
+                  <p className="max-w-[85%] rounded-2xl rounded-br-md bg-subtle px-3 py-2 text-[13px] leading-5 text-ink">
+                    {e.text}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2" key={i}>
+                  {traces[i] && <AILoadingState steps={traces[i]} />}
+                  {e.reportId ? (
+                    <a
+                      className="flex items-center gap-2.5 rounded-xl bg-subtle px-3 py-2.5 text-[13px] text-ink transition-colors hover:bg-line"
+                      href={reportPdf(e.reportId)}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      <FileText className="size-4 shrink-0 text-muted" />
+                      <span className="min-w-0 flex-1 truncate">
+                        {e.text.replace(/^Report ready:\s*/, "")}
+                      </span>
+                      <span className="shrink-0 text-[12px] text-muted">
+                        PDF
+                      </span>
+                    </a>
+                  ) : e.declined ? (
+                    <p className="text-[13px] leading-6 text-muted">{e.text}</p>
+                  ) : (
+                    <Answer sources={sources} text={e.text} />
+                  )}
+                </div>
+              ),
+            )}
+            {run && (
+              <AILoadingState collapseWhenDone={false} steps={run.steps} />
+            )}
+            {failure && <p className="text-[12px] text-muted">{failure}</p>}
+          </div>
+        </div>
+
+        <div className="shrink-0 border-t border-line px-3 pt-2.5 pb-1">
+          <button
+            className={cn(
+              "flex h-8 w-full items-center justify-center gap-2 rounded-xl text-[12px] font-medium transition-colors",
+              answered && !busy
+                ? "bg-ink text-white hover:bg-ink-soft"
+                : "bg-subtle text-faint",
+            )}
+            disabled={!answered || busy || !connected}
+            onClick={generate}
+            title={answered ? undefined : "Ask at least one question first"}
+            type="button"
+          >
+            <FileText className="size-3.5" />
+            {run?.kind === "report" ? "Generating report…" : "Generate report"}
+          </button>
+          <AIInputSearch
+            className="max-w-none py-2"
+            defaultTool={null}
+            disabled={!connected || run?.kind === "report"}
+            minimal
+            onSearch={(q, o) => ask(q, o)}
+            placeholder={connected ? "Ask about this trace" : "Connecting…"}
+          />
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
