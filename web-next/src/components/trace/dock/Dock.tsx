@@ -23,7 +23,8 @@ import { SpoofTag } from "./SpoofTag";
 import { spoofOf } from "./spoof";
 
 // The bottom dock: the active address's ledger, every transfer in and out.
-// It floats at the bottom centre at macOS-dock width, leaving room for the
+// It floats over the canvas (never pushing it) at the bottom centre at
+// macOS-dock width, collapsed until a node is interacted with, leaving room for the
 // address chain (left) and the AI dock (right). Three detents: collapsed
 // (header strip with counts, All/In/Out and any active filters), half,
 // and full (covers the canvas and slides under the address chain). Drag
@@ -56,6 +57,7 @@ function useViewport() {
 export function Dock({
   chain,
   address,
+  subjectName,
   rows,
   counterparties,
   labels,
@@ -64,10 +66,13 @@ export function Dock({
   onLoadMore,
   onRetry,
   onHoverCounterparty,
+  openKey,
+  collapseKey,
 }: {
   chain: string;
-  /** The active address; filters reset when it changes. */
+  /** Whose transfers these are; filters reset when it changes. */
   address: string;
+  subjectName?: string;
   rows: LedgerRow[];
   counterparties: Counterparty[];
   labels: Record<string, KnownLabel>;
@@ -76,10 +81,22 @@ export function Dock({
   onLoadMore: () => void;
   onRetry: () => void;
   onHoverCounterparty: (address: string | null) => void;
+  /** Changes when a node is inspected: the dock opens to half. */
+  openKey: number;
+  /** Changes when a node is followed: the dock gets out of the way. */
+  collapseKey: number;
 }) {
   const reduce = useReducedMotion();
   const { w: vw, h: vh } = useViewport();
-  const [detent, setDetent] = useState<Detent>("half");
+  // Collapsed by default, floating over the canvas; a node interaction
+  // opens it to half (never shrinks it).
+  const [detent, setDetent] = useState<Detent>("collapsed");
+  useEffect(() => {
+    if (openKey > 0) setDetent((d) => (d === "collapsed" ? "half" : d));
+  }, [openKey]);
+  useEffect(() => {
+    if (collapseKey > 0) setDetent("collapsed");
+  }, [collapseKey]);
   const [dragH, setDragH] = useState<number | null>(null);
   const [f, setF] = useState<Filters>(NO_FILTERS);
   const set = (patch: Partial<Filters>) => setF((x) => ({ ...x, ...patch }));
@@ -154,7 +171,17 @@ export function Dock({
           className="absolute top-1.5 left-1/2 h-1 w-9 -translate-x-1/2 rounded-full bg-ink/10"
         />
         <div className="min-w-0 flex-1">
-          <h2 className="text-[13.5px] font-medium text-ink">Transfers</h2>
+          <h2 className="flex items-center gap-1.5 text-[13.5px] font-medium text-ink">
+            Transfers
+            <span className="font-mono text-[12px] font-normal text-muted">
+              {short(address, 4, 4)}
+            </span>
+            {subjectName && (
+              <span className="truncate text-[12px] font-normal text-faint">
+                {subjectName}
+              </span>
+            )}
+          </h2>
           <p className="truncate text-[11.5px] text-faint tabular-nums">
             {summary(
               rows.length,

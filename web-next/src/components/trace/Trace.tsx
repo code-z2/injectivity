@@ -5,17 +5,24 @@ import { takePreloaded } from "@/lib/preload";
 import { SUGGESTIONS } from "@/lib/suggestions";
 import { ADDRESS_RE } from "@/lib/utils";
 import { AddressChain, type Flash } from "./AddressChain";
-import { CounterpartyPicks } from "./CounterpartyPicks";
+import { usePrices } from "@/lib/prices";
+import { CardGlobe } from "./globe/CardGlobe";
+import type { NodeStat } from "./globe/molecule";
+import { useOuterRing } from "./globe/useOuterRing";
 import { Dock } from "./dock/Dock";
 import { Toast, type ToastMessage } from "./Toast";
 import { nameFromLabel, roleFromLabel, type ChainLink } from "./types";
 import { useLedger } from "./useLedger";
 
-// The trace page (phase 2). Left: the user-built address chain; selecting
-// a link makes it active. Bottom: the dock, the active address's ledger.
-// Centre: for now, its unique counterparties as chips (the globe will take
-// this place); clicking one follows it, cutting any links after the active
-// one (undoable). Each link's menu copies its address or detaches it.
+// The trace page (phase 2), on a dot-pattern field. Left: the user-built
+// address chain; selecting a link makes it active. Centre: the card globe,
+// the active address's molecule; clicking a card follows it (cutting any
+// links after the active one, undoable) and opens the dock. Bottom: the
+// dock, the active address's ledger, floating over the globe.
+
+const RING1_MAX = 14; // atoms around the active address
+const RING2_PARENTS = 10; // ring-1 addresses whose own counterparties are fetched
+const RING3_PARENTS = 10; // ring-2 addresses that grow a third ring
 
 export function Trace({ chain, target }: { chain: Chain; target: string }) {
   const [root, setRoot] = useState<string | null>(() =>
@@ -41,6 +48,16 @@ export function Trace({ chain, target }: { chain: Chain; target: string }) {
 
   return (
     <main className="relative h-svh w-full overflow-hidden bg-canvas">
+      {/* Dot pattern: barely there, just enough texture. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgb(11 13 18 / 0.06) 1px, transparent 1px)",
+          backgroundSize: "18px 18px",
+        }}
+      />
       <h1 className="sr-only">Trace of {target}</h1>
       {root ? (
         <Workspace
@@ -81,12 +98,86 @@ function Workspace({
   const [selected, setSelected] = useState(0);
   const [flash, setFlash] = useState<Flash>();
   const [lit, setLit] = useState<string | null>(null);
+  const [openKey, setOpenKey] = useState(0);
+  const [collapseKey, setCollapseKey] = useState(0);
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [known, setKnown] = useState<Record<string, KnownLabel>>({});
   const toastId = useRef(0);
 
   const active = links[Math.min(selected, links.length - 1)]!;
   const ledger = useLedger(chain, active.address);
+  const fresh = ledger.owner === active.address;
+  const ready = fresh && ledger.status !== "loading";
+
+  // Ring 1: the active address's most active counterparties, with the
+  // counts and token flows between them (from the loaded ledger).
+  const ring1 = useMemo<NodeStat[]>(() => {
+    if (!fresh) return [];
+    const top = new Map(
+      ledger.counterparties.slice(0, RING1_MAX).map((c) => [
+        c.address,
+        {
+          address: c.address,
+          inCount: c.inCount,
+          outCount: c.outCount,
+          flows: [],
+        } as NodeStat,
+      ]),
+    );
+    for (const r of ledger.rows) {
+      top.get(r.counterparty)?.flows.push({
+        contract: r.contract,
+        asset: r.asset,
+        amount: r.amount,
+        category: r.category,
+      });
+    }
+    return [...top.values()];
+  }, [fresh, ledger.counterparties, ledger.rows]);
+  const prices = usePrices(chain);
+  const parents = useMemo(
+    () => ring1.slice(0, RING2_PARENTS).map((r) => r.address),
+    [ring1],
+  );
+  const outer2 = useOuterRing(chain, active.address, ready ? parents : [], 4);
+  // Ring 3 grows from the most active ring-2 atoms not already placed.
+  const parents3 = useMemo(() => {
+    const placed = new Set([active.address, ...ring1.map((r) => r.address)]);
+    const kids = [...outer2.ring.values()].flat();
+    const seen = new Set<string>();
+    return kids
+      .filter(
+        (k) =>
+          !placed.has(k.address) && !seen.has(k.address) && seen.add(k.address),
+      )
+      .sort((a, b) => b.inCount + b.outCount - (a.inCount + a.outCount))
+      .slice(0, RING3_PARENTS)
+      .map((k) => k.address);
+  }, [outer2.ring, ring1, active.address]);
+  const outer3 = useOuterRing(
+    chain,
+    active.address,
+    outer2.pending === 0 ? parents3 : [],
+    3,
+  );
+  const globeLabels = useMemo(
+    () => ({ ...known, ...ledger.labels, ...outer2.labels, ...outer3.labels }),
+    [known, ledger.labels, outer2.labels, outer3.labels],
+  );
+
+  // The dock shows the inspected card (a single click), else the active
+  // address. Its own ledger loads only while inspecting something else.
+  const [inspect, setInspect] = useState<string | null>(null);
+  const subject = inspect ?? active.address;
+  const other = useLedger(
+    chain,
+    inspect && inspect !== active.address ? inspect : "",
+  );
+  const dockLedger = inspect && inspect !== active.address ? other : ledger;
+  function inspectCard(address: string) {
+    setInspect(address);
+    setOpenKey((k) => k + 1);
+  }
 
   // Remember every label the ledger has found, for the chain's badges.
   useEffect(() => {
@@ -120,25 +211,33 @@ function Workspace({
     };
   }
 
-  function follow(address: string) {
-    if (links.some((l) => l.address === address)) {
+  // Follow one address (ring 1) or a parent and its child (ring 2) from
+  // the active link, cutting any links after it.
+  function follow(path: string[]) {
+    const unseen = path.filter((a) => !links.some((l) => l.address === a));
+    if (unseen.length === 0) {
+      const address = path[path.length - 1]!;
       setFlash((f) => ({ address, n: (f?.n ?? 0) + 1 }));
       return;
     }
-    const k = known[address] ?? ledger.labels[address];
     const keep = links.slice(0, selected + 1);
     const cut = links.length - keep.length;
     const prev = links;
     const prevSelected = selected;
-    setLinks([
-      ...keep,
-      { address, role: roleFromLabel(k), label: nameFromLabel(k) },
-    ]);
-    setSelected(keep.length);
+    const added = path
+      .filter((a) => !keep.some((l) => l.address === a))
+      .map((address) => {
+        const k = globeLabels[address];
+        return { address, role: roleFromLabel(k), label: nameFromLabel(k) };
+      });
+    setLinks([...keep, ...added]);
+    setSelected(keep.length + added.length - 1);
+    setInspect(null);
+    setCollapseKey((k) => k + 1);
     if (cut > 0) {
       say(
         cut === 1 ? "Detached 1 address" : `Detached ${cut} addresses`,
-        restore(prev, prevSelected, keep.length + 1),
+        restore(prev, prevSelected, keep.length + added.length),
       );
     }
   }
@@ -171,31 +270,48 @@ function Workspace({
           chain={chain}
           flash={flash}
           selected={selected}
-          onSelect={setSelected}
+          onSelect={(i) => {
+            setSelected(i);
+            setInspect(null);
+          }}
           onCopy={copy}
           onDetach={detach}
         />
       </aside>
-      <div className="absolute top-6 right-6 left-[360px]">
-        <CounterpartyPicks
-          counterparties={ledger.counterparties}
-          labels={ledger.labels}
+      <div className="absolute inset-0">
+        <CardGlobe
+          chain={chain}
+          active={active.address}
+          ring1={ring1}
+          ring2={outer2.ring}
+          ring3={outer3.ring}
+          ready={ready}
+          labels={globeLabels}
+          prices={prices}
           lit={lit}
-          detaches={links.length - 1 - selected}
+          overflow={
+            fresh ? Math.max(0, ledger.counterparties.length - RING1_MAX) : 0
+          }
+          mapping={outer2.pending + outer3.pending}
+          inspected={subject}
+          onInspect={inspectCard}
           onFollow={follow}
         />
       </div>
       <Dock
         chain={chain}
-        address={active.address}
-        rows={ledger.rows}
-        counterparties={ledger.counterparties}
-        labels={ledger.labels}
-        status={ledger.status}
-        error={ledger.error}
-        onLoadMore={ledger.loadMore}
-        onRetry={ledger.retry}
+        address={subject}
+        subjectName={nameFromLabel(globeLabels[subject])}
+        rows={dockLedger.rows}
+        counterparties={dockLedger.counterparties}
+        labels={dockLedger.labels}
+        status={dockLedger.status}
+        error={dockLedger.error}
+        onLoadMore={dockLedger.loadMore}
+        onRetry={dockLedger.retry}
         onHoverCounterparty={setLit}
+        openKey={openKey}
+        collapseKey={collapseKey}
       />
       <Toast toast={toast} onDone={clearToast} />
     </>

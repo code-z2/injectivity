@@ -36,6 +36,9 @@ export function useLedger(chain: string, address: string) {
   const [status, setStatus] = useState<LedgerStatus>("loading");
   const [error, setError] = useState("");
   const [labels, setLabels] = useState<Record<string, KnownLabel>>({});
+  // Whose rows these are: lags the address by one render after a switch,
+  // so callers can tell stale rows from fresh ones.
+  const [owner, setOwner] = useState("");
   const pageKey = useRef<string | undefined>(undefined);
   const gen = useRef(0);
   const asked = useRef(new Set<string>());
@@ -97,11 +100,16 @@ export function useLedger(chain: string, address: string) {
   useEffect(() => {
     const g = ++gen.current;
     setRows([]);
+    setOwner(me);
     setLabels({});
     setError("");
     setStatus("loading");
     pageKey.current = undefined;
     asked.current = new Set();
+    if (!me) {
+      setStatus("done"); // idle: no address to load
+      return;
+    }
     askLabels([me], g);
     void load(g);
   }, [me, load, askLabels]);
@@ -138,6 +146,7 @@ export function useLedger(chain: string, address: string) {
   }, [rows, me]);
 
   return {
+    owner,
     rows,
     counterparties,
     labels,
