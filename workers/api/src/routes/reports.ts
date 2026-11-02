@@ -1,11 +1,13 @@
-// INFRA-2 route: GET /v1/reports/:id.pdf renders a saved investigation
-// as a four-section PDF (snapshot, paths, risk split, findings+sources).
+// Reports. GET /v1/reports/:id (legacy one-shot investigations; ?format=pdf
+// renders a four-section PDF: snapshot, paths, risk split, findings+sources).
+// Agent post-mortems live under /v1/r/:key (see below).
 // Trace and risk context are re-derived cache-first at export time so the
 // stored row stays a plain report body.
 import { Hono } from 'hono';
 import { alchemyClient } from '@/alchemy';
 import type { ReportV2 } from '@/agent/report';
 import { retractFromReport } from '@/agent/memory/store';
+import { OWNER_TOKEN, REPORT_KEY, sameHex, sha256Hex } from '@/agent/reportKeys';
 import { renderIntelPdf } from '@/export/pdf';
 import { renderPostMortemPdf } from '@/export/postmortem';
 import type { IntelReport } from '@/llm/investigate';
@@ -40,18 +42,9 @@ export function createReportsRoutes(client: AlchemyClient = alchemyClient) {
     } catch {
       return c.json({ error: 'stored report is not readable JSON' }, 502);
     }
-    // v2: the agent's post-mortem.
+    // Agent reports (v2) are only served by their unguessable key.
     if ((parsed as { version?: number })?.version === 2) {
-      const v2 = parsed as ReportV2;
-      if (c.req.query('format') !== 'pdf')
-        return c.json({ id: row.id, title: row.title, created_at: row.created_at, ...v2 });
-      const pdf = await renderPostMortemPdf(row.id, row.created_at, v2);
-      return new Response(pdf.buffer as ArrayBuffer, {
-        headers: {
-          'content-type': 'application/pdf',
-          'content-disposition': `attachment; filename="report-${row.id}.pdf"`,
-        },
-      });
+      return c.json({ error: 'report not found' }, 404);
     }
     // Current envelope {address, chain, report}; legacy rows stored the
     // report object directly (address/chain then unknown).
@@ -127,18 +120,65 @@ export function createReportsRoutes(client: AlchemyClient = alchemyClient) {
     });
   });
 
-  // The analyst marks a report sentence as wrong: facts learned from it are
+  // Agent reports by key. The page data needs the owner token (sent by
+  // the browser that generated the report); the PDF needs only the key,
+  // so its link can be shared.
+  const keyed = async (env: Env, key: string) => {
+    if (!REPORT_KEY.test(key)) return null;
+    const row = await env.DB.prepare(
+      'SELECT id, title, body, created_at, owner_hash FROM reports WHERE key = ?',
+    )
+      .bind(key)
+      .first<StoredReport & { owner_hash: string | null }>();
+    if (!row) return null;
+    try {
+      const body = JSON.parse(row.body) as ReportV2;
+      return body?.version === 2 ? { row, body } : null;
+    } catch {
+      return null;
+    }
+  };
+  const isOwner = async (token: string | undefined, hash: string | null) =>
+    Boolean(token && hash && OWNER_TOKEN.test(token) && sameHex(await sha256Hex(token), hash));
+
+  routes.get('/v1/r/:key', async (c) => {
+    const found = await keyed(c.env, c.req.param('key'));
+    if (!found) return c.json({ error: 'report not found' }, 404);
+    if (!(await isOwner(c.req.header('x-report-owner'), found.row.owner_hash)))
+      return c.json({ error: 'this report can only be opened where it was generated' }, 403);
+    return c.json({ title: found.row.title, created_at: found.row.created_at, ...found.body });
+  });
+
+  routes.get('/v1/r/:key/pdf', async (c) => {
+    const found = await keyed(c.env, c.req.param('key'));
+    if (!found) return c.json({ error: 'report not found' }, 404);
+    const pdf = await renderPostMortemPdf(found.row.created_at, found.body);
+    const slug =
+      found.row.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 60) || 'report';
+    return new Response(pdf.buffer as ArrayBuffer, {
+      headers: {
+        'content-type': 'application/pdf',
+        'content-disposition': `inline; filename="${slug}.pdf"`,
+      },
+    });
+  });
+
+  // The owner marks a report sentence as wrong: facts learned from it are
   // retracted and the correction is remembered.
-  routes.post('/v1/reports/:id/feedback', async (c) => {
-    const id = Number(c.req.param('id'));
-    if (!Number.isInteger(id) || id <= 0) return c.json({ error: 'invalid report id' }, 400);
+  routes.post('/v1/r/:key/feedback', async (c) => {
+    const found = await keyed(c.env, c.req.param('key'));
+    if (!found) return c.json({ error: 'report not found' }, 404);
+    if (!(await isOwner(c.req.header('x-report-owner'), found.row.owner_hash)))
+      return c.json({ error: 'not allowed' }, 403);
     const body = (await c.req.json().catch(() => null)) as { sentence?: unknown } | null;
     const sentence = typeof body?.sentence === 'string' ? body.sentence.trim() : '';
     if (!sentence || sentence.length > 2000)
       return c.json({ error: 'sentence (1-2000 chars) is required' }, 400);
-    const row = await c.env.DB.prepare('SELECT id FROM reports WHERE id = ?').bind(id).first();
-    if (!row) return c.json({ error: 'report not found' }, 404);
-    return c.json(await retractFromReport(c.env, id, sentence));
+    return c.json(await retractFromReport(c.env, found.row.id, sentence));
   });
 
   return routes;

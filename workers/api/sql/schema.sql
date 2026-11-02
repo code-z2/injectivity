@@ -57,8 +57,11 @@ CREATE TABLE IF NOT EXISTS reports (
   id         INTEGER PRIMARY KEY,
   title      TEXT NOT NULL,
   body       TEXT NOT NULL,
-  created_at TEXT NOT NULL DEFAULT ''
+  created_at TEXT NOT NULL DEFAULT '',
+  key        TEXT,
+  owner_hash TEXT
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_reports_key ON reports(key);
 CREATE TABLE IF NOT EXISTS expansions (
   chain      TEXT NOT NULL,
   address    TEXT NOT NULL,

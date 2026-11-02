@@ -51,6 +51,8 @@ interface AICitationsProps {
    * Render previews elsewhere: called with the hovered chip's sources and
    * its box (null when it closes) instead of drawing the built-in card.
    */
+  /** Called with a chip's source ids when it is clicked. */
+  onCite?: (ids: string[]) => void;
   onPreview?: (
     preview: { key: string; sources: CitationSource[]; rect: DOMRect } | null,
   ) => void;
@@ -232,6 +234,7 @@ export default function AICitations({
   textClassName,
   showSources = true,
   onPreview,
+  onCite,
 }: AICitationsProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const { preview, warm, show, hide } = usePreview();
@@ -390,9 +393,10 @@ export default function AICitations({
                     onBlur={() => hide(true)}
                     // Focus already opened it for mouse and keyboard; a tap
                     // on touch opens it here. Blur or Escape closes it.
-                    onClick={(event) =>
-                      show(place(index, event.currentTarget), true)
-                    }
+                    onClick={(event) => {
+                      show(place(index, event.currentTarget), true);
+                      onCite?.(partSources.map((source) => source.id));
+                    }}
                     onFocus={(event) =>
                       show(place(index, event.currentTarget), true)
                     }

@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReportKeyRouteImport } from './routes/report.$key'
 import { Route as InvestigateChainTargetRouteImport } from './routes/investigate.$chain.$target'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportKeyRoute = ReportKeyRouteImport.update({
+  id: '/report/$key',
+  path: '/report/$key',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvestigateChainTargetRoute = InvestigateChainTargetRouteImport.update({
@@ -25,27 +31,31 @@ const InvestigateChainTargetRoute = InvestigateChainTargetRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/report/$key': typeof ReportKeyRoute
   '/investigate/$chain/$target': typeof InvestigateChainTargetRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/report/$key': typeof ReportKeyRoute
   '/investigate/$chain/$target': typeof InvestigateChainTargetRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/report/$key': typeof ReportKeyRoute
   '/investigate/$chain/$target': typeof InvestigateChainTargetRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/investigate/$chain/$target'
+  fullPaths: '/' | '/report/$key' | '/investigate/$chain/$target'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/investigate/$chain/$target'
-  id: '__root__' | '/' | '/investigate/$chain/$target'
+  to: '/' | '/report/$key' | '/investigate/$chain/$target'
+  id: '__root__' | '/' | '/report/$key' | '/investigate/$chain/$target'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ReportKeyRoute: typeof ReportKeyRoute
   InvestigateChainTargetRoute: typeof InvestigateChainTargetRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report/$key': {
+      id: '/report/$key'
+      path: '/report/$key'
+      fullPath: '/report/$key'
+      preLoaderRoute: typeof ReportKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/investigate/$chain/$target': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ReportKeyRoute: ReportKeyRoute,
   InvestigateChainTargetRoute: InvestigateChainTargetRoute,
 }
 export const routeTree = rootRouteImport

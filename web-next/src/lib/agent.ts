@@ -32,6 +32,8 @@ export interface Entry {
   removed?: number;
   declined?: boolean;
   reportId?: number;
+  reportKey?: string;
+  reportToken?: string;
 }
 
 export interface Workspace {
@@ -69,7 +71,8 @@ export type ServerFrame =
   | {
       type: "report";
       entry: Entry;
-      reportId: number;
+      reportKey: string;
+      ownerToken: string;
       title: string;
       removed: number;
     }
@@ -284,5 +287,3 @@ export async function streamSummary(
     }
   }
 }
-
-export const reportPdf = (id: number) => `${BASE}/v1/reports/${id}?format=pdf`;

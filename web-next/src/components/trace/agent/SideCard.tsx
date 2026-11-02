@@ -21,7 +21,14 @@ const GAP = 12;
 const WIDTH = 320;
 const EASE = [0.23, 1, 0.32, 1] as const;
 
-export function SideCard({ reveal }: { reveal: Reveal | null }) {
+export function SideCard({
+  reveal,
+  left,
+}: {
+  reveal: Reveal | null;
+  /** Place the card at this x instead of left of the agent dock. */
+  left?: number;
+}) {
   const card = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
   useLayoutEffect(() => {
@@ -43,7 +50,11 @@ export function SideCard({ reveal }: { reveal: Reveal | null }) {
           className="pointer-events-none fixed z-[5000]"
           exit={{ opacity: 0, x: 6, transition: { duration: 0.12 } }}
           initial={{ opacity: 0, x: 6, top }}
-          style={{ right: INSET + DOCK_W + GAP, width: WIDTH }}
+          style={
+            left === undefined
+              ? { right: INSET + DOCK_W + GAP, width: WIDTH }
+              : { left, width: WIDTH }
+          }
           transition={{
             opacity: { duration: 0.16, ease: EASE },
             x: { duration: 0.2, ease: EASE },

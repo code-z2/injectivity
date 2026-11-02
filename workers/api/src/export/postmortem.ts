@@ -3,15 +3,12 @@
 import type { ReportV2 } from '@/agent/report';
 import { Doc } from '@/export/pdf';
 
-export async function renderPostMortemPdf(id: number, createdAt: string, r: ReportV2) {
+export async function renderPostMortemPdf(createdAt: string, r: ReportV2) {
   const d = new Doc();
   await d.init();
   const pm = r.postMortem;
   d.heading(pm.title, 16);
-  d.line(
-    `Report ${id} · ${r.chain} · generated ${createdAt.slice(0, 10)} · ${r.sources.length} sources`,
-    8,
-  );
+  d.line(`${r.chain} · generated ${createdAt.slice(0, 10)} · ${r.sources.length} sources`, 8);
   d.gap(10);
 
   const section = (title: string, body: string) => {

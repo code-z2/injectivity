@@ -4,6 +4,7 @@
 import { alchemyClient } from '@/alchemy';
 import { checkScope } from '@/agent/gate';
 import { curate } from '@/agent/memory/curator';
+import { randomHex, sha256Hex } from '@/agent/reportKeys';
 import { Ledger, type Source } from '@/agent/ledger';
 import { type LoopEvent, runResearch } from '@/agent/loop';
 import { RESEARCH_PROMPT, SCOPE_DECLINE } from '@/agent/prompts/research';
@@ -33,6 +34,9 @@ export interface Entry {
   declined?: boolean;
   /** Assistant only: the report this entry announces. */
   reportId?: number;
+  /** Its unguessable key (page and PDF) and the owner token for the page. */
+  reportKey?: string;
+  reportToken?: string;
 }
 
 export interface Meta {
@@ -65,7 +69,14 @@ export type SessionEvent =
   | { type: 'step'; step: LoopEvent }
   | { type: 'answer'; entry: Entry; sources: Source[]; removed: Removed[] }
   | { type: 'declined'; entry: Entry }
-  | { type: 'report'; entry: Entry; reportId: number; title: string; removed: number }
+  | {
+      type: 'report';
+      entry: Entry;
+      reportKey: string;
+      ownerToken: string;
+      title: string;
+      removed: number;
+    }
   | { type: 'error'; error: string };
 
 export interface AskOptions {
@@ -244,10 +255,12 @@ export class SessionCore {
       sources,
       meta: { model: writer.model, removed, generatedAt: now() },
     };
+    const reportKey = randomHex(16);
+    const ownerToken = randomHex(24);
     const saved = (await this.env.DB.prepare(
-      'INSERT INTO reports (title, body, created_at) VALUES (?,?,?)',
+      'INSERT INTO reports (title, body, created_at, key, owner_hash) VALUES (?,?,?,?,?)',
     )
-      .bind(postMortem.title, JSON.stringify(body), now())
+      .bind(postMortem.title, JSON.stringify(body), now(), reportKey, await sha256Hex(ownerToken))
       .run()) as unknown as { meta?: { last_row_id?: number } };
     const reportId = saved.meta?.last_row_id;
     if (typeof reportId !== 'number') throw new Error('the report could not be saved');
@@ -256,9 +269,11 @@ export class SessionCore {
       text: `Report ready: ${postMortem.title}`,
       at: now(),
       reportId,
+      reportKey,
+      reportToken: ownerToken,
     };
     await this.store.append({ sources: ledger.all().slice(before), transcript: [entry] });
-    emit({ type: 'report', entry, reportId, title: postMortem.title, removed });
+    emit({ type: 'report', entry, reportKey, ownerToken, title: postMortem.title, removed });
 
     // 4. Keep what's worth remembering (best effort: the report stands either way).
     emit({ type: 'status', stage: 'memory' });

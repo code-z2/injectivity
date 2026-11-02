@@ -14,14 +14,20 @@ export function Answer({
   text,
   sources,
   onPreview,
+  onCite,
+  prose = "text-[13px] leading-6 text-ink-soft",
 }: {
   text: string;
   sources: Map<string, Source>;
   /** Show previews in the side card instead of beside the chip. */
   onPreview?: OnPreview;
+  /** A chip was clicked: its source ids. */
+  onCite?: (ids: string[]) => void;
+  /** Text classes (size, leading, colour). */
+  prose?: string;
 }) {
   const cites = [...sources.values()].map(toCitation);
-  const prose = "text-[13px] leading-6 text-ink-soft [overflow-wrap:anywhere]";
+  const textCls = `${prose} [overflow-wrap:anywhere]`;
   return (
     <div className="flex flex-col gap-2.5">
       {parseBlocks(text).map((b, i) => {
@@ -39,10 +45,11 @@ export function Answer({
                   <AICitations
                     className="max-w-none"
                     parts={parts}
+                    onCite={onCite}
                     onPreview={onPreview}
                     showSources={false}
                     sources={cites}
-                    textClassName={prose}
+                    textClassName={textCls}
                   />
                 </li>
               ))}
@@ -53,10 +60,11 @@ export function Answer({
             className="max-w-none"
             key={i}
             parts={b.parts}
+            onCite={onCite}
             onPreview={onPreview}
             showSources={false}
             sources={cites}
-            textClassName={prose}
+            textClassName={textCls}
           />
         );
       })}

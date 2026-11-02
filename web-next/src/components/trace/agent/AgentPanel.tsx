@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { ChevronUp, FileText } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import AILoadingState, {
@@ -11,12 +12,12 @@ import {
   connectSession,
   type Entry,
   forgetSession,
-  reportPdf,
   type ServerFrame,
   type Source,
   sessionFor,
   type Workspace,
 } from "@/lib/agent";
+import { rememberReport } from "@/lib/reports";
 import { cn } from "@/lib/utils";
 import type { AddressRole, ChainLink } from "../types";
 import { Answer, type OnPreview } from "./Answer";
@@ -134,6 +135,9 @@ export function AgentPanel({
     const onFrame = (f: ServerFrame) => {
       switch (f.type) {
         case "state":
+          for (const e of f.transcript)
+            if (e.reportKey && e.reportToken)
+              rememberReport(e.reportKey, e.reportToken);
           setTranscript(f.transcript);
           setSources(new Map(f.sources.map((s) => [s.id, s])));
           break;
@@ -160,6 +164,7 @@ export function AgentPanel({
           });
           break;
         case "report":
+          rememberReport(f.reportKey, f.ownerToken);
           setTranscript((t) => [...t, f.entry]);
           break;
         case "memory":
@@ -323,21 +328,20 @@ export function AgentPanel({
               ) : (
                 <div className="flex flex-col gap-2" key={i}>
                   {traces[i] && <AILoadingState steps={traces[i]} />}
-                  {e.reportId ? (
-                    <a
+                  {e.reportKey ? (
+                    <Link
                       className="flex items-center gap-2.5 rounded-xl bg-subtle px-3 py-2.5 text-[13px] text-ink transition-colors hover:bg-line"
-                      href={reportPdf(e.reportId)}
-                      rel="noopener noreferrer"
-                      target="_blank"
+                      params={{ key: e.reportKey }}
+                      to="/report/$key"
                     >
                       <FileText className="size-4 shrink-0 text-muted" />
                       <span className="min-w-0 flex-1 truncate">
                         {e.text.replace(/^Report ready:\s*/, "")}
                       </span>
                       <span className="shrink-0 text-[12px] text-muted">
-                        PDF
+                        Open
                       </span>
-                    </a>
+                    </Link>
                   ) : e.declined ? (
                     <p className="text-[13px] leading-6 text-muted">{e.text}</p>
                   ) : (

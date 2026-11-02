@@ -81,7 +81,53 @@ describe('finalise', () => {
       sources,
       meta: { model: 'm', removed: 0, generatedAt: '2026-11-02' },
     };
-    const pdf = await renderPostMortemPdf(7, '2026-11-02T00:00:00Z', r);
+    const pdf = await renderPostMortemPdf('2026-11-02T00:00:00Z', r);
     expect(new TextDecoder().decode(pdf.slice(0, 5))).toBe('%PDF-');
+  });
+});
+
+describe('keyed report routes', () => {
+  test('page data needs the owner token; the PDF only the key; ids never serve v2', async () => {
+    const { makeTestEnv } = await import('./harness');
+    const { sha256Hex } = await import('@/agent/reportKeys');
+    const { app, env, db } = makeTestEnv();
+    const { postMortem, sources } = finalise(draft, ledger());
+    const body: ReportV2 = {
+      version: 2,
+      chain: 'ethereum',
+      addresses: [A],
+      postMortem,
+      sources,
+      meta: { model: 'm', removed: 0, generatedAt: '' },
+    };
+    const key = 'a'.repeat(32);
+    const token = 'b'.repeat(48);
+    db.prepare(
+      'INSERT INTO reports (id, title, body, created_at, key, owner_hash) VALUES (?,?,?,?,?,?)',
+    ).run(
+      9,
+      'Bybit exploit',
+      JSON.stringify(body),
+      '2026-11-03T00:00:00Z',
+      key,
+      await sha256Hex(token),
+    );
+    const go = (path: string, headers: Record<string, string> = {}) =>
+      app.fetch(new Request(`http://test${path}`, { headers }), env);
+
+    expect((await go(`/v1/r/${key}`)).status).toBe(403);
+    expect((await go(`/v1/r/${key}`, { 'x-report-owner': 'c'.repeat(48) })).status).toBe(403);
+    const ok = await go(`/v1/r/${key}`, { 'x-report-owner': token });
+    expect(ok.status).toBe(200);
+    expect(((await ok.json()) as { postMortem: PostMortem }).postMortem.title).toBe(
+      'Bybit exploit',
+    );
+
+    const pdf = await go(`/v1/r/${key}/pdf`);
+    expect(pdf.status).toBe(200);
+    expect(pdf.headers.get('content-type')).toBe('application/pdf');
+
+    expect((await go(`/v1/r/${'f'.repeat(32)}/pdf`)).status).toBe(404);
+    expect((await go('/v1/reports/9')).status).toBe(404);
   });
 });
