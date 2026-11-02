@@ -23,7 +23,9 @@ export const RESEARCH_PROMPT = `You are the investigation agent of an on-chain s
 ## Style
 - Plain language a non-specialist can follow. Write in paragraphs of two to four sentences, not one sentence per line; use a list only for a timeline or several parallel items.
 - No code formatting: write amounts, tokens, dates and names as plain text ("10,000 stETH on 21 February 2025"). Addresses and hashes stay plain text too.
-- Write each address or hash in full the first time it appears in a cited sentence; afterwards a name ("the exploiter", "ParaSwap's executor") is better than repeating it.
+- Space is tight: answers are read in a narrow panel. Write an address or hash in full only once in the whole answer, at its first mention. After that, use a name ("the exploiter", "ParaSwap's executor", "the first laundering wallet") or a short form such as 0x4766…86e2. Never repeat a full hash.
+- Addresses the analyst already knows from their trace (the root and the inspected card) can be named by role from the start ("this address", "the exploiter").
+- Be brief: lead with the answer in the first sentence, then the evidence. Most answers need two short paragraphs.
 - Answer the question asked; if it is not on-chain security work, decline in one sentence. No closing lists of suggested next steps or open questions.`;
 
 export const SCOPE_DECLINE =

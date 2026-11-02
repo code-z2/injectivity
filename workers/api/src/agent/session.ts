@@ -290,42 +290,56 @@ export class SessionCore {
     const custom = customModel((n) => headerOf(opts.model, n));
     const userEntry: Entry = { role: 'user', text: question, at: now() };
 
-    emit({ type: 'status', stage: 'gate' });
-    const scope = await checkScope(
+    // The scope gate runs alongside the research rather than before it, so
+    // in-scope questions don't wait on it; an out-of-scope verdict cancels
+    // the research and the fixed decline is all that's shown or stored.
+    const gate = new AbortController();
+    const signal = opts.signal ? AbortSignal.any([opts.signal, gate.signal]) : gate.signal;
+    const scope = checkScope(
       modelFor(env, 'gate', null),
       question,
       recent(state.transcript),
       this.fetchImpl,
-    );
-    if (!scope.inScope) {
+    ).then((s) => {
+      if (!s.inScope) gate.abort();
+      return s;
+    });
+    const decline = async () => {
       const entry: Entry = { role: 'assistant', text: SCOPE_DECLINE, at: now(), declined: true };
       await this.store.append({ transcript: [userEntry, entry] });
-      return emit({ type: 'declined', entry });
-    }
-
-    const { cfg, caps } = await this.researchModel(env, custom);
+      emit({ type: 'declined', entry });
+    };
 
     emit({ type: 'status', stage: 'research' });
     const ledger = new Ledger(state.sources);
     const before = ledger.size;
     const history: Msg[] = [...trimHistory(state.messages), { role: 'user', text: question }];
-    const result = await runResearch({
-      adapter: adapterFor(cfg.baseUrl, this.fetchImpl),
-      cfg,
-      search: caps.search,
-      system: RESEARCH_PROMPT,
-      messages: history,
-      registry: new Registry(),
-      ctx: {
-        env,
-        client: this.client,
-        fetch: this.fetchImpl,
-        workspace: state.workspace ?? undefined,
-      },
-      ledger,
-      onEvent: (step) => emit({ type: 'step', step }),
-      signal: opts.signal,
-    });
+    let result;
+    try {
+      const { cfg, caps } = await this.researchModel(env, custom);
+      if (gate.signal.aborted) throw new Error('out of scope');
+      result = await runResearch({
+        adapter: adapterFor(cfg.baseUrl, this.fetchImpl),
+        cfg,
+        search: caps.search,
+        system: RESEARCH_PROMPT,
+        messages: history,
+        registry: new Registry(),
+        ctx: {
+          env,
+          client: this.client,
+          fetch: this.fetchImpl,
+          workspace: state.workspace ?? undefined,
+        },
+        ledger,
+        onEvent: (step) => emit({ type: 'step', step }),
+        signal,
+      });
+    } catch (err) {
+      if (!opts.signal?.aborted && !(await scope).inScope) return decline();
+      throw err;
+    }
+    if (!(await scope).inScope) return decline();
 
     emit({ type: 'status', stage: 'verify' });
     const entry: Entry = {
