@@ -310,20 +310,29 @@ export class SessionCore {
     // the research and the fixed decline is all that's shown or stored.
     const gate = new AbortController();
     const signal = opts.signal ? AbortSignal.any([opts.signal, gate.signal]) : gate.signal;
+    // Out of scope: decline at once, without waiting for the research to
+    // wind down (it's cancelled and its result discarded).
+    let declined: Promise<void> | null = null;
+    const decline = () => {
+      declined ??= (async () => {
+        const entry: Entry = { role: 'assistant', text: SCOPE_DECLINE, at: now(), declined: true };
+        await this.store.append({ transcript: [userEntry, entry] });
+        emit({ type: 'declined', entry });
+      })();
+      return declined;
+    };
     const scope = checkScope(
       modelFor(env, 'gate', null),
       question,
       recent(state.transcript),
       this.fetchImpl,
     ).then((s) => {
-      if (!s.inScope) gate.abort();
+      if (!s.inScope) {
+        gate.abort();
+        void decline();
+      }
       return s;
     });
-    const decline = async () => {
-      const entry: Entry = { role: 'assistant', text: SCOPE_DECLINE, at: now(), declined: true };
-      await this.store.append({ transcript: [userEntry, entry] });
-      emit({ type: 'declined', entry });
-    };
 
     emit({ type: 'status', stage: 'research' });
     const ledger = new Ledger(state.sources);
