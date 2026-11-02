@@ -240,3 +240,34 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* In-progress labels (agent dock): a light band sweeps across muted text. */
+@keyframes text-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+.text-shimmer {
+  background: linear-gradient(
+      90deg,
+      var(--color-muted) 0%,
+      var(--color-muted) 40%,
+      var(--color-ink) 50%,
+      var(--color-muted) 60%,
+      var(--color-muted) 100%
+    )
+    0 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-shimmer 1.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .text-shimmer {
+    animation: none;
+    color: var(--color-muted);
+  }
+}

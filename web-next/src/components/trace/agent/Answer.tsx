@@ -1,15 +1,24 @@
-import AICitations from "@/components/kokonutui/ai-citations";
+import AICitations, {
+  type CitationSource,
+} from "@/components/kokonutui/ai-citations";
 import type { Source } from "@/lib/agent";
 import { parseBlocks, toCitation } from "./citations";
 
 // A verified answer: paragraphs, lists and headings with a citation chip
 // after each claim; hovering a chip previews the source it rests on.
+export type OnPreview = (
+  p: { key: string; sources: CitationSource[]; rect: DOMRect } | null,
+) => void;
+
 export function Answer({
   text,
   sources,
+  onPreview,
 }: {
   text: string;
   sources: Map<string, Source>;
+  /** Show previews in the side card instead of beside the chip. */
+  onPreview?: OnPreview;
 }) {
   const cites = [...sources.values()].map(toCitation);
   const prose = "text-[13px] leading-6 text-ink-soft [overflow-wrap:anywhere]";
@@ -30,6 +39,7 @@ export function Answer({
                   <AICitations
                     className="max-w-none"
                     parts={parts}
+                    onPreview={onPreview}
                     showSources={false}
                     sources={cites}
                     textClassName={prose}
@@ -43,6 +53,7 @@ export function Answer({
             className="max-w-none"
             key={i}
             parts={b.parts}
+            onPreview={onPreview}
             showSources={false}
             sources={cites}
             textClassName={prose}

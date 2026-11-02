@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronUp, FileText } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
-import AIInputSearch, {
-  type SearchSource,
-} from "@/components/kokonutui/ai-input-search";
 import AILoadingState, {
   type AgentStep,
 } from "@/components/kokonutui/ai-loading";
@@ -22,8 +19,12 @@ import {
 } from "@/lib/agent";
 import { cn } from "@/lib/utils";
 import type { AddressRole, ChainLink } from "../types";
-import { Answer } from "./Answer";
-import { NodeBrief } from "./NodeBrief";
+import { Answer, type OnPreview } from "./Answer";
+import { Composer } from "./Composer";
+import { SummaryStrip } from "./NodeBrief";
+import { type Reveal, SideCard } from "./SideCard";
+import { SourcePreview } from "./SourcePreview";
+import { ThinkingLine } from "./ThinkingLine";
 import { fail, finish, onStage, onStep } from "./steps";
 
 // The agent dock (right): a collapsible panel matching the bottom dock.
@@ -50,6 +51,7 @@ function useViewportHeight() {
 interface Run {
   kind: "ask" | "report";
   steps: AgentStep[];
+  failed?: boolean;
 }
 
 export function AgentPanel({
@@ -101,11 +103,19 @@ export function AgentPanel({
   const [traces, setTraces] = useState<Record<number, AgentStep[]>>({});
   const [failure, setFailure] = useState<string | null>(null);
   const socket = useRef<AgentSocket | null>(null);
-  const pending = useRef<{
-    resolve: () => void;
-    onSource: (s: SearchSource) => void;
-  } | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
+  // What the side card shows: a citation's sources or the node summary.
+  const [reveal, setReveal] = useState<Reveal | null>(null);
+  const preview: OnPreview = (p) =>
+    setReveal(
+      p
+        ? {
+            key: `sources:${p.key}`,
+            anchor: p.rect,
+            content: <SourcePreview sources={p.sources} />,
+          }
+        : null,
+    );
 
   // Session for this trace root.
   useEffect(() => {
@@ -121,10 +131,6 @@ export function AgentPanel({
   // Frames from the session.
   useEffect(() => {
     if (!sessionId) return;
-    const settle = () => {
-      pending.current?.resolve();
-      pending.current = null;
-    };
     const onFrame = (f: ServerFrame) => {
       switch (f.type) {
         case "state":
@@ -135,16 +141,6 @@ export function AgentPanel({
           setRun((r) => (r ? { ...r, steps: onStage(r.steps, f.stage) } : r));
           break;
         case "step":
-          if (f.step.type === "search")
-            for (const s of f.step.sources) {
-              let domain = "";
-              try {
-                domain = new URL(s.url).hostname;
-              } catch {
-                continue;
-              }
-              pending.current?.onSource({ domain, title: s.title });
-            }
           setRun((r) => (r ? { ...r, steps: onStep(r.steps, f.step) } : r));
           break;
         case "answer":
@@ -162,17 +158,15 @@ export function AgentPanel({
             });
             return [...t, f.entry];
           });
-          settle();
           break;
         case "report":
           setTranscript((t) => [...t, f.entry]);
           break;
         case "memory":
           setRun(null);
-          settle();
           break;
         case "error":
-          setRun((r) => (r ? { ...r, steps: fail(r.steps) } : r));
+          setRun((r) => (r ? { ...r, steps: fail(r.steps), failed: true } : r));
           setFailure(
             f.error === "stopped"
               ? "Stopped."
@@ -182,7 +176,6 @@ export function AgentPanel({
           );
           if (f.error === "session not initialised") forgetSession(chain, root);
           setTimeout(() => setRun(null), 1500);
-          settle();
           break;
       }
     };
@@ -220,32 +213,20 @@ export function AgentPanel({
 
   const busy = run !== null;
 
-  const ask = (
-    query: string,
-    opts: { signal: AbortSignal; onSource: (s: SearchSource) => void },
-  ) =>
-    new Promise<void>((resolve) => {
-      setFailure(null);
-      if (
-        !socket.current?.send({ type: "ask", text: query, ...askExtras(chain) })
-      ) {
-        setFailure("Not connected to the agent.");
-        return resolve();
-      }
-      setTranscript((t) => [
-        ...t,
-        { role: "user", text: query, at: new Date().toISOString() },
-      ]);
-      setRun({ kind: "ask", steps: [] });
-      pending.current = { resolve, onSource: opts.onSource };
-      opts.signal.addEventListener(
-        "abort",
-        () => socket.current?.send({ type: "stop" }),
-        {
-          once: true,
-        },
-      );
-    });
+  const ask = (query: string) => {
+    setFailure(null);
+    if (
+      !socket.current?.send({ type: "ask", text: query, ...askExtras(chain) })
+    ) {
+      setFailure("Not connected to the agent.");
+      return;
+    }
+    setTranscript((t) => [
+      ...t,
+      { role: "user", text: query, at: new Date().toISOString() },
+    ]);
+    setRun({ kind: "ask", steps: [] });
+  };
 
   const generate = () => {
     setFailure(null);
@@ -254,7 +235,6 @@ export function AgentPanel({
       return;
     }
     setRun({ kind: "report", steps: [] });
-    pending.current = { resolve: () => undefined, onSource: () => undefined };
   };
 
   // The server echoes the user's message in the transcript only on reload,
@@ -314,10 +294,11 @@ export function AgentPanel({
 
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="shrink-0 px-3">
-          <NodeBrief
+          <SummaryStrip
             address={inspected}
             chain={chain}
             name={inspectedName}
+            onReveal={setReveal}
             role={inspectedRole}
           />
         </div>
@@ -327,14 +308,9 @@ export function AgentPanel({
           ref={scroller}
         >
           {transcript.length === 0 && !run && (
-            <div className="px-1 pt-1 text-[13px] leading-6 text-muted">
-              <p className="text-ink">Ask about this trace.</p>
-              <p className="mt-1">
-                Who an address is, where funds went, how the exploit worked.
-                Every answer cites the transactions, datasets or pages it rests
-                on.
-              </p>
-            </div>
+            <p className="px-1 pt-1 text-[13px] text-ink">
+              Ask about this trace.
+            </p>
           )}
           <div className="flex flex-col gap-4">
             {transcript.map((e, i) =>
@@ -365,44 +341,42 @@ export function AgentPanel({
                   ) : e.declined ? (
                     <p className="text-[13px] leading-6 text-muted">{e.text}</p>
                   ) : (
-                    <Answer sources={sources} text={e.text} />
+                    <Answer
+                      onPreview={preview}
+                      sources={sources}
+                      text={e.text}
+                    />
                   )}
                 </div>
               ),
             )}
             {run && (
-              <AILoadingState collapseWhenDone={false} steps={run.steps} />
+              <ThinkingLine
+                failed={Boolean(run.failed)}
+                key={`${transcript.length}:${run.kind}`}
+                steps={run.steps}
+              />
             )}
-            {failure && <p className="text-[12px] text-muted">{failure}</p>}
+            {failure && !run && (
+              <p className="text-[12px] text-muted">{failure}</p>
+            )}
           </div>
         </div>
 
-        <div className="shrink-0 border-t border-line px-3 pt-2.5 pb-1">
-          <button
-            className={cn(
-              "flex h-8 w-full items-center justify-center gap-2 rounded-xl text-[12px] font-medium transition-colors",
-              answered && !busy
-                ? "bg-ink text-white hover:bg-ink-soft"
-                : "bg-subtle text-faint",
-            )}
-            disabled={!answered || busy || !connected}
-            onClick={generate}
-            title={answered ? undefined : "Ask at least one question first"}
-            type="button"
-          >
-            <FileText className="size-3.5" />
-            {run?.kind === "report" ? "Generating report…" : "Generate report"}
-          </button>
-          <AIInputSearch
-            className="max-w-none py-2"
-            defaultTool={null}
+        <div className="shrink-0 px-3 pt-1 pb-3">
+          <Composer
+            canGenerate={connected}
             disabled={!connected || run?.kind === "report"}
-            minimal
-            onSearch={(q, o) => ask(q, o)}
-            placeholder={connected ? "Ask about this trace" : "Connecting…"}
+            generating={run?.kind === "report"}
+            onAsk={ask}
+            onGenerate={generate}
+            onStop={() => socket.current?.send({ type: "stop" })}
+            placeholder={connected ? "Ask about this trace…" : "Connecting…"}
+            running={busy}
           />
         </div>
       </div>
+      <SideCard reveal={open ? reveal : null} />
     </motion.section>
   );
 }

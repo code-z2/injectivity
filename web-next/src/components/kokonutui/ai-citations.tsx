@@ -47,6 +47,13 @@ interface AICitationsProps {
   textClassName?: string;
   /** The "N sources" list under the answer. Defaults to true. */
   showSources?: boolean;
+  /**
+   * Render previews elsewhere: called with the hovered chip's sources and
+   * its box (null when it closes) instead of drawing the built-in card.
+   */
+  onPreview?: (
+    preview: { key: string; sources: CitationSource[]; rect: DOMRect } | null,
+  ) => void;
 }
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
@@ -155,6 +162,8 @@ interface Preview {
   y: number;
   /** Opens under the chip when there is no room above it on screen. */
   below: boolean;
+  /** The chip's box on screen, for previews rendered elsewhere. */
+  rect: DOMRect;
 }
 
 /**
@@ -222,6 +231,7 @@ export default function AICitations({
   className,
   textClassName,
   showSources = true,
+  onPreview,
 }: AICitationsProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const { preview, warm, show, hide } = usePreview();
@@ -257,6 +267,7 @@ export default function AICitations({
     const below = rect.top < cardHeight.current + 16;
     return {
       part: index,
+      rect,
       x: Math.min(Math.max(0, left), Math.max(0, max)),
       y: below
         ? rect.bottom - (root?.top ?? 0) + 8
@@ -276,6 +287,27 @@ export default function AICitations({
   const activeSources = (active?.cite ?? [])
     .map((id) => byId.get(id))
     .filter((source): source is CitationSource => Boolean(source));
+
+  // Previews rendered elsewhere follow the open one.
+  const previewKey = preview ? `${preview.part}` : "";
+  const reportRef = useRef(onPreview);
+  reportRef.current = onPreview;
+  const latest = useRef({ preview, activeSources });
+  latest.current = { preview, activeSources };
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reports only when the open chip changes
+  useEffect(() => {
+    const { preview: p, activeSources: list } = latest.current;
+    reportRef.current?.(
+      p && list.length
+        ? {
+            key: `${previewKey}:${list.map((x) => x.id).join(",")}`,
+            sources: list,
+            rect: p.rect,
+          }
+        : null,
+    );
+  }, [previewKey]);
+  useEffect(() => () => reportRef.current?.(null), []);
 
   // Escape, or a press anywhere but a chip, closes a preview opened by
   // keyboard or tap. iOS doesn't focus a tapped button, so blur alone would
@@ -393,7 +425,7 @@ export default function AICitations({
         {/* One preview for every chip. It glides between chips once open,
             and fades in fresh after a pause. */}
         <AnimatePresence>
-          {preview && activeSources.length > 0 && (
+          {!onPreview && preview && activeSources.length > 0 && (
             <motion.div
               animate={{
                 opacity: 1,
