@@ -12,8 +12,10 @@ import { SettingsDialog } from "@/components/SettingsDialog";
 import { CHAIN_META } from "@/lib/chains";
 import { looksLikeEns } from "@/lib/ens";
 import { lookupErrorMessage, preloadInvestigation } from "@/lib/preload";
-import { useSettings } from "@/lib/settings";
-import { ADDRESS_RE, cn } from "@/lib/utils";
+import type { Chain } from "@/lib/api";
+import { saveSettings, useSettings } from "@/lib/settings";
+import { SUGGESTIONS, type Suggestion } from "@/lib/suggestions";
+import { ADDRESS_RE, cn, short } from "@/lib/utils";
 import { ThinkingOrb, type ThinkingPhase } from "./ThinkingOrb";
 
 // The landing spotlight. A zero-size anchor at the stage centre, where the
@@ -22,7 +24,7 @@ import { ThinkingOrb, type ThinkingPhase } from "./ThinkingOrb";
 //   orb → field     the search field opens out from behind the orb while
 //                   the orb grows into the send button and slides to the
 //                   field's right edge
-//   field → ready   placeholder, chips and focus arrive last
+//   field → ready   placeholder, chips, suggestions and focus arrive last
 // On submit the orb shrinks to a core and blooms into the thinking swirl
 // while the first view loads. Success: the swirl holds for at least
 // MIN_THINK_OK, then collapses into its centre and the terminal opens
@@ -82,7 +84,7 @@ export function Spotlight({
     });
   }
 
-  async function submit(e: React.FormEvent) {
+  function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!ready || busy) return;
     const v = query.trim();
@@ -95,7 +97,18 @@ export function Spotlight({
       inputRef.current?.focus();
       return;
     }
-    const chain = settings.chain;
+    void trace(v, settings.chain);
+  }
+
+  // A suggestion fills the field, switches to its chain and traces it.
+  function pick(s: Suggestion) {
+    if (!ready || busy) return;
+    setQuery(s.address);
+    if (s.chain !== settings.chain) saveSettings({ chain: s.chain });
+    void trace(s.address, s.chain);
+  }
+
+  async function trace(v: string, chain: Chain) {
     setError("");
     setThink("think");
     const started = performance.now();
@@ -293,6 +306,55 @@ export function Spotlight({
           />
         </motion.div>
       </div>
+
+      {/* Suggestions: known exploiter wallets to start from. */}
+      <motion.div
+        className="absolute"
+        style={{
+          left: -fieldW / 2,
+          top: FIELD_H / 2 + 14 + 32 + 18,
+          width: fieldW,
+        }}
+        initial={false}
+        animate={ready ? shown : hiddenChip}
+        transition={{ ...chipTransition, delay: ready ? 0.34 : 0 }}
+      >
+        <div
+          className={cn(
+            "rounded-2xl border border-white/70 bg-white/50 p-1.5 shadow-hairline backdrop-blur-md transition-opacity duration-300",
+            busy && "opacity-50",
+          )}
+        >
+          <p className="px-3 pt-1.5 pb-1 text-[11.5px] text-faint">
+            Start from a known exploit
+          </p>
+          <ul>
+            {SUGGESTIONS.slice(0, compact ? 3 : SUGGESTIONS.length).map((s) => (
+              <li key={s.address}>
+                <button
+                  type="button"
+                  onClick={() => pick(s)}
+                  disabled={!ready || busy}
+                  className="flex h-9 w-full items-center gap-2.5 rounded-xl px-3 text-left transition-colors hover:bg-white/80 disabled:pointer-events-none"
+                >
+                  <span className="size-2 shrink-0 rounded-full bg-attacker" />
+                  <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
+                    {s.label}
+                  </span>
+                  <span
+                    className="size-1.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: CHAIN_META[s.chain].dot }}
+                    title={CHAIN_META[s.chain].label}
+                  />
+                  <span className="font-mono text-[12px] text-muted">
+                    {short(s.address)}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </motion.div>
     </div>
   );
 }

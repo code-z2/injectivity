@@ -1,13 +1,7 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { Wordmark } from "@/components/Wordmark";
 
-// The brand mark sits outside the page outlet so it persists across
-// navigation and morphs between wordmark and orb.
+// Pages own their own chrome for now; the persistent brand mark
+// (components/Wordmark) comes back when the trace page is laid out.
 export const Route = createRootRoute({
-  component: () => (
-    <>
-      <Wordmark />
-      <Outlet />
-    </>
-  ),
+  component: () => <Outlet />,
 });

@@ -1,5 +1,8 @@
 // Typed client for the intel-terminal API. Shapes mirror the Worker
 // responses; every field the UI reads is required (no null/undefined leaks).
+import { healthFromNote, reportRpc, type RpcHealth } from "./rpcSignal";
+import { customRpc } from "./settings";
+
 const BASE: string = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8787";
 
 export type Chain =
@@ -111,7 +114,7 @@ export function fetchTrace(
   fanout: number,
 ): Promise<TraceResult> {
   const q = `direction=${direction}&depth=${depth}&fanout=${fanout}`;
-  return get<TraceResult>(`/v1/trace/${chain}/${address}?${q}`);
+  return get<TraceResult>(`/v1/trace/${chain}/${address}?${q}`, chain);
 }
 
 export interface Finding {
@@ -156,14 +159,47 @@ export interface ReportSummary {
   liveTrace: boolean;
 }
 
-async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`);
+// Requests for a chain carry that chain's custom RPC (Settings), so the
+// API's live calls go through it. Live-fetch failures the API reports in
+// its note feed the RPC status straight away.
+function rpcHeaders(chain?: string): Record<string, string> {
+  const url = chain ? customRpc(chain as Chain) : "";
+  return url ? { "x-rpc-url": url } : {};
+}
+
+async function get<T>(path: string, chain?: string): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, { headers: rpcHeaders(chain) });
+  const body = (await res.json().catch(() => null)) as
+    (T & { note?: string }) | null;
+  if (chain) {
+    const h = healthFromNote(body?.note);
+    if (h) reportRpc(chain, h);
+    else if (res.ok && (body as { live?: boolean } | null)?.live)
+      reportRpc(chain, "ok");
+  }
+  if (!res.ok || !body) throw new Error(`api-${res.status}`);
+  return body;
+}
+
+// The RPC that lookups for a chain actually use, probed by the API.
+export async function fetchRpcHealth(
+  chain: string,
+  signal?: AbortSignal,
+): Promise<{ health: RpcHealth; ms: number | null; custom: boolean }> {
+  const res = await fetch(`${BASE}/health/rpc/${chain}`, {
+    headers: rpcHeaders(chain),
+    signal,
+  });
   if (!res.ok) throw new Error(`api-${res.status}`);
-  return (await res.json()) as T;
+  return (await res.json()) as {
+    health: RpcHealth;
+    ms: number | null;
+    custom: boolean;
+  };
 }
 
 export function fetchIntel(chain: string, address: string): Promise<Intel> {
-  return get<Intel>(`/v1/address/${chain}/${address}`);
+  return get<Intel>(`/v1/address/${chain}/${address}`, chain);
 }
 
 export function fetchTransfers(
@@ -172,7 +208,10 @@ export function fetchTransfers(
   pageKey?: string,
 ): Promise<TransfersPage> {
   const q = pageKey ? `?pageKey=${encodeURIComponent(pageKey)}` : "";
-  return get<TransfersPage>(`/v1/address/${chain}/${address}/transfers${q}`);
+  return get<TransfersPage>(
+    `/v1/address/${chain}/${address}/transfers${q}`,
+    chain,
+  );
 }
 
 export async function runInvestigation(
@@ -185,6 +224,7 @@ export async function runInvestigation(
   // back to its configured key (401 only when neither exists).
   const headers: Record<string, string> = {
     "content-type": "application/json",
+    ...rpcHeaders(chain),
   };
   if (modelKey.trim()) headers["x-model-key"] = modelKey.trim();
   const res = await fetch(`${BASE}/v1/investigate`, {

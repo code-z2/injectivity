@@ -1,4 +1,5 @@
 // risk_lists exact-match screening rows + R1 inferred proximity assessment.
+import { hasLiveRpc } from '@/alchemy';
 import type { AlchemyClient, Env } from '@/types';
 import { cachedTransfers, storeTransfers } from '@/stores/transfers';
 
@@ -72,7 +73,7 @@ export async function assessRisk(
 
   let rows = (await cachedTransfers(env, chain, addr, 'both')).rows;
   let source: RiskAssessment['source'] = rows.length > 0 ? 'cache' : 'none';
-  if (rows.length === 0 && env.ALCHEMY_API_KEY) {
+  if (rows.length === 0 && hasLiveRpc(env, chain)) {
     try {
       const { transfers } = await client.getTransfers(env, chain, addr, 'both');
       await storeTransfers(env, chain, transfers);
@@ -101,7 +102,7 @@ export async function assessRisk(
   const level = exact.length > 0 ? 'verified' : matches.length > 0 ? 'inferred' : 'none';
   const assessment: RiskAssessment = { level, matches, screened: parties.size, source };
   if (source === 'none' && exact.length === 0) {
-    assessment.note = 'counterparty screen skipped: no cached transfers and no ALCHEMY_API_KEY';
+    assessment.note = 'counterparty screen skipped: no cached transfers and no live RPC';
   }
   return assessment;
 }

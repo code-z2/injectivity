@@ -6,6 +6,8 @@ import { CHAINS } from "@/lib/api";
 import { CHAIN_META } from "@/lib/chains";
 import {
   DEFAULT_SETTINGS,
+  HTTPS_URL_RE,
+  saveRpc,
   saveSettings,
   useSettings,
   type Effort,
@@ -53,8 +55,9 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
   const s = useSettings();
   const [showKey, setShowKey] = useState(false);
   const [tab, setTab] = useState<"network" | "model">("network");
+  const rpcValue = s.rpcUrls[s.chain] ?? "";
   const rpcError =
-    s.ensRpcUrl.trim() && !/^https:\/\/\S+$/.test(s.ensRpcUrl.trim())
+    rpcValue.trim() && !HTTPS_URL_RE.test(rpcValue.trim())
       ? "Use an https:// URL."
       : undefined;
 
@@ -139,14 +142,14 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
                 </div>
               </div>
               <Field
-                label="Custom RPC"
-                hint="Mainnet RPC for ENS resolution. Empty uses publicnode."
+                label={`Custom RPC · ${CHAIN_META[s.chain].label}`}
+                hint="Lookups on this chain go through it. Needs alchemy_getAssetTransfers (an Alchemy URL with your key works). Empty uses the service RPC."
                 error={rpcError}
               >
                 <input
-                  value={s.ensRpcUrl}
-                  onChange={(e) => saveSettings({ ensRpcUrl: e.target.value })}
-                  placeholder="https://your-mainnet-rpc.example"
+                  value={rpcValue}
+                  onChange={(e) => saveRpc(s.chain, e.target.value)}
+                  placeholder="https://eth-mainnet.g.alchemy.com/v2/your-key"
                   spellCheck={false}
                   className={cn(
                     inputCls,

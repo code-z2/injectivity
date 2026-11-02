@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { Terminal } from "@/components/terminal/Terminal";
+import { Trace } from "@/components/trace/Trace";
 import { CHAINS, type Chain } from "@/lib/api";
 
 // Shareable investigation URL: /investigate/ethereum/vitalik.eth
@@ -11,10 +11,10 @@ export const Route = createFileRoute("/investigate/$chain/$target")({
     },
     stringify: ({ chain, target }) => ({ chain, target }),
   },
-  component: TerminalRoute,
+  component: TraceRoute,
 });
 
-function TerminalRoute() {
+function TraceRoute() {
   const { chain, target } = Route.useParams();
-  return <Terminal chain={chain} target={target} />;
+  return <Trace chain={chain} target={target} />;
 }

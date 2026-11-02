@@ -2,7 +2,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { alchemyClient } from '@/alchemy';
+import { alchemyClient, hasLiveRpc } from '@/alchemy';
 import { chainBase } from '@/constants/chains';
 import { cachedTransfers, nowIso, storeTransfers } from '@/stores/transfers';
 import { assessRisk } from '@/stores/risk';
@@ -25,7 +25,7 @@ export function createAddressRoutes(client: AlchemyClient = alchemyClient) {
     const { chain, address } = c.req.valid('param');
     if (!chainBase(chain)) return c.json({ error: `unsupported chain: ${chain}` }, 400);
     const assessment = await assessRisk(c.env, client, chain, address);
-    const live = Boolean(c.env.ALCHEMY_API_KEY);
+    const live = hasLiveRpc(c.env, chain);
     let balances: { native: string; tokens: unknown[] } | null = null;
     if (live) {
       try {
@@ -71,7 +71,7 @@ export function createAddressRoutes(client: AlchemyClient = alchemyClient) {
           transfers: cache.rows,
         });
       }
-      if (!c.env.ALCHEMY_API_KEY) {
+      if (!hasLiveRpc(c.env, chain)) {
         return c.json({
           address: address.toLowerCase(),
           chain,
@@ -80,7 +80,7 @@ export function createAddressRoutes(client: AlchemyClient = alchemyClient) {
           stale: true,
           fetched_at: nowIso(),
           transfers: cache.rows,
-          note: 'no ALCHEMY_API_KEY: D1 cache only',
+          note: 'no live RPC: D1 cache only',
         });
       }
       try {

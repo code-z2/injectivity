@@ -73,9 +73,7 @@ export function createReportsRoutes(client: AlchemyClient = alchemyClient) {
       edgeCount = traced.result.edges.length;
       nodes = traced.result.nodes;
       edges = traced.result.edges;
-      traceNote = traced.empty
-        ? 'no cached transfers and no ALCHEMY_API_KEY: nothing to trace.'
-        : null;
+      traceNote = traced.empty ? 'no cached transfers and no live RPC: nothing to trace.' : null;
     }
 
     if (c.req.query('format') !== 'pdf') {

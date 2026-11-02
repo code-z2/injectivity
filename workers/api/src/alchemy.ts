@@ -10,10 +10,10 @@ function backoffMs(attempt: number): number {
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
 // BYOR seam: RPC_URLS (JSON, {chain: url}) overrides the built-in Alchemy
-// bases per chain, so UI settings can later accept a universal or per-chain
-// RPC without touching call sites. A custom URL is used as-is (it carries
-// its own credentials); built-in bases use the Alchemy key. Custom
-// endpoints must speak alchemy_getAssetTransfers.
+// bases per chain. It comes from the binding, or per request from the
+// client's x-rpc-url header (see withRequestRpc in app.ts). A custom URL is
+// used as-is (it carries its own credentials); built-in bases use the
+// Alchemy key. Custom endpoints must speak alchemy_getAssetTransfers.
 function overrideBase(env: Env, chain: string): string | undefined {
   try {
     const overrides = env.RPC_URLS ? (JSON.parse(env.RPC_URLS) as Record<string, string>) : {};
@@ -23,11 +23,72 @@ function overrideBase(env: Env, chain: string): string | undefined {
   }
 }
 
-async function rpc(env: Env, chain: string, method: string, params: unknown[]): Promise<unknown> {
+function rpcUrlFor(env: Env, chain: string): string | undefined {
   const custom = overrideBase(env, chain);
   const builtin = chainBase(chain);
-  const url =
-    custom ?? (builtin && env.ALCHEMY_API_KEY ? `${builtin}/v2/${env.ALCHEMY_API_KEY}` : undefined);
+  return (
+    custom ?? (builtin && env.ALCHEMY_API_KEY ? `${builtin}/v2/${env.ALCHEMY_API_KEY}` : undefined)
+  );
+}
+
+/** True when live calls are possible: the built-in key or a custom RPC. */
+export function hasLiveRpc(env: Env, chain?: string): boolean {
+  if (chain) return rpcUrlFor(env, chain) !== undefined;
+  return Boolean(env.ALCHEMY_API_KEY || env.RPC_URLS);
+}
+
+export type RpcHealth = 'ok' | 'rate-limited' | 'unsupported' | 'error' | 'unavailable';
+
+// One un-retried transfers query for the latest block: proves the RPC is
+// reachable, not throttled, and speaks alchemy_getAssetTransfers (what
+// lookups actually need), at the cost of a single small call.
+export async function probeRpc(
+  env: Env,
+  chain: string,
+): Promise<{ health: RpcHealth; ms: number | null; custom: boolean }> {
+  const url = rpcUrlFor(env, chain);
+  const custom = overrideBase(env, chain) !== undefined;
+  if (!url) return { health: 'unavailable', ms: null, custom };
+  const t0 = Date.now();
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'alchemy_getAssetTransfers',
+        params: [
+          { fromBlock: 'latest', toBlock: 'latest', category: ['external'], maxCount: '0x1' },
+        ],
+      }),
+      signal: AbortSignal.timeout(6000),
+    });
+    const ms = Date.now() - t0;
+    if (res.status === 429) return { health: 'rate-limited', ms, custom };
+    if (!res.ok) return { health: 'error', ms, custom };
+    const body = (await res.json()) as {
+      result?: unknown;
+      error?: { code?: number; message?: string };
+    };
+    if (body.error) {
+      const m = (body.error.message ?? '').toLowerCase();
+      if (body.error.code === 429 || m.includes('rate') || m.includes('capacity')) {
+        return { health: 'rate-limited', ms, custom };
+      }
+      if (body.error.code === -32601 || m.includes('not found') || m.includes('not supported')) {
+        return { health: 'unsupported', ms, custom };
+      }
+      return { health: 'error', ms, custom };
+    }
+    return { health: 'ok', ms, custom };
+  } catch {
+    return { health: 'error', ms: null, custom };
+  }
+}
+
+async function rpc(env: Env, chain: string, method: string, params: unknown[]): Promise<unknown> {
+  const url = rpcUrlFor(env, chain);
   if (!url) throw new Error('alchemy-unavailable');
   let lastErr = '';
   for (let attempt = 0; attempt < 4; attempt++) {

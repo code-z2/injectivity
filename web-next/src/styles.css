@@ -50,6 +50,15 @@
   --color-clean: #129f74;
   --color-clean-soft: #e7f7f1;
 
+  /* Address roles on the trace (no red): attacker black, victim yellow,
+     everyone else grey. */
+  --color-attacker: #0b0d12;
+  --color-victim: #f3c63f;
+  --color-victim-ink: #3a2c00;
+  --color-victim-soft: #fdf6dd;
+  --color-normal: #a3a9b3;
+  --color-rope: #b9bec7;
+
   /* Elevation */
   --shadow-hairline: 0 0 0 1px rgb(11 13 18 / 0.06);
   --shadow-card:

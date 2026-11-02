@@ -6,7 +6,14 @@ const LABEL: Record<ServiceStatus["state"], string> = {
   checking: "Checking",
   operational: "Operational",
   degraded: "Degraded",
+  limited: "Rate limited",
+  unsupported: "Unsupported",
   down: "Unavailable",
+};
+
+const TIP: Partial<Record<ServiceStatus["state"], string>> = {
+  limited: "Lookups are being throttled. Add your own RPC in Settings.",
+  unsupported: "This RPC doesn't support alchemy_getAssetTransfers.",
 };
 
 // Quiet, glanceable service status, bottom-right in one row. Present,
@@ -20,7 +27,7 @@ export function StatusBar({ show }: { show: boolean }) {
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="fixed right-6 bottom-5 z-10 flex items-center gap-4 text-[11px] leading-none text-ink/40 select-none"
     >
-      <Row name="RPC" s={rpc} />
+      <Row name={rpc.custom ? "Custom RPC" : "RPC"} s={rpc} />
       <span aria-hidden className="h-2.5 w-px bg-ink/10" />
       <Row name="AI agent" s={agent} />
     </motion.dl>
@@ -31,7 +38,9 @@ function Row({ name, s }: { name: string; s: ServiceStatus }) {
   return (
     <div
       className="flex items-center gap-1.5"
-      title={s.ms !== null ? `${name}: ${s.ms} ms` : undefined}
+      title={
+        TIP[s.state] ?? (s.ms !== null ? `${name}: ${s.ms} ms` : undefined)
+      }
     >
       <dt>{name}</dt>
       <dd className="flex items-center gap-1.5">
@@ -41,7 +50,9 @@ function Row({ name, s }: { name: string; s: ServiceStatus }) {
           className={cn(
             "size-1.5 rounded-full",
             s.state === "operational" && "bg-clean/70",
-            s.state === "degraded" && "bg-inferred/70",
+            (s.state === "degraded" || s.state === "limited") &&
+              "bg-inferred/70",
+            s.state === "unsupported" && "bg-verified/70",
             s.state === "down" && "bg-verified/70",
             s.state === "checking" && "animate-pulse bg-ink/20",
           )}
