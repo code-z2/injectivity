@@ -1,5 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { AddressBadge } from "./AddressBadge";
 import { AddressCard } from "./AddressCard";
 import { LinkMenu } from "./LinkMenu";
@@ -28,11 +29,16 @@ export function AddressChain({
   links,
   chain,
   flash,
+  selected,
+  onSelect,
   onCopy,
   onDetach,
 }: {
   links: ChainLink[];
   chain: string;
+  /** The active link: the dock and counterparties show its flows. */
+  selected: number;
+  onSelect: (index: number) => void;
   /** Pulses an existing link (when it is followed again). */
   flash?: Flash;
   onCopy: (address: string) => void;
@@ -165,7 +171,22 @@ export function AddressChain({
                   },
                 }}
               >
-                {i === 0 ? <AddressCard link={l} /> : <AddressBadge link={l} />}
+                <button
+                  type="button"
+                  onClick={() => onSelect(i)}
+                  aria-pressed={i === selected}
+                  aria-label={`Show transfers of ${l.address}`}
+                  className={cn(
+                    "block rounded-full outline-offset-2 transition-shadow duration-200",
+                    i === selected && "ring-2 ring-ink/15",
+                  )}
+                >
+                  {i === 0 ? (
+                    <AddressCard link={l} />
+                  ) : (
+                    <AddressBadge link={l} />
+                  )}
+                </button>
                 {flash?.address === l.address && (
                   <motion.span
                     key={flash.n}

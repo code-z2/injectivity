@@ -123,6 +123,64 @@ export interface Transfer {
   asset: string;
   value: string;
   blockNum: string;
+  /** external | internal | erc20 | erc721 | erc1155 */
+  category?: string;
+  /** Token contract; null for the chain's native coin. */
+  contract?: string | null;
+  /** ISO block time (from Alchemy metadata). */
+  timestamp?: string;
+  /** Stable per transfer (several transfers can share one tx hash). */
+  uniqueId?: string;
+}
+
+interface RawTransfer {
+  hash: string;
+  from: string;
+  to: string | null;
+  asset: string | null;
+  value: number | string | null;
+  blockNum: string;
+  category?: string;
+  uniqueId?: string;
+  rawContract?: { address?: string | null };
+  metadata?: { blockTimestamp?: string };
+}
+
+export function normalizeTransfer(t: RawTransfer | Transfer): Transfer {
+  const raw = t as RawTransfer & Transfer;
+  return {
+    hash: raw.hash,
+    from: raw.from,
+    to: raw.to ?? '',
+    asset: raw.asset ?? '',
+    value: raw.value === null || raw.value === undefined ? '' : String(raw.value),
+    blockNum: raw.blockNum,
+    category: raw.category,
+    contract: raw.contract !== undefined ? raw.contract : (raw.rawContract?.address ?? null),
+    timestamp: raw.timestamp ?? raw.metadata?.blockTimestamp,
+    uniqueId: raw.uniqueId,
+  };
+}
+
+// Paging cursor for direction=both: Alchemy pages inflows and outflows
+// separately, so the cursor carries one key per side (base64url JSON);
+// a side with no key is finished.
+interface BothCursor {
+  in?: string;
+  out?: string;
+}
+function encodeCursor(c: BothCursor): string | undefined {
+  if (!c.in && !c.out) return undefined;
+  return btoa(JSON.stringify(c)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeCursor(key: string): BothCursor | null {
+  try {
+    const b64 = key.replace(/-/g, '+').replace(/_/g, '/');
+    const c = JSON.parse(atob(b64)) as BothCursor;
+    return typeof c === 'object' && c !== null ? c : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getTransfers(
@@ -134,27 +192,40 @@ export async function getTransfers(
   maxCount = 100,
 ): Promise<{ transfers: Transfer[]; pageKey?: string }> {
   const both = direction === 'both';
-  const queries = both ? ['to', 'from'] : [direction === 'in' ? 'to' : 'from'];
+  const cursor = both && pageKey ? decodeCursor(pageKey) : null;
+  if (both && pageKey && !cursor) throw new Error('bad-page-key');
+  const sides: Array<'in' | 'out'> = both
+    ? (['in', 'out'] as const).filter((s) => !cursor || cursor[s])
+    : [direction as 'in' | 'out'];
   const out: Transfer[] = [];
-  let next: string | undefined;
-  for (const q of queries) {
+  const next: BothCursor = {};
+  let single: string | undefined;
+  for (const side of sides) {
     const params: Record<string, unknown> = {
-      [q === 'to' ? 'toAddress' : 'fromAddress']: address,
+      [side === 'in' ? 'toAddress' : 'fromAddress']: address,
       category: ['external', 'erc20', 'erc721', 'erc1155'],
       withMetadata: true,
       excludeZeroValue: true,
+      order: 'desc',
       maxCount: `0x${Math.min(maxCount, 100).toString(16)}`,
     };
-    if (pageKey && !both) params.pageKey = pageKey;
+    const key = both ? cursor?.[side] : pageKey;
+    if (key) params.pageKey = key;
     const result = (await rpc(env, chain, 'alchemy_getAssetTransfers', [params])) as {
-      transfers?: Transfer[];
+      transfers?: RawTransfer[];
       pageKey?: string;
     };
-    for (const t of result.transfers ?? []) out.push(t);
-    if (!both) next = result.pageKey;
+    for (const t of result.transfers ?? []) out.push(normalizeTransfer(t));
+    if (both) next[side] = result.pageKey;
+    else single = result.pageKey;
   }
-  out.sort((a, b) => (a.blockNum > b.blockNum ? -1 : 1));
-  return { transfers: out.slice(0, maxCount), pageKey: next };
+  out.sort((a, b) => (parseInt(b.blockNum, 16) || 0) - (parseInt(a.blockNum, 16) || 0));
+  // direction=both returns both sides' pages whole: trimming would drop
+  // rows the cursor has already moved past.
+  return {
+    transfers: both ? out : out.slice(0, maxCount),
+    pageKey: both ? encodeCursor(next) : single,
+  };
 }
 
 export async function getNativeBalance(env: Env, chain: string, address: string): Promise<string> {
@@ -171,6 +242,18 @@ export async function getTokenBalances(
     tokenBalances?: Array<{ contractAddress: string; tokenBalance: string; error?: string }>;
   };
   return (result.tokenBalances ?? []).filter((t) => !t.error && t.tokenBalance !== '0x0');
+}
+
+/** Token logo from Alchemy metadata (the ledger's last icon fallback). */
+export async function getTokenLogo(
+  env: Env,
+  chain: string,
+  contract: string,
+): Promise<string | null> {
+  const result = (await rpc(env, chain, 'alchemy_getTokenMetadata', [contract])) as {
+    logo?: string | null;
+  };
+  return result.logo || null;
 }
 
 export const alchemyClient = { getTransfers, getNativeBalance, getTokenBalances };

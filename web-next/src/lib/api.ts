@@ -60,6 +60,14 @@ export interface Transfer {
   asset: string;
   value: string;
   blockNum: string;
+  /** external | internal | erc20 | erc721 | erc1155 */
+  category?: string;
+  /** Token contract; null for the chain's native coin. */
+  contract?: string | null;
+  /** ISO block time. */
+  timestamp?: string;
+  /** Stable per transfer (several can share one tx hash). */
+  uniqueId?: string;
 }
 
 export interface TransfersPage {
@@ -206,8 +214,12 @@ export function fetchTransfers(
   chain: string,
   address: string,
   pageKey?: string,
+  opts: { live?: boolean } = {},
 ): Promise<TransfersPage> {
-  const q = pageKey ? `?pageKey=${encodeURIComponent(pageKey)}` : "";
+  const qs = new URLSearchParams();
+  if (pageKey) qs.set("pageKey", pageKey);
+  if (opts.live) qs.set("live", "1");
+  const q = qs.size ? `?${qs}` : "";
   return get<TransfersPage>(
     `/v1/address/${chain}/${address}/transfers${q}`,
     chain,
@@ -277,4 +289,30 @@ export async function fetchHealth(signal?: AbortSignal): Promise<boolean> {
   if (!res.ok) return false;
   const body = (await res.json()) as { ok?: boolean };
   return body.ok === true;
+}
+
+export interface KnownLabel {
+  role: "attacker" | "victim" | "sanctioned" | string;
+  label: string;
+  list: string;
+  chains: string[];
+}
+
+// Known roles (exploit attackers/victims, OFAC) for many addresses at once;
+// unlisted addresses are absent from the map.
+export async function fetchLabels(
+  chain: string,
+  addresses: string[],
+): Promise<Record<string, KnownLabel>> {
+  const res = await fetch(`${BASE}/v1/labels/${chain}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ addresses }),
+  });
+  if (!res.ok) throw new Error(`api-${res.status}`);
+  return ((await res.json()) as { labels: Record<string, KnownLabel> }).labels;
+}
+
+export function tokenLogoUrl(chain: string, contract: string): string {
+  return `${BASE}/v1/token-logo/${chain}/${contract}`;
 }
