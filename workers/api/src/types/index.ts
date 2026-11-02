@@ -8,6 +8,7 @@ export interface Env {
   MODEL_API_BASE_URL?: string;
   MODEL_API_MODEL?: string;
   MODEL_REASONING_EFFORT?: string;
+  AGENT_SESSIONS?: DurableObjectNamespace;
 }
 
 export interface AlchemyClient {
@@ -25,6 +26,8 @@ export interface AlchemyClient {
     chain: string,
     address: string,
   ): Promise<Array<{ contractAddress: string; tokenBalance: string }>>;
+  /** Raw JSON-RPC (optional so test fakes needn't implement it). */
+  call?(env: Env, chain: string, method: string, params: unknown[]): Promise<unknown>;
 }
 
 export interface CreateAppOptions {

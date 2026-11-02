@@ -4,7 +4,10 @@
 // stored row stays a plain report body.
 import { Hono } from 'hono';
 import { alchemyClient } from '@/alchemy';
+import type { ReportV2 } from '@/agent/report';
+import { retractFromReport } from '@/agent/memory/store';
 import { renderIntelPdf } from '@/export/pdf';
+import { renderPostMortemPdf } from '@/export/postmortem';
 import type { IntelReport } from '@/llm/investigate';
 import { assessRisk } from '@/stores/risk';
 import { nowIso } from '@/stores/transfers';
@@ -36,6 +39,19 @@ export function createReportsRoutes(client: AlchemyClient = alchemyClient) {
       parsed = JSON.parse(row.body);
     } catch {
       return c.json({ error: 'stored report is not readable JSON' }, 502);
+    }
+    // v2: the agent's post-mortem.
+    if ((parsed as { version?: number })?.version === 2) {
+      const v2 = parsed as ReportV2;
+      if (c.req.query('format') !== 'pdf')
+        return c.json({ id: row.id, title: row.title, created_at: row.created_at, ...v2 });
+      const pdf = await renderPostMortemPdf(row.id, row.created_at, v2);
+      return new Response(pdf.buffer as ArrayBuffer, {
+        headers: {
+          'content-type': 'application/pdf',
+          'content-disposition': `attachment; filename="report-${row.id}.pdf"`,
+        },
+      });
     }
     // Current envelope {address, chain, report}; legacy rows stored the
     // report object directly (address/chain then unknown).
@@ -109,6 +125,20 @@ export function createReportsRoutes(client: AlchemyClient = alchemyClient) {
         'content-disposition': `attachment; filename="intel-report-${row.id}.pdf"`,
       },
     });
+  });
+
+  // The analyst marks a report sentence as wrong: facts learned from it are
+  // retracted and the correction is remembered.
+  routes.post('/v1/reports/:id/feedback', async (c) => {
+    const id = Number(c.req.param('id'));
+    if (!Number.isInteger(id) || id <= 0) return c.json({ error: 'invalid report id' }, 400);
+    const body = (await c.req.json().catch(() => null)) as { sentence?: unknown } | null;
+    const sentence = typeof body?.sentence === 'string' ? body.sentence.trim() : '';
+    if (!sentence || sentence.length > 2000)
+      return c.json({ error: 'sentence (1-2000 chars) is required' }, 400);
+    const row = await c.env.DB.prepare('SELECT id FROM reports WHERE id = ?').bind(id).first();
+    if (!row) return c.json({ error: 'report not found' }, 404);
+    return c.json(await retractFromReport(c.env, id, sentence));
   });
 
   return routes;

@@ -14,6 +14,11 @@ interface OfacSeed {
 interface ExploitSeed {
   meta: { generated: string };
   exploits: {
+    id: string;
+    date: string;
+    chains: string[];
+    loss_usd: number;
+    technique: string;
     protocol: string;
     sources?: string[];
     hacker_addresses: { address: string; chain: string; label: string }[];
@@ -62,11 +67,21 @@ for (const e of ex.exploits) {
   }
 }
 
+// Whole exploit records for the agent's search_exploits tool.
+const rowsExploits = ex.exploits.map(
+  (e) =>
+    `INSERT OR REPLACE INTO exploits VALUES (${q(e.id)},${q(e.protocol)},${q(e.date)},` +
+    `${q(pyList(e.chains))},${Number(e.loss_usd) || 0},${q(e.technique ?? '')},${q(JSON.stringify(e))});`,
+);
+
 const out = [
   `INSERT OR REPLACE INTO seed_versions VALUES ('OFAC SDN',${q(ofacV)},${q(ofac.meta.fetched)},${rowsOfac.length});`,
   `INSERT OR REPLACE INTO seed_versions VALUES ('exploit',${q(exV)},${q(exV)},${rowsEx.length});`,
   ...rowsOfac,
   ...rowsEx,
+  ...rowsExploits,
 ];
 writeFileSync(join(ROOT, 'workers/api/sql/seed.sql'), out.join('\n') + '\n');
-console.log(`seed.sql: ${rowsOfac.length} ofac + ${rowsEx.length} exploit rows`);
+console.log(
+  `seed.sql: ${rowsOfac.length} ofac + ${rowsEx.length} exploit rows + ${rowsExploits.length} exploits`,
+);

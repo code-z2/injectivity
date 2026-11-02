@@ -1,5 +1,6 @@
 // TST-1: transfers cache behavior (fresh hit, stale + keyless, TTL override).
 import { describe, expect, test } from 'bun:test';
+import { transferUid } from '@/stores/transfers';
 import { FIX, get, lo, makeTestEnv } from './harness';
 
 function seedTransfer(
@@ -7,8 +8,8 @@ function seedTransfer(
   fetchedAt: string,
 ) {
   db.prepare(
-    `INSERT INTO transfers (tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
-     VALUES (?,?,?,?,?,?,?,?,?)`,
+    `INSERT INTO transfers (uid, tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
+     VALUES (?1,?1,?2,?3,?4,?5,?6,?7,?8,?9)`,
   ).run(
     `0x${'d'.repeat(64)}`,
     'ethereum',
@@ -58,5 +59,26 @@ describe('transfers cache', () => {
     const r = await get(app, env, `/v1/address/ethereum/${FIX.clean.address}/transfers`);
     expect(r.status).toBe(200);
     expect((r.body.transfers as unknown[]).length).toBe(0);
+  });
+});
+
+describe('transfers cache key', () => {
+  test('several transfers in one tx are kept as separate rows', async () => {
+    const { db } = makeTestEnv();
+    const hash = `0x${'f'.repeat(64)}`;
+    const base = { hash, from: FIX.sanctioned.address, to: FIX.mid.address, blockNum: '0x1' };
+    const a = { ...base, asset: 'USDC', value: '5', contract: '0xa0b8' };
+    const b = { ...base, asset: 'USDT', value: '7', contract: '0xdac1' };
+    expect(transferUid(a)).not.toBe(transferUid(b));
+    expect(transferUid({ ...a, uniqueId: `${hash}:log:3` })).toBe(`${hash}:log:3`);
+    const insert = db.prepare(
+      `INSERT INTO transfers (uid, tx_hash, chain, from_addr, to_addr) VALUES (?,?,?,?,?)`,
+    );
+    insert.run(transferUid(a), hash, 'ethereum', lo(base.from), lo(base.to));
+    insert.run(transferUid(b), hash, 'ethereum', lo(base.from), lo(base.to));
+    const n = db.prepare('SELECT COUNT(*) AS n FROM transfers WHERE tx_hash = ?').get(hash) as {
+      n: number;
+    };
+    expect(n.n).toBe(2);
   });
 });

@@ -69,6 +69,14 @@ export async function cachedTransfers(
   return { rows: transfers, fresh: isFresh };
 }
 
+/** Row key: Alchemy's uniqueId, else the transfer's own fields (one tx can carry several). */
+export function transferUid(t: Transfer): string {
+  return (
+    t.uniqueId ??
+    `${t.hash}:${t.from.toLowerCase()}:${t.to.toLowerCase()}:${t.contract ?? t.asset ?? ''}:${t.value ?? ''}`
+  );
+}
+
 export async function storeTransfers(
   env: Env,
   chain: string,
@@ -78,9 +86,10 @@ export async function storeTransfers(
   const stmts = transfers.map((t) =>
     env.DB.prepare(
       `INSERT OR REPLACE INTO transfers
-       (tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
-       VALUES (?,?,?,?,?,?,?,?,?)`,
+       (uid, tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?)`,
     ).bind(
+      transferUid(t),
       t.hash,
       chain,
       t.from.toLowerCase(),

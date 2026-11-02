@@ -99,6 +99,8 @@ async function rpc(env: Env, chain: string, method: string, params: unknown[]): 
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ id: 1, jsonrpc: '2.0', method, params }),
+        // A stalled RPC must not hang an agent turn.
+        signal: AbortSignal.timeout(30_000),
       });
     } catch (err) {
       lastErr = `network: ${err instanceof Error ? err.message : 'unknown'}`;
@@ -256,4 +258,8 @@ export async function getTokenLogo(
   return result.logo || null;
 }
 
-export const alchemyClient = { getTransfers, getNativeBalance, getTokenBalances };
+/** Any JSON-RPC method on the chain's RPC (the agent's transaction and code lookups). */
+export const call = (env: Env, chain: string, method: string, params: unknown[]) =>
+  rpc(env, chain, method, params);
+
+export const alchemyClient = { getTransfers, getNativeBalance, getTokenBalances, call };
