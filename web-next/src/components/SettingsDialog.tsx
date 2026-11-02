@@ -1,13 +1,16 @@
-import { Eye, EyeOff, Settings2, X } from "lucide-react";
+import { Check, Eye, EyeOff, Minus, Settings2, X } from "lucide-react";
 import { motion } from "motion/react";
 import { Dialog, Tabs } from "radix-ui";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { type Capabilities, probeModel } from "@/lib/agent";
 import { CHAINS } from "@/lib/api";
 import { CHAIN_META } from "@/lib/chains";
 import {
   DEFAULT_SETTINGS,
   HTTPS_URL_RE,
   saveRpc,
+  modelConfig,
+  modelId,
   saveSettings,
   useSettings,
   type Effort,
@@ -56,6 +59,10 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
   const [showKey, setShowKey] = useState(false);
   const [tab, setTab] = useState<"network" | "model">("network");
   const rpcValue = s.rpcUrls[s.chain] ?? "";
+  const baseUrlError =
+    s.modelBaseUrl.trim() && !HTTPS_URL_RE.test(s.modelBaseUrl.trim())
+      ? "Use an https:// URL."
+      : undefined;
   const rpcError =
     rpcValue.trim() && !HTTPS_URL_RE.test(rpcValue.trim())
       ? "Use an https:// URL."
@@ -161,29 +168,35 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
             </Tabs.Content>
 
             <Tabs.Content value="model" className="mt-5 space-y-5 outline-none">
-              <div className="flex items-center justify-between rounded-xl bg-subtle px-3.5 py-3">
-                <div>
-                  <p className="text-[13px] font-medium">
-                    OpenAI-compatible endpoint
-                  </p>
-                  <p className="text-[12px] text-muted">
-                    Responses API · base URL set on the server
-                  </p>
-                </div>
-                <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-medium text-muted shadow-hairline">
-                  Server
-                </span>
-              </div>
+              <Field
+                label="Base URL"
+                hint="With base URL, model and key all set, the agent uses your model; otherwise the service model."
+                error={baseUrlError}
+              >
+                <input
+                  value={s.modelBaseUrl}
+                  onChange={(e) =>
+                    saveSettings({ modelBaseUrl: e.target.value })
+                  }
+                  placeholder="https://api.meta.ai/v1"
+                  spellCheck={false}
+                  className={cn(
+                    inputCls,
+                    "font-mono text-[13px]",
+                    baseUrlError && "border-verified",
+                  )}
+                />
+              </Field>
               <Field
                 label="API key"
-                hint="Optional. Sent only with investigations; the service key is used otherwise."
+                hint="Kept in this browser and sent only with agent requests."
               >
                 <div className="relative">
                   <input
                     type={showKey ? "text" : "password"}
                     value={s.modelKey}
                     onChange={(e) => saveSettings({ modelKey: e.target.value })}
-                    placeholder="sk-…"
+                    placeholder="Your API key"
                     autoComplete="off"
                     spellCheck={false}
                     className={cn(inputCls, "pr-10 font-mono text-[13px]")}
@@ -202,7 +215,7 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
                   </button>
                 </div>
               </Field>
-              <Field label="Model" hint="Empty uses the server default model.">
+              <Field label="Model" hint="The model name at that endpoint.">
                 <input
                   value={s.model}
                   onChange={(e) => saveSettings({ model: e.target.value })}
@@ -233,6 +246,7 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
                   ))}
                 </div>
               </div>
+              <ModelCheck />
             </Tabs.Content>
 
             <div className="mt-6 flex items-center justify-between border-t border-line pt-4">
@@ -263,4 +277,107 @@ function Pill({ id }: { id: string }) {
       className="absolute inset-0 rounded-full bg-surface shadow-card"
     />
   );
+}
+
+// What the custom model can do, checked against the API once base URL,
+// model and key are set (debounced while typing). The agent needs tool
+// calling; search and effort are used when present.
+function ModelCheck() {
+  const s = useSettings();
+  const model = modelConfig(s);
+  const id = model ? modelId(model) : "";
+  const [state, setState] = useState<
+    | { kind: "idle" }
+    | { kind: "checking" }
+    | { kind: "done"; caps: Capabilities }
+    | { kind: "failed"; error: string }
+  >({ kind: "idle" });
+
+  useEffect(() => {
+    if (!model) {
+      setState({ kind: "idle" });
+      return;
+    }
+    const ctl = new AbortController();
+    const t = setTimeout(() => {
+      setState({ kind: "checking" });
+      probeModel(model, ctl.signal)
+        .then((caps) => {
+          // Only a model that answered is used by the agent.
+          saveSettings({ modelVerified: caps.error ? "" : id });
+          setState(
+            caps.error
+              ? { kind: "failed", error: caps.error }
+              : { kind: "done", caps },
+          );
+        })
+        .catch(
+          (e) =>
+            !ctl.signal.aborted &&
+            setState({
+              kind: "failed",
+              error: e instanceof Error ? e.message : "check failed",
+            }),
+        );
+    }, 700);
+    return () => {
+      clearTimeout(t);
+      ctl.abort();
+    };
+    // biome-ignore lint/correctness/useExhaustiveDependencies: re-check only when the model config changes
+  }, [id]);
+
+  if (state.kind === "idle")
+    return (
+      <p className="rounded-xl bg-subtle px-3.5 py-3 text-[12px] text-muted">
+        Using the service model. Fill in base URL, model and key to use your
+        own.
+      </p>
+    );
+  if (state.kind === "checking")
+    return (
+      <p className="rounded-xl bg-subtle px-3.5 py-3 text-[12px]">
+        <span className="text-shimmer">Checking your model…</span>
+      </p>
+    );
+  if (state.kind === "failed")
+    return (
+      <p className="rounded-xl bg-subtle px-3.5 py-3 text-[12px] [overflow-wrap:anywhere] text-ink-soft">
+        Couldn't reach your model ({readable(state.error)}). The agent keeps
+        using the service model.
+      </p>
+    );
+  const { caps } = state;
+  const cap = (on: boolean, label: string) => (
+    <span
+      className={cn("flex items-center gap-1", on ? "text-ink" : "text-faint")}
+    >
+      {on ? <Check className="size-3.5" /> : <Minus className="size-3.5" />}
+      {label}
+    </span>
+  );
+  return (
+    <div className="rounded-xl bg-subtle px-3.5 py-3 text-[12px]">
+      <div className="flex items-center gap-3">
+        {cap(caps.tools, "Tools")}
+        {cap(caps.search, "Search")}
+        {cap(caps.effort, "Effort")}
+      </div>
+      <p className="mt-1.5 text-muted">
+        {caps.tools
+          ? caps.search
+            ? "Your model will research, search the web and write reports."
+            : "Your model will research and write reports, without web search."
+          : "Your model can't call tools, so the service model researches; summaries use yours."}
+      </p>
+    </div>
+  );
+}
+
+/** "model API error: http-401 {…"message":"Invalid API Key"…}" → "401, Invalid API Key". */
+function readable(error: string): string {
+  const status = /http-(\d{3})/.exec(error)?.[1];
+  const message = /"message"\s*:\s*"([^"]+)"/.exec(error)?.[1];
+  if (status || message) return [status, message].filter(Boolean).join(", ");
+  return error.replace(/^model API error: /, "");
 }

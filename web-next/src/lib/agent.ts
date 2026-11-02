@@ -1,7 +1,7 @@
 // Client for the agent backend: investigation sessions over a WebSocket and
 // node summaries over SSE. Shapes mirror workers/api/src/agent.
 import { BASE, type Chain } from "./api";
-import { customRpc } from "./settings";
+import { type CustomModel, customModel, customRpc } from "./settings";
 
 export type SourceKind =
   | "tx"
@@ -179,10 +179,49 @@ export function connectSession(
   };
 }
 
-/** Extras every ask/report carries: the chain's custom RPC. */
+/** Extras every ask/report carries: the chain's custom RPC and model. */
 export function askExtras(chain: Chain): Record<string, unknown> {
   const rpcUrl = customRpc(chain);
-  return rpcUrl ? { rpcUrl } : {};
+  const model = customModel();
+  return { ...(rpcUrl ? { rpcUrl } : {}), ...(model ? { model } : {}) };
+}
+
+/** The custom model as request headers (plain HTTP routes). */
+export function modelHeaders(
+  model: CustomModel | null = customModel(),
+): Record<string, string> {
+  return model
+    ? {
+        "x-llm-base-url": model.baseUrl,
+        "x-llm-model": model.model,
+        "x-llm-key": model.key,
+        "x-llm-effort": model.effort,
+      }
+    : {};
+}
+
+export interface Capabilities {
+  model: string;
+  tools: boolean;
+  search: boolean;
+  effort: boolean;
+  error?: string;
+}
+
+/** What a model can do, found by trying it (tool call, search, effort). */
+export async function probeModel(
+  model: CustomModel,
+  signal?: AbortSignal,
+): Promise<Capabilities> {
+  const res = await fetch(`${BASE}/v1/models/probe`, {
+    method: "POST",
+    headers: modelHeaders(model),
+    signal,
+  });
+  const body = (await res.json().catch(() => null)) as
+    (Capabilities & { error?: string }) | null;
+  if (!res.ok || !body) throw new Error(body?.error ?? `probe-${res.status}`);
+  return body;
 }
 
 export interface Fact {
@@ -217,6 +256,7 @@ export async function streamSummary(
     headers: {
       "content-type": "application/json",
       ...(rpc ? { "x-rpc-url": rpc } : {}),
+      ...modelHeaders(),
     },
     body: JSON.stringify({ chain, address }),
     signal,

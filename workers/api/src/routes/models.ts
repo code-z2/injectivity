@@ -1,6 +1,6 @@
 // POST /v1/models/probe: capabilities of the visitor's custom model
 // (x-llm-* headers), or of the server research model when none is set.
-// Never echoes a key.
+// Never echoes a key or which vendor API was picked.
 import { Hono } from 'hono';
 import { ConfigError, customModel, serverModel } from '@/llm/config';
 import { probeModel } from '@/llm/probe';
@@ -19,7 +19,9 @@ export function createModelsRoutes(modelFetch?: typeof fetch) {
     }
     if (!cfg) return c.json({ error: 'no model configured on the server' }, 503);
     const caps = await probeModel(cfg, modelFetch);
-    return c.json({ model: cfg.model, ...caps });
+    // Which wire format was picked stays internal.
+    const { adapter: _adapter, ...visible } = caps;
+    return c.json({ model: cfg.model, ...visible });
   });
 
   return routes;

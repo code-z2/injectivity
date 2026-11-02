@@ -14,9 +14,13 @@ export interface Settings {
   /** Older builds' ENS-only mainnet RPC. Kept for ENS (it may not serve
    * transfers, so it never becomes a lookup RPC); no longer editable. */
   ensRpcUrl?: string;
+  /** Custom model endpoint (base URL). */
+  modelBaseUrl: string;
   modelKey: string;
   model: string;
   effort: Effort;
+  /** The custom model config that last passed the capability check. */
+  modelVerified: string;
 }
 
 const SLOT = "intel-terminal:settings";
@@ -24,9 +28,11 @@ const SLOT = "intel-terminal:settings";
 export const DEFAULT_SETTINGS: Settings = {
   chain: "ethereum",
   rpcUrls: {},
+  modelBaseUrl: "",
   modelKey: "",
   model: "",
   effort: "medium",
+  modelVerified: "",
 };
 
 function read(): Settings {
@@ -75,4 +81,33 @@ export function customRpc(chain: Chain, s: Settings = current): string {
 
 export function saveRpc(chain: Chain, url: string): void {
   saveSettings({ rpcUrls: { ...current.rpcUrls, [chain]: url } });
+}
+
+export interface CustomModel {
+  baseUrl: string;
+  model: string;
+  key: string;
+  effort: Effort;
+}
+
+/** The custom model as configured (base URL, model and key all set), checked or not. */
+export function modelConfig(s: Settings = current): CustomModel | null {
+  const baseUrl = s.modelBaseUrl.trim();
+  const model = s.model.trim();
+  const key = s.modelKey.trim();
+  if (!HTTPS_URL_RE.test(baseUrl) || !model || !key) return null;
+  return { baseUrl, model, key, effort: s.effort };
+}
+
+export const modelId = (m: CustomModel) =>
+  `${m.baseUrl}|${m.model}|${m.key}|${m.effort}`;
+
+/**
+ * The visitor's own model, once it has passed the capability check (the
+ * agent then uses it for research, reports and summaries). null means the
+ * service model, so a mistyped key never breaks the agent.
+ */
+export function customModel(s: Settings = current): CustomModel | null {
+  const m = modelConfig(s);
+  return m && s.modelVerified === modelId(m) ? m : null;
 }
