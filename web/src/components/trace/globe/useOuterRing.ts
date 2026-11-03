@@ -25,6 +25,8 @@ async function statsOf(
     inCount: c.outCount,
     outCount: c.inCount,
     flows: [],
+    movedUsd: c.inUsd + c.outUsd,
+    movedPartial: c.partial,
   }));
   return { stats, labels: profileLabels(p) };
 }

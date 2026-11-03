@@ -714,6 +714,15 @@ function NodeCard({
   const inC = s?.inCount ?? 0;
   const outC = s?.outCount ?? 0;
   const protocol = label?.list === "protocol";
+  // Dead ends: protocols and verified contracts hold everyone's money, so
+  // their balance says nothing about the trace; show what moved through
+  // them with the inner address instead.
+  const deadEnd =
+    protocol || Boolean(balance?.isContract && balance.contractName);
+  const moved =
+    s?.movedUsd !== undefined
+      ? fmtUsd(s.movedUsd, Boolean(s.movedPartial))
+      : null;
   // Bridges and mixers are where a trail leaves what we can follow.
   const exit =
     protocol && (label?.role === "bridge" || label?.role === "mixer");
@@ -759,16 +768,20 @@ function NodeCard({
           {name}
         </div>
       )}
-      {!active && !protocol && (
+      {!active && (
         <div className="mt-0.5 flex items-center gap-1.5 text-[10.5px] whitespace-nowrap text-muted tabular-nums">
           <span className={inC > 0 ? "text-clean" : undefined}>↓{inC}</span>
           <span>↑{outC}</span>
-          <span className="text-ink-soft">
-            · Bal {bal ?? <span className="text-faint">…</span>}
-          </span>
+          {deadEnd ? (
+            moved && <span className="text-ink-soft">· moved {moved}</span>
+          ) : (
+            <span className="text-ink-soft">
+              · Bal {bal ?? <span className="text-faint">…</span>}
+            </span>
+          )}
         </div>
       )}
-      {active && bal && (
+      {active && bal && !deadEnd && (
         <div className="mt-0.5 text-[10.5px] text-ink-soft tabular-nums">
           Balance {bal}
         </div>
@@ -780,13 +793,20 @@ function NodeCard({
               {name ?? "Unlabelled"}
             </div>
           )}
-          {balance && balance.holdings.length > 0 && (
-            <div className="text-muted tabular-nums">
-              Holds{" "}
-              {balance.holdings
-                .map((h) => `${compactNum(h.amount)} ${h.symbol}`)
-                .join(", ")}
+          {deadEnd ? (
+            <div className="max-w-[26ch] whitespace-normal text-muted">
+              Shared contract: its balance isn't the trace's money.
             </div>
+          ) : (
+            balance &&
+            balance.holdings.length > 0 && (
+              <div className="text-muted tabular-nums">
+                Holds{" "}
+                {balance.holdings
+                  .map((h) => `${compactNum(h.amount)} ${h.symbol}`)
+                  .join(", ")}
+              </div>
+            )
           )}
           <div className="text-faint">
             {active

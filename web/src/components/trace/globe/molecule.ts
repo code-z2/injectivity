@@ -19,6 +19,10 @@ export interface NodeStat {
   outCount: number;
   /** Token movements between this address and its inner neighbour. */
   flows: TokenFlow[];
+  /** USD moved between this address and its inner neighbour (profiles). */
+  movedUsd?: number;
+  /** Some of it couldn't be priced: movedUsd is a lower bound. */
+  movedPartial?: boolean;
 }
 
 export type Flow = "in" | "out" | "both";

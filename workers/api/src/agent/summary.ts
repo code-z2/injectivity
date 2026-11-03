@@ -163,9 +163,21 @@ export async function buildFacts(
       );
   }
   const bal = deep ? await balanceOf(env, chain, a, prices, fetchImpl).catch(() => null) : null;
-  if (bal)
+  // A shared contract (protocol, pool, router) holds everyone's money: its
+  // balance is not the trace's.
+  const shared =
+    Boolean(bal?.isContract) &&
+    (Boolean(bal?.contractName) ||
+      labelRows.some((r) => r.address === a && r.list_name === 'protocol'));
+  if (bal && shared)
     add(
-      `Its current balance is ${fmtValue({ usd: bal.usd, partial: bal.partial })}${bal.holdings.length ? `, mainly ${bal.holdings.map((h) => `${fmt(h.amount)} ${h.symbol}`).join(', ')}` : ''}${bal.isContract ? `; it is a contract${bal.contractName ? ` (${bal.contractName})` : ''}` : ''}.`,
+      `It is a shared contract${bal.contractName ? ` (${bal.contractName})` : ''}; its balance of ${fmtValue({ usd: bal.usd, partial: bal.partial })} belongs to all its users, not to any one trace.`,
+      'chain_state',
+      `balance-now:${a}`,
+    );
+  else if (bal)
+    add(
+      `Its current balance is ${fmtValue({ usd: bal.usd, partial: bal.partial })}${bal.holdings.length ? `, mainly ${bal.holdings.map((h) => `${fmt(h.amount)} ${h.symbol}`).join(', ')}` : ''}${bal.isContract ? '; it is an unverified contract' : ''}.`,
       'chain_state',
       `balance-now:${a}`,
     );

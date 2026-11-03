@@ -129,6 +129,8 @@ function Workspace({
         inCount: c.inCount,
         outCount: c.outCount,
         flows: [],
+        movedUsd: c.inUsd + c.outUsd,
+        movedPartial: c.partial,
       }));
     if (!fresh) return [];
     return ledger.counterparties.slice(0, RING1_MAX).map((c) => ({
