@@ -2,159 +2,254 @@
 
 **Investigate any wallet. No wallet needed.**
 
-Intel Terminal is an AI-powered on-chain security investigation terminal for
-EVM chains. Paste a wallet address or an ENS name and it traces fund flows,
-screens them against sanctioned and exploit-linked addresses, visualizes the
-wallet mesh, and produces a grounded intelligence report — separating verified
-malicious activity from inferred association at every step.
+Intel Terminal is an AI-powered security investigation terminal for EVM
+blockchains. You paste in a wallet address or an ENS name — for example
+`vitalik.eth` or `0x8B1b…D3b` — and the terminal tells you what that wallet
+has been touching: where its funds came from, where they went, whether any
+counterparty appears on sanctions or exploit lists, and how all of it connects
+on a visual graph. An AI investigator then reads the whole picture and writes
+it up as a structured report you can download as a PDF.
 
-Live: [intel-terminal.pages.dev](https://intel-terminal.pages.dev) ·
+It is built for anyone who needs to answer one question with confidence:
+**is this wallet connected to something malicious, and how sure should I be?**
+
+Live product: [intel-terminal.pages.dev](https://intel-terminal.pages.dev) ·
 API: [intel-terminal-api.anyaogupeter601.workers.dev](https://intel-terminal-api.anyaogupeter601.workers.dev)
 
-## Why this exists
+## Why Intel Terminal exists
 
-Block explorers answer "what happened in this transaction." They do not answer
-the question an investigator actually asks: **"is this wallet connected to
-something malicious, and how confident should I be?"**
+A block explorer will show you exactly what happened inside a single
+transaction. That is useful, but it is not the question an investigator is
+actually asking. The real question is about relationships: has this wallet
+been transacting with sanctioned addresses, with known hackers, with the
+victims of major exploits? And if there is a connection, is it a direct,
+proven link — or just a shared counterparty two hops away that could mean
+nothing at all?
 
-A shared counterparty is not proof of wrongdoing. A direct hit on a sanctions
-list is close to it. Most tooling collapses that distinction; Intel Terminal
-keeps it structural. Exact list matches are `verified`. One-hop counterparties
-of verified addresses are `inferred` — shown in their own section, never mixed
-into labels, never exported as verdicts without qualification. The LLM
-investigator is bound by the same rule: its draft findings are validated
-against the actual trace edges and risk matches, and anything it cannot cite
-is stripped before it reaches you, with the strip count reported.
+Most tools blur that distinction. Intel Terminal is built around it. When an
+address appears directly on a sanctions list or in our curated exploit
+dataset, the terminal marks it **verified**. When an address has simply
+transacted with a verified address — one hop away — it is marked **inferred**,
+shown in its own separate section, and always accompanied by a plain statement
+that association is not wrongdoing. Verified findings and inferred
+associations are never mixed together, not in the UI, not in the API, and not
+in the AI-generated report.
 
-## What you can do
+The AI investigator works under the same rule. It proposes findings, and then
+the server checks every single claim against the real trace data and the real
+risk matches before anything is kept. Any finding the evidence cannot support
+is removed, and the report tells you how many were removed. You always see
+the coverage limits of the investigation alongside its conclusions.
 
-- **Look up any address or ENS name.** Intel, balances, and paginated history,
-  cache-first from D1 with live Alchemy fill on miss. No key means D1-only
-  responses with `live: false` — never a guess.
-- **Trace fund flows.** Bounded BFS to depth 2 across six EVM chains, with
-  direction, fanout, value, and asset controls. Shared counterparties are
-  detected server-side, not eyeballed in the client.
-- **See the mesh.** A Cytoscape wallet graph: verified nodes in red, shared
-  counterparties in amber, the searched root boxed. Every node links to its
-  explorer page; every edge links to its transaction.
-- **Read the risk split.** Verified matches and inferred associations render
-  as two distinct sections, with the one-hop path (`via`) shown for each
-  inference and a plain-language disclaimer that association is not
-  wrongdoing.
-- **Get an AI report.** A one-shot grounded investigation: summary, findings
-  with verdict/confidence/evidence, open questions, next checks. Streaming is
-  status events plus the validated report only — ungrounded draft text never
-  reaches the client.
-- **Export and save.** Any saved investigation downloads as a four-section
-  PDF (graph snapshot, paths, risk split, findings + sources) and can be kept
-  in local browser storage.
+## What you can do with it
+
+**Look up any address or ENS name.** Type a 0x address or a name like
+`vitalik.eth` into the console and the terminal resolves it, loads its
+intelligence profile, token balances, and transaction history. Results come
+from a fast local cache first and fill in live on-chain data when it is
+missing. If you have not configured an API key, you still get everything the
+cache holds — the terminal tells you honestly what is live and what is
+cached, and it never invents data it does not have.
+
+**Trace where funds flow.** From any address you can expand a fund-flow trace
+up to two hops deep, in either direction, across six EVM chains (Ethereum,
+Base, BSC, Polygon, Arbitrum, and Optimism). You control the direction, the
+depth, and how many counterparties to consider per step. The detection of
+shared counterparties — wallets that sit between the paths you are tracing —
+happens on the server, so the graph you see is computed, not eyeballed.
+
+**See the wallet mesh.** The trace renders as an interactive graph. Wallets
+that are verified as malicious appear in red. Shared counterparties appear in
+amber. The wallet you searched is boxed so you never lose your place. Clicking
+any wallet opens its page on the right block explorer; clicking any transfer
+opens the transaction itself.
+
+**Read the risk split.** Below the profile, the terminal separates everything
+it found into two sections. The verified section lists exact matches against
+the sanctions and exploit lists, with the list name and version for each one.
+The inferred section lists one-hop associations, shows you exactly which
+wallet the association runs through, and reminds you that an association on
+its own proves nothing. When nothing is found, the terminal says so plainly
+and tells you how many counterparties it screened to reach that conclusion.
+
+**Ask the AI investigator.** With one click, a grounded AI investigation runs
+over the full evidence bundle: the trace, the risk matches, and the balances.
+You get back a written summary, individual findings each tagged with a verdict
+(verified or inferred), a confidence level, and the exact evidence behind
+them — transaction hashes and list references you can click and check
+yourself. Open questions and recommended next steps come with every report.
+The investigation streams its progress and then delivers only the validated
+report; the model's unverified draft text is never shown to you.
+
+**Export and keep your work.** Every completed investigation is saved and can
+be downloaded as a PDF report with four sections: a snapshot of the fund-flow
+graph, the full fund-flow paths, the verified-versus-inferred risk split, and
+the findings with their cited sources. You can also keep reports in your
+browser's local storage and reopen them later.
 
 ## What it is not
 
-- **Not a wallet.** Nothing connects, signs, or transacts. There is no
-  key custody anywhere in the system.
-- **Not a verdict engine.** `inferred` means "one hop from something
-  flagged." Treating it as proof of wrongdoing is a misuse of the tool, and
-  the UI says so where the inference appears.
-- **Not an always-on indexer.** There is no polling and no standing
-  infrastructure bill: Alchemy is called on demand and results persist in
-  D1/SQLite cache (~$0 idle).
-- **Not exhaustive.** Trace depth caps at 2 and fanout caps at 100 per
-  expansion; the report states its coverage limits. A clean result means
-  "nothing found within these bounds," not "this address is safe."
+Intel Terminal is deliberately narrow about what it claims, and you should
+know its boundaries before relying on it.
 
-## How it works
+It is **not a wallet**. Nothing in the product connects to a wallet, asks you
+to sign anything, or moves funds. There is no key custody anywhere in the
+system, and there never will be.
 
-```text
-paste address/ENS ─▶ intel + history (D1 cache, Alchemy on miss)
-                    ─▶ trace depth≤2 (BFS, cache-first per expansion)
-                    ─▶ screen: exact → verified / 1-hop → inferred / else none
-                    ─▶ investigate (bundle → Muse → validate → strip → persist)
-                    ─▶ report JSON / PDF export
-```
+It is **not a guilt engine**. An inferred association means one thing: this
+wallet transacted with a flagged wallet. Exchanges, bridges, and popular
+services share counterparties with thousands of innocent users every day.
+The product labels inference as inference everywhere it appears.
 
-The API is a Hono Worker backed by D1. The `reports`, `risk_lists`,
-`risk_hits`, `transfers`, `traces`, and `expansions` tables are the whole
-memory: an address whose rows are cached is not the same as an address that
-was explored, and the schema keeps the two apart. The web app is a React +
-TanStack Router + Tailwind front end with no wallet code paths at all.
+It is **not an always-on surveillance system**. Nothing polls the chain in
+the background. On-chain data is fetched on demand when you investigate
+something, and then kept in cache so repeat lookups are instant. The standing
+infrastructure cost is effectively zero when nobody is using it.
 
-Model access is bring-your-own-key: `X-Model-Key` per request, service
-`MODEL_API_KEY` as fallback, 401 only when neither exists. The default model
-is `muse-spark-1.3-contributor` at medium reasoning effort with search
-grounding; model and effort are overridable per investigation.
+It is **not exhaustive**. Traces are bounded at two hops and at most one
+hundred counterparties per expansion step, and every report states what it
+covered. A clean result means nothing was found within those bounds — it is
+not a certificate that an address is safe.
+
+## How an investigation flows
+
+When you trace an address, the terminal works through the same pipeline every
+time:
+
+1. **Resolve and look up.** ENS names are resolved to addresses, and the
+   terminal loads the intelligence profile: exact risk-list matches,
+   balances, and cached history.
+2. **Trace.** A breadth-first search walks fund flows out to depth two,
+   reading cached transfers first and fetching live data only for gaps, only
+   when an API key is available.
+3. **Screen.** Every address touched is checked against the risk lists. Exact
+   matches become verified findings. Direct counterparties of verified
+   addresses become inferred findings, each annotated with the verified
+   address it runs through. Everything else is left alone.
+4. **Investigate.** The evidence bundle — trace edges, risk matches, and
+   coverage limits — is sent to the language model with strict instructions
+   to cite only what is in the bundle. The server then re-checks every
+   finding the model returns, removes anything unsupported, and records how
+   much was removed.
+5. **Report.** The validated report is stored, shown in full with clickable
+   evidence, and made available as a JSON document and as a PDF export.
+
+Model access follows a bring-your-own-key design. You can supply your own
+model key per request in the Settings menu, and the service falls back to its
+own configured key when you do not. You will only ever be asked for a key
+when neither exists. The default model and its reasoning effort are
+configurable per investigation.
+
+## The data underneath
+
+The terminal's judgments are only as good as its lists, so the seed data is
+curated with strict rules. Every row in the exploit dataset names both the
+attacker and the victim with complete, checksummed addresses on a named
+chain — rows that cannot meet that bar are held out of the strict file rather
+than guessed into it. The sanctions list tracks 123 EVM addresses with the
+exact upstream commit each entry came from, so any match can be traced back
+to its source. In total, 866 flagged addresses are indexed and served from
+the cache from the first lookup.
 
 ## Repository map
 
-| Component | Purpose |
+| Component | What lives there |
 | --- | --- |
-| [Web app](web/) | Spotlight console, investigation terminal, wallet mesh, risk panel, report view, PDF download |
-| [API Worker](workers/api/) | Hono routes, Alchemy clients, trace engine, risk assessment, LLM investigation, PDF export |
-| [API routes](workers/api/src/routes/) | `address` (intel + history), `trace`, `investigate`, `reports` (JSON/PDF), `agent`, `exploits`, `models`, `profile` |
-| [Investigative agent](workers/api/src/agent/) | Multi-step agent loop with tools, fact ledger, and verification gate |
-| [Seed data](data/seeds/) | `exploits.json` (strict EVM-only DeFi hacks, hacker + victim required), `ofac.json` (123 sanctioned addresses), `master.json`, `protocols.json` |
-| [API SQL](workers/api/sql/) | `schema.sql` + `seed.sql` (source of truth; `migrations/` holds applied D1 migrations) |
-| [API tests](workers/api/test/) | Contract + regression suite (`bun test`), offline by construction |
-| [Design](docs/DESIGN.md) | Scoped work chunks (INFRA/API/LLM/UI/INT/TST) and completion criteria |
-| [Build log](docs/system.md) | Per-completion record: what, how, why, importance |
+| [Web app](web/) | The spotlight console, the investigation terminal, the wallet mesh graph, the risk panel, the report view, and PDF download |
+| [API Worker](workers/api/) | Hono routes, Alchemy clients, the trace engine, risk assessment, the LLM investigation pipeline, and PDF export |
+| [API routes](workers/api/src/routes/) | `address` for intel and history, `trace` for fund flows, `investigate` for AI reports, `reports` for saved reports in JSON and PDF, plus `agent`, `exploits`, `models`, and `profile` |
+| [Investigative agent](workers/api/src/agent/) | A multi-step agent loop with tools, a fact ledger, and a verification gate for deeper investigations |
+| [Seed data](data/seeds/) | `exploits.json` for curated EVM DeFi hacks, `ofac.json` for sanctioned addresses, `master.json` and `protocols.json` for the wider working sets |
+| [API SQL](workers/api/sql/) | `schema.sql` and `seed.sql`, the source of truth — the `migrations/` folder holds the migrations already applied to D1 |
+| [API tests](workers/api/test/) | The contract and regression suite, which runs with `bun test` and is fully offline by construction |
+| [Design](docs/DESIGN.md) | The scoped work plan (infrastructure, API, LLM, UI, integration, tests) with completion criteria for each piece |
+| [Build log](docs/system.md) | A running record of what was built, how, why, and what it unlocked |
 
-Seed discipline: every exploit row carries hacker and victim addresses with
-full 42-char `0x` form on a named chain — no nulls, no truncation. Single-
-sourced or ambiguous attributions are held out of the strict file rather than
-guessed into it.
+## Running it locally
 
-## Local setup
+You need [bun](https://bun.sh) and [wrangler](https://developers.cloudflare.com/workers/wrangler/).
+Check that `wrangler whoami` shows the Cloudflare account you intend to deploy
+with before doing anything remote.
 
-Prerequisites: [bun](https://bun.sh) and [wrangler](https://developers.cloudflare.com/workers/wrangler/)
-(`wrangler whoami` must show the deploying account).
+Start the API first. It installs its dependencies, creates and seeds a local
+D1 database, and serves on port 8787:
 
 ```sh
-# API: install, migrate + seed local D1, run
 cd workers/api
 bun install
 bun run migrate && bun run seed
 printf 'ALCHEMY_API_KEY=...\nMODEL_API_KEY=...\n' > .dev.vars  # gitignored; keys only
-bun run dev   # http://127.0.0.1:8787
-
-# Web: install, point at the API, run (separate terminal)
-cd web
-bun install
-VITE_API_BASE=http://127.0.0.1:8787 bun run dev   # http://127.0.0.1:5173
+bun run dev
 ```
 
-The web app opens on a spotlight console: paste an ENS name or address,
-open Settings for chain, custom ENS RPC, and model configuration, and Trace
-carries you into the terminal. Local D1 starts empty of transfers — lookups
-serve the 866 seeded risk rows immediately; fund-flow history fills on first
-keyed lookup and persists.
+Then start the web app in a second terminal, pointed at that local API:
 
-## Checks
+```sh
+cd web
+bun install
+VITE_API_BASE=http://127.0.0.1:8787 bun run dev
+```
+
+Open `http://127.0.0.1:5173`. You land on the spotlight console: paste an ENS
+name or an address, open Settings to choose your chain, set a custom RPC for
+name resolution, or add your own model key — then press Trace to step into
+the terminal. The local database starts with the full set of 866 flagged
+addresses but no transfer history, so risk screening works immediately while
+fund-flow history fills in the first time you look an address up with a key
+configured, and stays cached after that.
+
+## Checking your work
+
+The API suite is the quality gate, and it is designed to run anywhere
+without secrets:
 
 ```sh
 cd workers/api
-bun run check    # tsc --noEmit
-bun test         # contract + regression suite, no live keys (15+ tests)
-bun run int1     # end-to-end loop: fixtures → lookup → trace → screen → export
-cd ../../web
-bun run check    # tsc --noEmit
-bun run build
+bun run check    # typecheck with tsc
+bun test         # contract and regression tests — no live keys, ever
+bun run int1     # the full end-to-end loop: fixtures, lookup, trace, screen, export
 ```
 
-The suite runs fully offline: the test harness builds an in-memory DB from
-the committed schema + seed and uses a throwing Alchemy stub, so any live
-leak fails loudly. Live checks (Alchemy, Muse) are manual-only and gated
-behind explicit env opt-in.
+The tests build an in-memory database from the committed schema and seed and
+talk to it through an Alchemy client that throws on any live call, so a test
+that accidentally reaches the network fails loudly instead of passing
+quietly. Anything that touches the real Alchemy or Muse APIs is manual-only
+and sits behind an explicit opt-in flag.
 
-## Deployment and security
+For the web app:
 
-Production is Cloudflare: Worker + D1 + Pages ([pages project](https://intel-terminal.pages.dev)).
-Remote D1 is created once (`wrangler d1 create intel-terminal`), its id wired
-into `workers/api/wrangler.toml`; schema and seed apply with
-`wrangler d1 execute intel-terminal --remote --file=./sql/<schema|seed>.sql`.
-Secrets (`ALCHEMY_API_KEY`, `MODEL_API_KEY`) are set with `wrangler secret put`
-and never enter source control — `.dev.vars` is gitignored.
+```sh
+cd web
+bun run check    # typecheck with tsc
+bun run build    # production build
+```
 
-Keep provider keys out of logs and fixtures. The strict seed files contain
-only public attribution data (addresses, tx hashes, published sources).
-Risk-list versions are pinned per row so a match can always be traced back to
-the list commit it came from.
+## Deploying it
+
+Production runs on Cloudflare: a Worker and D1 for the API, Pages for the
+front end. The remote database is created once and its id is wired into
+`workers/api/wrangler.toml`:
+
+```sh
+cd workers/api
+wrangler d1 create intel-terminal
+wrangler d1 execute intel-terminal --remote --file=./sql/schema.sql
+wrangler d1 execute intel-terminal --remote --file=./sql/seed.sql
+wrangler secret put ALCHEMY_API_KEY
+wrangler secret put MODEL_API_KEY
+wrangler deploy
+```
+
+Then build the web app against the deployed API and publish it:
+
+```sh
+cd web
+VITE_API_BASE=https://<your-worker>.workers.dev bun run build
+wrangler pages deploy dist --project-name=intel-terminal
+```
+
+Secrets are set with `wrangler secret put` and never enter source control —
+`.dev.vars` is gitignored. The seed files contain only public attribution
+data (addresses, transaction hashes, and links to published sources), and
+every risk-list row carries the upstream version it came from, so a match in
+production can always be traced back to the list entry behind it.
