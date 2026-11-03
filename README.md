@@ -7,9 +7,9 @@ connected to something malicious, and how confident should you be?
 You begin with nothing more than a wallet address or an ENS name. From there,
 the terminal traces where funds have flowed, checks every counterparty
 against sanctions lists and a curated dataset of DeFi exploits, maps the
-network of connected wallets as an interactive graph, and lets you interrogate
-the whole picture through a conversational agent whose every claim carries
-citations. Completed investigations become post-mortem reports you can keep
+network of connected wallets as an interactive graph, and lets you
+interrogate the whole picture through a conversational agent that backs every
+claim with citations. Completed investigations become reports you can keep
 and share as PDFs.
 
 The live product is at [intel-terminal.pages.dev](https://intel-terminal.pages.dev),
@@ -43,35 +43,30 @@ both its conclusions and the limits of what it covered.
 
 ## What it gives you
 
-**A landing that gets out of the way.** The front page opens on an animated
-wordmark over a dark aurora, with line art of the on-chain world — blocks,
-locks, graphs, exploit code — surfacing softly around your cursor as if you
-are peeking beneath the surface. The orb at the center becomes the send
-button of a spotlight search field. You can paste an address or ENS name, or
-start from the curated exploit quick list (covering major incidents including
-Binance) and jump straight to an attacker's trace. Every investigation lives
-at a shareable URL such as `/investigate/ethereum/vitalik.eth`.
+**A starting point that asks almost nothing of you.** The front page is a
+single search. You paste an address or a name like `vitalik.eth`, or you pick
+up a thread from the quick list of major exploits — including the Binance
+incident — and jump straight to an attacker's trail. Every investigation gets
+its own shareable link, so you can send someone exactly what you are seeing.
 
-**A trace view built for following money.** The investigation page centers on
-a molecular graph of the active wallet: ring by ring of counterparties you can
-expand, with a ledger dock underneath showing the address's transfers.
-Transfers are value-ranked with balances and protocol labels (routers,
-bridges, and mixers are recognized from an on-chain-verified contract list),
-dust and spoof-token transfers stay hidden unless you ask for them, and
-internal transfers are flagged. You build multi-hop paths as an address
-chain, each link opening its own ledger, and every address and transaction
-links out to the appropriate block explorer. Profiles summarize a wallet's
-top counterparties and current USD holdings.
+**A trace view built for following money.** The investigation page maps the
+wallet's network as an interactive graph you can expand hop by hop, with a
+transfer ledger beneath it. Transfers arrive ranked by value with balances
+shown in dollars, known services and routers labeled, and dust, spoof tokens,
+and internal transfers filtered or flagged so the noise stays out of your
+way. You can string wallets together into a multi-hop path and open each
+step's own ledger, and everything links out to the block explorer so any
+detail can be checked independently. A profile view summarizes each wallet's
+top counterparties and current holdings.
 
-**A conversational agent that cites its sources.** Beside the graph, the
-agent panel holds a cited conversation about the investigation, backed by a
-dedicated session that streams its thinking, tool calls, and answers over a
-WebSocket. Node summaries stream in as server-sent events: verified sentences
-first, each with its sources. When the investigation is done, the agent
-writes a post-mortem report that opens only in the browser that generated it
-(through an unguessable owner key) while its PDF link can be shared freely.
-A one-shot investigation mode sits alongside the conversation for quick,
-single-pass reports.
+**A conversational agent that shows its work.** Beside the graph, you can
+simply ask about the investigation in plain language. The agent thinks out
+loud as it works, pulls on-chain evidence through its tools, and answers with
+citations attached to its claims. Short briefs on individual wallets stream in
+as they are written. When the work is done, the agent compiles a full
+post-mortem report that only you can open, with a PDF version you can pass
+around. For quicker questions, a one-shot investigation mode gives you a
+single validated report without the back-and-forth.
 
 **A risk assessment that keeps its categories apart.** Verified matches list
 the exact list, role, and version behind each one. Inferred associations show
@@ -80,48 +75,46 @@ verdicts. When nothing is found, the terminal says so directly and tells you
 how many counterparties it screened, so a clean result reads as the outcome
 of work rather than the absence of it.
 
-**Your model, your RPC, your theme.** The Settings dialog configures the
-chain, a custom RPC for name resolution and chain reads (sent per request and
-health-checked live), and an OpenAI-compatible custom model — base URL,
-model, key, and reasoning effort — which replaces the research, writing, and
-summarising roles while the safety scope gate always stays on the server
-model. A probe endpoint reports what your custom model can do without ever
-echoing the key. Appearance follows light, dark, or your system, with no
-flash on first paint.
+**Your model, your data source, your theme.** The Settings dialog lets you
+choose the chain, point the terminal at your own RPC endpoint for chain reads
+and name resolution, and plug in your own OpenAI-compatible model with your
+own key and reasoning effort — while the safety checks always keep running on
+the service's own model. A probe tells you what your model supports without
+ever exposing the key. The interface comes in light and dark and follows your
+system unless you override it.
 
-**Work you can keep and share.** Saved one-shot investigations download as
-four-section PDFs covering the graph snapshot, the fund-flow paths, the
-verified-versus-inferred risk split, and the findings with their sources.
-Agent post-mortems render as full report pages with their own PDFs.
+**Work you can keep and share.** One-shot investigations download as
+structured PDFs covering the graph, the fund-flow paths, the risk split, and
+the findings with their sources. Agent post-mortems open as full report
+pages with PDFs of their own.
 
 ## Where it runs and what sits underneath
 
-Intel Terminal runs on Cloudflare: a Worker and a D1 database serve the API,
-Durable Objects hold one investigation session each with their own SQLite
-storage, and Pages hosts the front end. On-chain data is fetched on demand
-through Alchemy when you investigate something and then cached, so repeat
-lookups are instant and nothing polls the chain in the background.
+Intel Terminal runs on Cloudflare: a Worker and database serve the API, and
+Pages hosts the front end. On-chain data is fetched on demand when you
+investigate something and then cached, so repeat lookups are instant and
+nothing polls the chain in the background.
 
 The terminal's judgments rest on its lists, which are curated under a strict
 rule: every exploit row must name both attacker and victim with complete
 addresses on a named chain, and rows that cannot meet that bar are kept out
 of the dataset rather than approximated into it. The sanctions data tracks
 123 EVM addresses with the upstream source recorded per entry, 903 flagged
-addresses are indexed in total, and known protocol contracts are verified
-on-chain with their code present — so any match or label can be traced back
-to where it came from.
+addresses are indexed in total, and well-known protocol contracts are
+verified against their on-chain code — so any match or label can be traced
+back to where it came from.
 
 ## Repository map
 
 | Component | What lives there |
 | --- | --- |
-| [Web app](web/) | The landing, the trace view with its graph globe and ledger dock, the agent panel, the report pages, settings, and theming |
-| [Web routes](web/src/routes/) | `/` for the landing, `/investigate/$chain/$target` for shareable investigations, `/report/$key` for owner-gated post-mortems |
+| [Web app](web/) | The landing, the trace view with its graph and ledger, the agent panel, the report pages, settings, and theming |
+| [Web routes](web/src/routes/) | `/` for the landing, `/investigate/$chain/$target` for shareable investigations, `/report/$key` for private post-mortems |
 | [API Worker](workers/api/) | Hono routes, Alchemy clients, the trace engine, risk assessment, the agent loop, the investigation pipeline, and PDF export |
 | [API routes](workers/api/src/routes/) | `address` for intel and history, `trace` for fund flows, `agent` for sessions and summaries, `reports` for saved reports and PDFs, `exploits` for dataset search, `models` for custom-model probing, `profile` for profiles and balances |
-| [Investigative agent](workers/api/src/agent/) | The multi-step loop with chain, docs, local, and memory tools, a fact ledger with a verification gate, per-session Durable Object state, and post-mortem rendering |
-| [Model layer](workers/api/src/llm/) | Per-role server models, visitor custom-model configuration over `x-llm-*` headers, OpenAI-compatible adapters, and capability probing |
-| [Seed data](data/seeds/) | `exploits.json` for curated EVM DeFi hacks, `ofac.json` for sanctioned addresses, `protocols.json` for on-chain-verified protocol contracts, plus the wider working sets |
+| [Investigative agent](workers/api/src/agent/) | The multi-step loop with chain, docs, local, and memory tools, a fact ledger with a verification gate, per-session state, and post-mortem rendering |
+| [Model layer](workers/api/src/llm/) | Per-role server models, visitor custom-model configuration, OpenAI-compatible adapters, and capability probing |
+| [Seed data](data/seeds/) | `exploits.json` for curated EVM DeFi hacks, `ofac.json` for sanctioned addresses, `protocols.json` for verified protocol contracts, plus the wider working sets |
 | [API SQL](workers/api/sql/) | `schema.sql` and `seed.sql`, the source of truth, while `migrations/` holds what has already been applied to D1 |
 | [API tests](workers/api/test/) | Sixty-plus contract and regression tests — trace caps, risk match types, cache behavior, agent loop, memory, ledger, sessions — run with `bun test` and fully offline by construction |
 | [Design](docs/DESIGN.md) | The scoped work plan across infrastructure, API, language model, UI, integration, and tests, with completion criteria for each part |
@@ -152,14 +145,14 @@ bun install
 VITE_API_BASE=http://127.0.0.1:8787 bun run dev
 ```
 
-Opening `http://127.0.0.1:5173` lands you on the spotlight console. From there
-you can start from an address, a name, or the exploit quick list, then pick a
+Opening `http://127.0.0.1:5173` lands you on the search page. From there you
+can start from an address, a name, or the exploit quick list, then pick a
 chain, set a custom RPC, add your own model, or switch themes from Settings.
-Durable Object sessions also run locally under `wrangler dev`, so the agent
-panel works without any remote resources. The local database ships with the
-full set of flagged addresses, so risk screening works immediately; transfer
-history accumulates the first time you look addresses up with a key
-configured and stays cached afterwards.
+Agent conversations also run locally, so the full loop works without any
+remote resources. The local database ships with the full set of flagged
+addresses, so risk screening works immediately; transfer history accumulates
+the first time you look addresses up with a key configured and stays cached
+afterwards.
 
 ## Checking the work
 
@@ -189,8 +182,7 @@ bun run build    # production build
 ## Deploying it
 
 The remote database is created once and its id is recorded in
-`workers/api/wrangler.toml` (Durable Object migrations in the same file
-deploy alongside the Worker):
+`workers/api/wrangler.toml`:
 
 ```sh
 cd workers/api
