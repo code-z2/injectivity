@@ -11,6 +11,7 @@ import { createAgentRoutes } from '@/routes/agent';
 import { createExploitsRoutes } from '@/routes/exploits';
 import { createInvestigateRoutes } from '@/routes/investigate';
 import { createModelsRoutes } from '@/routes/models';
+import { createProfileRoutes } from '@/routes/profile';
 import { createReportsRoutes } from '@/routes/reports';
 import { createTraceRoutes } from '@/routes/trace';
 import type { CreateAppOptions, Env } from '@/types';
@@ -44,6 +45,7 @@ export function createApp(options: CreateAppOptions = {}) {
   app.route('/', createReportsRoutes(options.alchemy));
   app.route('/', createModelsRoutes(options.modelFetch));
   app.route('/', createExploitsRoutes());
+  app.route('/', createProfileRoutes(options.modelFetch));
   app.route('/', createAgentRoutes({ client: options.alchemy, modelFetch: options.modelFetch }));
 
   app.notFound((c) =>

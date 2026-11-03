@@ -1,51 +1,32 @@
 import { useEffect, useState } from "react";
-import { fetchLabels, fetchTransfers, type KnownLabel } from "@/lib/api";
+import type { KnownLabel } from "@/lib/api";
+import { profileLabels, profileOf } from "@/lib/profiles";
 import type { NodeStat } from "./molecule";
 
 // Outer atoms: each parent address's own counterparties (ring 2 from ring
-// 1, ring 3 from ring 2), from its first page of transfers (newest, both
-// directions), with the counts and token flows between them. Fetched two
-// at a time and shown as they arrive. Remembered for the session, so
-// turning back is instant. Moving the globe never calls this; only a
-// change of the active address or of the parents does.
+// 1, ring 3 from ring 2), the largest by value from its profile (first
+// 5,000 transfers, dust set aside). Fetched two at a time and shown as
+// they arrive; profiles are remembered for the session. Moving the globe
+// never calls this; only a change of the active address or parents does.
 
 const CONCURRENCY = 2;
 
-const cache = new Map<string, NodeStat[]>();
 const failed = new Set<string>();
 
-async function statsOf(chain: string, address: string): Promise<NodeStat[]> {
-  const key = `${chain}:${address}`;
-  const hit = cache.get(key);
-  if (hit) return hit;
-  // live=1: the cache only holds rows seen while loading other addresses
-  // (where this one was merely a counterparty), which would look complete
-  // but isn't.
-  const page = await fetchTransfers(chain, address, undefined, { live: true });
-  const m = new Map<string, NodeStat>();
-  for (const t of page.transfers) {
-    const out = t.from.toLowerCase() === address;
-    const cp = (out ? t.to : t.from).toLowerCase();
-    if (!cp || cp === address) continue;
-    const s = m.get(cp) ?? { address: cp, inCount: 0, outCount: 0, flows: [] };
-    // Counts are from the counterparty's side of the link: money the
-    // parent sent is money the counterparty received.
-    if (out) s.inCount++;
-    else s.outCount++;
-    const n = t.value === "" ? NaN : Number(t.value);
-    s.flows.push({
-      contract: t.contract ?? null,
-      asset: t.asset,
-      amount: Number.isFinite(n) ? n : null,
-      category: t.category ?? "",
-    });
-    m.set(cp, s);
-  }
-  const list = [...m.values()].sort(
-    (a, b) => b.inCount + b.outCount - (a.inCount + a.outCount),
-  );
-  cache.set(key, list);
-  return list;
+async function statsOf(
+  chain: string,
+  address: string,
+): Promise<{ stats: NodeStat[]; labels: Record<string, KnownLabel> }> {
+  const p = await profileOf(chain, address);
+  // Counts are from the counterparty's side of the link: money the parent
+  // sent is money the counterparty received.
+  const stats = p.counterparties.map((c) => ({
+    address: c.address,
+    inCount: c.outCount,
+    outCount: c.inCount,
+    flows: [],
+  }));
+  return { stats, labels: profileLabels(p) };
 }
 
 export function useOuterRing(
@@ -65,10 +46,6 @@ export function useOuterRing(
     const found = new Map<string, NodeStat[]>();
     const pick = (list: NodeStat[]) =>
       list.filter((k) => k.address !== active).slice(0, perParent);
-    for (const p of parents) {
-      const hit = cache.get(`${chain}:${p}`);
-      if (hit) found.set(p, pick(hit));
-    }
     setRing(new Map(found));
     setPending(queue.length);
 
@@ -80,18 +57,12 @@ export function useOuterRing(
           continue;
         }
         try {
-          const kids = pick(await statsOf(chain, p));
+          const { stats, labels: found_labels } = await statsOf(chain, p);
+          const kids = pick(stats);
           if (!live) return;
           found.set(p, kids);
           setRing(new Map(found));
-          if (kids.length) {
-            fetchLabels(
-              chain,
-              kids.map((k) => k.address),
-            )
-              .then((l) => live && setLabels((x) => ({ ...x, ...l })))
-              .catch(() => {});
-          }
+          setLabels((x) => ({ ...x, ...found_labels }));
         } catch {
           failed.add(`${chain}:${p}`);
         } finally {

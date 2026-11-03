@@ -338,3 +338,62 @@ export async function searchExploits(
   if (!res.ok) throw new Error(`api-${res.status}`);
   return ((await res.json()) as { results: ExploitMatch[] }).results;
 }
+
+export interface ProfileCounterparty {
+  address: string;
+  inCount: number;
+  outCount: number;
+  inUsd: number;
+  outUsd: number;
+  partial: boolean;
+  label?: { list: string; role: string; name: string };
+}
+
+/** Value-ranked profile over an address's first transfers (up to 5,000). */
+export interface Profile {
+  chain: string;
+  address: string;
+  scanned: number;
+  complete: boolean;
+  first: string | null;
+  last: string | null;
+  dust: { transfers: number; spoof: number };
+  totals: { inUsd: number; outUsd: number; partial: boolean };
+  counterparties: ProfileCounterparty[];
+}
+
+export async function fetchProfile(
+  chain: string,
+  address: string,
+): Promise<Profile> {
+  const res = await fetch(`${BASE}/v1/address/${chain}/${address}/profile`, {
+    headers: rpcHeaders(chain),
+  });
+  const body = (await res.json().catch(() => null)) as
+    (Profile & { error?: string }) | null;
+  if (!res.ok || !body) throw new Error(body?.error ?? `api-${res.status}`);
+  return body;
+}
+
+/** Current holdings in USD (a lower bound when partial), contract flag and name. */
+export interface Balance {
+  address: string;
+  usd: number;
+  partial: boolean;
+  holdings: { symbol: string; amount: number; usd: number }[];
+  isContract: boolean;
+  contractName: string | null;
+}
+
+export async function fetchBalances(
+  chain: string,
+  addresses: string[],
+): Promise<Balance[]> {
+  const res = await fetch(`${BASE}/v1/balances/${chain}`, {
+    method: "POST",
+    headers: { "content-type": "application/json", ...rpcHeaders(chain) },
+    body: JSON.stringify({ addresses }),
+  });
+  if (!res.ok) throw new Error(`api-${res.status}`);
+  return ((await res.json()) as { balances: Balance[] }).balances;
+}

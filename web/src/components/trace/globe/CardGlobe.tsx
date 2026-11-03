@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { currentTheme } from "@/lib/theme";
-import type { KnownLabel } from "@/lib/api";
-import { fmtValue, valueOf, type Prices } from "@/lib/prices";
+import type { Balance, KnownLabel } from "@/lib/api";
+import { useBalances } from "@/lib/profiles";
 import { cn, short } from "@/lib/utils";
 import { RoleDot } from "../AddressCard";
 import { nameFromLabel, roleFromLabel } from "../types";
@@ -164,10 +164,9 @@ export function CardGlobe({
   ring3,
   ready,
   labels,
-  prices,
   lit,
   inspected,
-  overflow,
+  coverage,
   mapping,
   onInspect,
   onFollow,
@@ -180,12 +179,12 @@ export function CardGlobe({
   /** The active address's ring 1 has loaded (re-form only then). */
   ready: boolean;
   labels: Record<string, KnownLabel>;
-  prices: Prices;
   /** Address to highlight (a hovered dock row). */
   lit: string | null;
   /** The card shown in the dock. */
   inspected: string;
-  overflow: number;
+  /** What the rings cover ("largest 24 of 80 counterparties by value…"). */
+  coverage: string;
   mapping: number;
   /** Single click: show this address in the dock. */
   onInspect: (address: string) => void;
@@ -196,6 +195,11 @@ export function CardGlobe({
   const lines = useRef<HTMLCanvasElement>(null);
   const cardEls = useRef(new Map<string, HTMLDivElement>());
   const [cards, setCards] = useState<MolNode[]>([]);
+  // Current balances (and contract names) of every card on the globe.
+  const balanceOf = useBalances(
+    chain,
+    useMemo(() => cards.map((c) => c.address), [cards]),
+  );
   const [hovered, setHovered] = useState<string | null>(null);
   const mol = useMemo(
     () => buildMolecule(active, ring1, ring2, ring3),
@@ -671,14 +675,12 @@ export function CardGlobe({
             linked={neighbours.has(n.address)}
             hovered={n.address === hovered}
             label={labels[n.address]}
-            prices={prices}
+            balance={balanceOf(n.address)}
           />
         </div>
       ))}
       <p className="pointer-events-none absolute bottom-24 left-1/2 z-[2000] -translate-x-1/2 text-center text-[11.5px] text-muted">
-        {overflow > 0 && (
-          <span className="block">+{overflow} more counterparties</span>
-        )}
+        {coverage && <span className="block">{coverage}</span>}
         {mapping > 0 && (
           <span className="t-shimmer block">
             Mapping outer rings… {mapping} left
@@ -691,13 +693,12 @@ export function CardGlobe({
 
 function NodeCard({
   node,
-  chain,
   active,
   inspected,
   linked,
   hovered,
   label,
-  prices,
+  balance,
 }: {
   node: MolNode;
   chain: string;
@@ -707,17 +708,23 @@ function NodeCard({
   linked: boolean;
   hovered: boolean;
   label: KnownLabel | undefined;
-  prices: Prices;
+  balance: Balance | undefined;
 }) {
   const s = node.stat;
   const inC = s?.inCount ?? 0;
   const outC = s?.outCount ?? 0;
-  const value = fmtValue(valueOf(chain, s?.flows ?? [], prices));
-  const name = nameFromLabel(label);
+  const protocol = label?.list === "protocol";
+  // Bridges and mixers are where a trail leaves what we can follow.
+  const exit =
+    protocol && (label?.role === "bridge" || label?.role === "mixer");
+  const name =
+    nameFromLabel(label) ?? (balance?.isContract ? balance.contractName : null);
+  const bal = balance ? fmtUsd(balance.usd, balance.partial) : null;
   return (
     <div
       className={cn(
-        "rounded-xl border border-glass-edge bg-surface/90 shadow-card backdrop-blur-md transition-[box-shadow] duration-200",
+        "rounded-xl border bg-surface/90 shadow-card backdrop-blur-md transition-[box-shadow] duration-200",
+        exit ? "border-dashed border-line-strong" : "border-glass-edge",
         active ? "px-3 py-2" : "px-2.5 py-1.5",
         (active || inspected) && "ring-2 ring-ink/10",
         linked && "border-ion-400/70",
@@ -725,7 +732,14 @@ function NodeCard({
       )}
     >
       <div className="flex items-center gap-1.5 whitespace-nowrap">
-        <RoleDot role={roleFromLabel(label)} className="size-1.5" />
+        {balance?.isContract || protocol ? (
+          <span
+            aria-label="Contract"
+            className="size-1.5 shrink-0 rotate-45 rounded-[1px] bg-ink-soft"
+          />
+        ) : (
+          <RoleDot role={roleFromLabel(label)} className="size-1.5" />
+        )}
         <span
           className={cn(
             "font-mono text-ink",
@@ -734,18 +748,29 @@ function NodeCard({
         >
           {short(node.address, 4, 4)}
         </span>
+        {protocol && (
+          <span className="rounded-full bg-subtle px-1.5 text-[9.5px] text-muted">
+            {exit ? "exit" : label?.role}
+          </span>
+        )}
       </div>
-      {active ? (
-        name && (
-          <div className="mt-0.5 max-w-[20ch] truncate text-[10.5px] text-muted">
-            {name}
-          </div>
-        )
-      ) : (
+      {(active || protocol || (name && balance?.isContract)) && name && (
+        <div className="mt-0.5 max-w-[22ch] truncate text-[10.5px] text-ink-soft">
+          {name}
+        </div>
+      )}
+      {!active && !protocol && (
         <div className="mt-0.5 flex items-center gap-1.5 text-[10.5px] whitespace-nowrap text-muted tabular-nums">
           <span className={inC > 0 ? "text-clean" : undefined}>↓{inC}</span>
           <span>↑{outC}</span>
-          <span className="text-ink-soft">· {value}</span>
+          <span className="text-ink-soft">
+            · Bal {bal ?? <span className="text-faint">…</span>}
+          </span>
+        </div>
+      )}
+      {active && bal && (
+        <div className="mt-0.5 text-[10.5px] text-ink-soft tabular-nums">
+          Balance {bal}
         </div>
       )}
       {hovered && (
@@ -755,13 +780,41 @@ function NodeCard({
               {name ?? "Unlabelled"}
             </div>
           )}
+          {balance && balance.holdings.length > 0 && (
+            <div className="text-muted tabular-nums">
+              Holds{" "}
+              {balance.holdings
+                .map((h) => `${compactNum(h.amount)} ${h.symbol}`)
+                .join(", ")}
+            </div>
+          )}
           <div className="text-faint">
             {active
               ? "Click to inspect"
-              : "Click to inspect · double-click to follow"}
+              : protocol
+                ? "Click to inspect · a protocol, not expanded"
+                : "Click to inspect · double-click to follow"}
           </div>
         </div>
       )}
     </div>
   );
+}
+
+const compact = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+const compactNum = (n: number) =>
+  n >= 1 ? compact.format(n) : n.toPrecision(2);
+
+/** "$2B", or ">$2B" when some holdings couldn't be priced. */
+function fmtUsd(usd: number, partial: boolean): string {
+  const s =
+    usd < 1
+      ? "$0"
+      : usd < 1000
+        ? `$${Math.round(usd)}`
+        : `$${compact.format(usd)}`;
+  return partial ? `>${s}` : s;
 }

@@ -1,4 +1,6 @@
 import type { KnownLabel } from "@/lib/api";
+import { type Prices, valueOf } from "@/lib/prices";
+import { spoofOf } from "./spoof";
 import { roleFromLabel } from "../types";
 import type { LedgerRow } from "../useLedger";
 
@@ -17,6 +19,8 @@ export interface Filters {
   counterparty: string | null;
   min: number | null;
   sort: Sort;
+  /** Show dust and spoof-token transfers (hidden by default). */
+  dust: boolean;
 }
 
 export const NO_FILTERS: Filters = {
@@ -27,7 +31,33 @@ export const NO_FILTERS: Filters = {
   counterparty: null,
   min: null,
   sort: "newest",
+  dust: false,
 };
+
+/**
+ * Dust: spoof-token transfers, priced transfers under $1, and unpriced
+ * amounts under a millionth (address-poisoning spam). Same rules as the
+ * API's profile.
+ */
+export function isDust(chain: string, r: LedgerRow, prices: Prices): boolean {
+  if (r.asset && spoofOf(r.asset)) return true;
+  if (r.amount === null) return false;
+  const v = valueOf(
+    chain,
+    [
+      {
+        contract: r.contract,
+        asset: r.asset,
+        amount: r.amount,
+        category: r.category,
+      },
+    ],
+    prices,
+  );
+  if (!v.partial) return v.usd < 1;
+  const nft = r.category === "erc721" || r.category === "erc1155";
+  return !nft && Math.abs(r.amount) < 1e-6;
+}
 
 const RANGE_MS: Record<Exclude<Range, "all">, number> = {
   "24h": 864e5,
@@ -53,11 +83,13 @@ export function applyFilters(
   rows: LedgerRow[],
   f: Filters,
   labels: Record<string, KnownLabel>,
+  dusty: (r: LedgerRow) => boolean = () => false,
   now = Date.now(),
 ): LedgerRow[] {
   const since = f.range === "all" ? null : now - RANGE_MS[f.range];
   const tokens = f.tokens.length ? new Set(f.tokens) : null;
   const out = rows.filter((r) => {
+    if (!f.dust && dusty(r)) return false;
     if (f.dir !== "all" && r.direction !== f.dir) return false;
     if (since !== null && (r.time === null || r.time < since)) return false;
     if (tokens && !tokens.has(tokenKey(r))) return false;

@@ -185,6 +185,59 @@ function decodeCursor(key: string): BothCursor | null {
   }
 }
 
+// Internal transfers (ETH moved by contracts: swap proceeds, bridge and
+// mixer withdrawals) are only indexed by Alchemy on these chains.
+const INTERNAL_CHAINS = new Set(['ethereum', 'polygon']);
+export const categoriesFor = (chain: string) =>
+  INTERNAL_CHAINS.has(chain)
+    ? ['external', 'internal', 'erc20', 'erc721', 'erc1155']
+    : ['external', 'erc20', 'erc721', 'erc1155'];
+
+/**
+ * The first transfers of an address, oldest first, both directions, up to
+ * `limit` in all (1,000 per call). `complete` is false when more exist.
+ */
+export async function getEarlyTransfers(
+  env: Env,
+  chain: string,
+  address: string,
+  limit = 5000,
+): Promise<{ transfers: Transfer[]; complete: boolean }> {
+  const sides = ['in', 'out'] as const;
+  const keys: Record<(typeof sides)[number], string | undefined | null> = {
+    in: undefined,
+    out: undefined,
+  };
+  const out: Transfer[] = [];
+  // Alternate sides a page at a time so neither starves the other.
+  for (let round = 0; round < 5 && out.length < limit; round++) {
+    for (const side of sides) {
+      if (keys[side] === null || out.length >= limit) continue;
+      const params: Record<string, unknown> = {
+        [side === 'in' ? 'toAddress' : 'fromAddress']: address,
+        category: categoriesFor(chain),
+        withMetadata: true,
+        excludeZeroValue: true,
+        order: 'asc',
+        maxCount: '0x3e8',
+      };
+      if (keys[side]) params.pageKey = keys[side];
+      const r = (await rpc(env, chain, 'alchemy_getAssetTransfers', [params])) as {
+        transfers?: RawTransfer[];
+        pageKey?: string;
+      };
+      for (const t of r.transfers ?? []) out.push(normalizeTransfer(t));
+      keys[side] = r.pageKey ?? null;
+    }
+    if (keys.in === null && keys.out === null) break;
+  }
+  out.sort((a, b) => (parseInt(a.blockNum, 16) || 0) - (parseInt(b.blockNum, 16) || 0));
+  return {
+    transfers: out.slice(0, limit),
+    complete: out.length <= limit && keys.in === null && keys.out === null,
+  };
+}
+
 export async function getTransfers(
   env: Env,
   chain: string,
@@ -205,7 +258,7 @@ export async function getTransfers(
   for (const side of sides) {
     const params: Record<string, unknown> = {
       [side === 'in' ? 'toAddress' : 'fromAddress']: address,
-      category: ['external', 'erc20', 'erc721', 'erc1155'],
+      category: categoriesFor(chain),
       withMetadata: true,
       excludeZeroValue: true,
       order: 'desc',

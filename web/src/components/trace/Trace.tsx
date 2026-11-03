@@ -2,10 +2,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Chain, KnownLabel } from "@/lib/api";
 import { looksLikeEns, resolveEns } from "@/lib/ens";
 import { takePreloaded } from "@/lib/preload";
+import {
+  isProtocol,
+  profileLabels,
+  useBalances,
+  useProfile,
+} from "@/lib/profiles";
 import { SUGGESTIONS } from "@/lib/suggestions";
 import { ADDRESS_RE } from "@/lib/utils";
 import { AddressChain, type Flash } from "./AddressChain";
-import { usePrices } from "@/lib/prices";
 import { CardGlobe } from "./globe/CardGlobe";
 import type { NodeStat } from "./globe/molecule";
 import { useOuterRing } from "./globe/useOuterRing";
@@ -22,9 +27,11 @@ import { useLedger } from "./useLedger";
 // dock, the active address's ledger, floating over the globe. Right: the
 // agent panel (node brief, cited conversation, report).
 
-const RING1_MAX = 14; // atoms around the active address
-const RING2_PARENTS = 10; // ring-1 addresses whose own counterparties are fetched
-const RING3_PARENTS = 10; // ring-2 addresses that grow a third ring
+const RING1_MAX = 24; // atoms around the active address
+const RING2_PARENTS = 16; // ring-1 addresses whose own counterparties are fetched
+const RING2_PER = 6; // counterparties shown per ring-1 parent
+const RING3_PARENTS = 16; // ring-2 addresses that grow a third ring
+const RING3_PER = 4;
 
 export function Trace({ chain, target }: { chain: Chain; target: string }) {
   const [root, setRoot] = useState<string | null>(() =>
@@ -111,60 +118,93 @@ function Workspace({
   const fresh = ledger.owner === active.address;
   const ready = fresh && ledger.status !== "loading";
 
-  // Ring 1: the active address's most active counterparties, with the
-  // counts and token flows between them (from the loaded ledger).
+  // Ring 1: the active address's largest counterparties by value, from its
+  // profile (first 5,000 transfers, dust set aside). Until the profile
+  // arrives, the most frequent ones from the loaded ledger page stand in.
+  const { profile } = useProfile(chain, active.address);
   const ring1 = useMemo<NodeStat[]>(() => {
+    if (profile)
+      return profile.counterparties.slice(0, RING1_MAX).map((c) => ({
+        address: c.address,
+        inCount: c.inCount,
+        outCount: c.outCount,
+        flows: [],
+      }));
     if (!fresh) return [];
-    const top = new Map(
-      ledger.counterparties.slice(0, RING1_MAX).map((c) => [
-        c.address,
-        {
-          address: c.address,
-          inCount: c.inCount,
-          outCount: c.outCount,
-          flows: [],
-        } as NodeStat,
-      ]),
-    );
-    for (const r of ledger.rows) {
-      top.get(r.counterparty)?.flows.push({
-        contract: r.contract,
-        asset: r.asset,
-        amount: r.amount,
-        category: r.category,
-      });
-    }
-    return [...top.values()];
-  }, [fresh, ledger.counterparties, ledger.rows]);
-  const prices = usePrices(chain);
-  const parents = useMemo(
-    () => ring1.slice(0, RING2_PARENTS).map((r) => r.address),
-    [ring1],
+    return ledger.counterparties.slice(0, RING1_MAX).map((c) => ({
+      address: c.address,
+      inCount: c.inCount,
+      outCount: c.outCount,
+      flows: [],
+    }));
+  }, [profile, fresh, ledger.counterparties]);
+  const profileLabelMap = useMemo(
+    () => (profile ? profileLabels(profile) : {}),
+    [profile],
   );
-  const outer2 = useOuterRing(chain, active.address, ready ? parents : [], 4);
-  // Ring 3 grows from the most active ring-2 atoms not already placed.
+  // Protocol contracts (routers, bridges, mixers) are where trails end:
+  // never expanded, since a router's counterparties are everyone.
+  // Verified contracts (pools, vaults, tokens) are skipped too: attacker
+  // contracts are almost never verified, public infrastructure almost
+  // always is.
+  const balanceOf = useBalances(
+    chain,
+    useMemo(() => ring1.map((r) => r.address), [ring1]),
+  );
+  const expandable = (a: string) =>
+    !isProtocol(profileLabelMap[a] ?? known[a] ?? ledger.labels[a]) &&
+    !balanceOf(a)?.contractName;
+  const parents = useMemo(
+    () =>
+      ring1
+        .map((r) => r.address)
+        .filter(expandable)
+        .slice(0, RING2_PARENTS),
+    // biome-ignore lint/correctness/useExhaustiveDependencies: balances fill in over time
+    [
+      ring1,
+      profileLabelMap,
+      ring1.map((r) => balanceOf(r.address)?.contractName ?? "").join(","),
+    ],
+  );
+  const outer2 = useOuterRing(
+    chain,
+    active.address,
+    ready ? parents : [],
+    RING2_PER,
+  );
+  // Ring 3 grows from the largest ring-2 atoms not already placed.
   const parents3 = useMemo(() => {
     const placed = new Set([active.address, ...ring1.map((r) => r.address)]);
-    const kids = [...outer2.ring.values()].flat();
     const seen = new Set<string>();
-    return kids
+    return [...outer2.ring.values()]
+      .flat()
       .filter(
         (k) =>
-          !placed.has(k.address) && !seen.has(k.address) && seen.add(k.address),
+          !placed.has(k.address) &&
+          !seen.has(k.address) &&
+          seen.add(k.address) &&
+          !isProtocol(outer2.labels[k.address]) &&
+          !balanceOf(k.address)?.contractName,
       )
-      .sort((a, b) => b.inCount + b.outCount - (a.inCount + a.outCount))
       .slice(0, RING3_PARENTS)
       .map((k) => k.address);
-  }, [outer2.ring, ring1, active.address]);
+  }, [outer2.ring, outer2.labels, ring1, active.address]);
   const outer3 = useOuterRing(
     chain,
     active.address,
     outer2.pending === 0 ? parents3 : [],
-    3,
+    RING3_PER,
   );
   const globeLabels = useMemo(
-    () => ({ ...known, ...ledger.labels, ...outer2.labels, ...outer3.labels }),
-    [known, ledger.labels, outer2.labels, outer3.labels],
+    () => ({
+      ...known,
+      ...ledger.labels,
+      ...profileLabelMap,
+      ...outer2.labels,
+      ...outer3.labels,
+    }),
+    [known, ledger.labels, profileLabelMap, outer2.labels, outer3.labels],
   );
 
   // The dock shows the inspected card (a single click), else the active
@@ -289,10 +329,11 @@ function Workspace({
           ring3={outer3.ring}
           ready={ready}
           labels={globeLabels}
-          prices={prices}
           lit={lit}
-          overflow={
-            fresh ? Math.max(0, ledger.counterparties.length - RING1_MAX) : 0
+          coverage={
+            profile
+              ? `Largest ${Math.min(RING1_MAX, profile.counterparties.length)} of ${profile.counterparties.length}${profile.counterparties.length >= 80 ? "+" : ""} counterparties by value · ${profile.scanned.toLocaleString("en-US")}${profile.complete ? "" : "+"} transfers read`
+              : ""
           }
           mapping={outer2.pending + outer3.pending}
           inspected={subject}

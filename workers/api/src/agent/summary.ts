@@ -10,6 +10,8 @@ import { Ledger, type Source } from '@/agent/ledger';
 import { recallFacts } from '@/agent/memory/store';
 import { verifyText } from '@/agent/verify';
 import type { ModelAdapter, ModelConfig } from '@/llm/adapters';
+import { balanceOf } from '@/stores/balances';
+import { buildProfile } from '@/stores/profile';
 import { cachedTransfers, storeTransfers, transferUid } from '@/stores/transfers';
 import type { AlchemyClient, Env } from '@/types';
 
@@ -118,6 +120,56 @@ export async function buildFacts(
       text: `From an earlier investigation: ${f.statement}`,
     });
 
+  // The value-ranked profile (first 5,000 transfers, dust set aside) and
+  // the current balance say far more than the newest page, which spam can
+  // dominate; when they're available they replace the page-based figures.
+  const prices = await loadPrices(chain, fetchImpl);
+  // (Only with the real chain client: test doubles have no raw RPC.)
+  const deep = live && Boolean(client.call);
+  const profile =
+    deep && rows.length ? await buildProfile(env, chain, a, fetchImpl).catch(() => null) : null;
+  if (profile && profile.scanned > 0) {
+    const span =
+      profile.first && profile.last ? ` (${day(profile.first)} to ${day(profile.last)})` : '';
+    const money = (usd: number) => fmtValue({ usd, partial: profile.totals.partial });
+    add(
+      `Across its first ${profile.scanned.toLocaleString('en-US')}${profile.complete ? '' : '+'} transfers${span}, setting aside ${profile.dust.transfers} dust or spoof transfers, ${a} received ${money(profile.totals.inUsd)} and sent ${money(profile.totals.outUsd)} in liquid tokens (">" marks a lower bound).`,
+      'computed',
+      `profile:${a}:${profile.scanned}`,
+    );
+    const big = profile.counterparties.slice(0, 5);
+    add(
+      `Largest counterparties by value: ${big
+        .map(
+          (c) =>
+            `${c.address} (${fmtValue({ usd: c.inUsd, partial: c.partial })} in, ${fmtValue({ usd: c.outUsd, partial: c.partial })} out${c.label ? `; ${c.label.list} ${c.label.role}: ${c.label.name}` : ''})`,
+        )
+        .join(', ')}.`,
+      'computed',
+      `profile-cps:${a}:${profile.scanned}`,
+    );
+    const protocols = profile.counterparties.filter((c) => c.label?.list === 'protocol');
+    if (protocols.length)
+      add(
+        `It moved funds through these protocols: ${protocols
+          .slice(0, 6)
+          .map(
+            (c) =>
+              `${c.label!.name} (${c.label!.role}, ${c.inCount + c.outCount} transfers, ${fmtValue({ usd: c.inUsd + c.outUsd, partial: c.partial })})`,
+          )
+          .join(', ')}.`,
+        'computed',
+        `profile-protocols:${a}:${profile.scanned}`,
+      );
+  }
+  const bal = deep ? await balanceOf(env, chain, a, prices, fetchImpl).catch(() => null) : null;
+  if (bal)
+    add(
+      `Its current balance is ${fmtValue({ usd: bal.usd, partial: bal.partial })}${bal.holdings.length ? `, mainly ${bal.holdings.map((h) => `${fmt(h.amount)} ${h.symbol}`).join(', ')}` : ''}${bal.isContract ? `; it is a contract${bal.contractName ? ` (${bal.contractName})` : ''}` : ''}.`,
+      'chain_state',
+      `balance-now:${a}`,
+    );
+
   if (!rows.length) {
     add(
       `No transfers were found for ${a}${live ? '' : ' in the cache (no live RPC)'}.`,
@@ -137,13 +189,13 @@ export async function buildFacts(
     ? ` between ${day(times[0]!)} and ${day(times[times.length - 1]!)}`
     : '';
   const cover = `${rows.length}${more ? ' most recent' : ''} transfers`;
-  add(
-    `Across its ${cover}${span}, ${a} received ${ins.length} and sent ${outs.length}, with ${byCp.size} distinct counterparties.`,
-    'computed',
-    `coverage:${a}:${rows.length}`,
-  );
+  if (!profile)
+    add(
+      `Across its ${cover}${span}, ${a} received ${ins.length} and sent ${outs.length}, with ${byCp.size} distinct counterparties.`,
+      'computed',
+      `coverage:${a}:${rows.length}`,
+    );
 
-  const prices = await loadPrices(chain, fetchImpl);
   const flows = (list: Transfer[]) =>
     list.map((t) => ({
       contract: t.contract ?? null,
@@ -153,11 +205,12 @@ export async function buildFacts(
     }));
   const vin = fmtValue(valueOf(chain, flows(ins), prices));
   const vout = fmtValue(valueOf(chain, flows(outs), prices));
-  add(
-    `Counted value over those ${cover}: ${vin} in and ${vout} out (liquid tokens only; ">" marks a lower bound).`,
-    'computed',
-    `value:${a}:${rows.length}`,
-  );
+  if (!profile)
+    add(
+      `Counted value over those ${cover}: ${vin} in and ${vout} out (liquid tokens only; ">" marks a lower bound).`,
+      'computed',
+      `value:${a}:${rows.length}`,
+    );
 
   const tokens = new Map<string, { asset: string; in: number; out: number; n: number }>();
   for (const t of rows) {
@@ -170,23 +223,25 @@ export async function buildFacts(
     tokens.set(k, x);
   }
   const topTokens = [...tokens.values()].sort((p, q) => q.n - p.n).slice(0, 5);
-  add(
-    `Main tokens moved: ${topTokens.map((x) => `${x.asset} (${fmt(x.in)} in, ${fmt(x.out)} out, ${x.n} transfers)`).join('; ')}.`,
-    'computed',
-    `tokens:${a}:${rows.length}`,
-  );
+  if (!profile)
+    add(
+      `Main tokens moved: ${topTokens.map((x) => `${x.asset} (${fmt(x.in)} in, ${fmt(x.out)} out, ${x.n} transfers)`).join('; ')}.`,
+      'computed',
+      `tokens:${a}:${rows.length}`,
+    );
 
   const top = [...byCp.entries()].sort((p, q) => q[1].n - p[1].n).slice(0, 5);
-  add(
-    `Most frequent counterparties: ${top
-      .map(
-        ([cp, c]) =>
-          `${cp} (${c.n} transfers${labels.get(cp) ? `; ${labels.get(cp)!.join('; ')}` : ''})`,
-      )
-      .join(', ')}.`,
-    'computed',
-    `counterparties:${a}:${rows.length}`,
-  );
+  if (!profile)
+    add(
+      `Most frequent counterparties: ${top
+        .map(
+          ([cp, c]) =>
+            `${cp} (${c.n} transfers${labels.get(cp) ? `; ${labels.get(cp)!.join('; ')}` : ''})`,
+        )
+        .join(', ')}.`,
+      'computed',
+      `counterparties:${a}:${rows.length}`,
+    );
 
   for (const [cp, ls] of labels) {
     if (cp === a) continue;

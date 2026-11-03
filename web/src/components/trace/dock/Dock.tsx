@@ -1,6 +1,7 @@
 import { ChevronUp, Maximize2, Minimize2, RotateCw, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePrices } from "@/lib/prices";
 import type { KnownLabel } from "@/lib/api";
 import { useAgentWidth } from "@/lib/agentDock";
 import { cn, short } from "@/lib/utils";
@@ -12,6 +13,7 @@ import { FilterChip, Option } from "./FilterChip";
 import {
   activeCount,
   applyFilters,
+  isDust,
   NO_FILTERS,
   tokenKey,
   type Filters,
@@ -106,7 +108,16 @@ export function Dock({
   const set = (patch: Partial<Filters>) => setF((x) => ({ ...x, ...patch }));
   useEffect(() => setF(NO_FILTERS), [address]);
 
-  const shown = useMemo(() => applyFilters(rows, f, labels), [rows, f, labels]);
+  const prices = usePrices(chain);
+  const dusty = useCallback(
+    (r: LedgerRow) => isDust(chain, r, prices),
+    [chain, prices],
+  );
+  const dustCount = useMemo(() => rows.filter(dusty).length, [rows, dusty]);
+  const shown = useMemo(
+    () => applyFilters(rows, f, labels, dusty),
+    [rows, f, labels, dusty],
+  );
   const active = activeCount(f);
   const showChips = detent !== "collapsed" || active > 0;
 
@@ -253,11 +264,17 @@ export function Dock({
             labels={labels}
             chain={chain}
             onlyActive={detent === "collapsed"}
+            dustCount={dustCount}
           />
           {active > 0 && (
             <button
               onClick={() =>
-                setF((x) => ({ ...NO_FILTERS, dir: x.dir, sort: x.sort }))
+                setF((x) => ({
+                  ...NO_FILTERS,
+                  dir: x.dir,
+                  sort: x.sort,
+                  dust: x.dust,
+                }))
               }
               className="flex h-7 shrink-0 items-center gap-1 rounded-full px-2 text-[12px] text-muted hover:text-ink"
             >
@@ -388,6 +405,7 @@ function Chips({
   labels,
   chain,
   onlyActive,
+  dustCount,
 }: {
   f: Filters;
   set: (p: Partial<Filters>) => void;
@@ -396,6 +414,7 @@ function Chips({
   labels: Record<string, KnownLabel>;
   chain: string;
   onlyActive: boolean;
+  dustCount: number;
 }) {
   const tokens = useMemo(() => {
     const m = new Map<
@@ -429,6 +448,22 @@ function Chips({
 
   return (
     <>
+      {dustCount > 0 && show(f.dust) && (
+        <button
+          className={cn(
+            "flex h-7 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-[12px] transition-colors",
+            f.dust
+              ? "border-ink/15 bg-ink/5 text-ink"
+              : "border-glass-edge bg-surface/70 text-muted shadow-hairline hover:text-ink-soft",
+          )}
+          onClick={() => set({ dust: !f.dust })}
+          title="Spoof tokens, transfers under $1 and poisoning spam"
+          type="button"
+        >
+          {f.dust ? "Showing dust" : "Dust hidden"}
+          <span className="text-faint tabular-nums">{dustCount}</span>
+        </button>
+      )}
       {show(f.range !== "all") && (
         <FilterChip
           label="Time"
