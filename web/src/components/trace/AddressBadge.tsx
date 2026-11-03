@@ -7,7 +7,7 @@ import type { ChainLink } from "./types";
 export function AddressBadge({ link }: { link: ChainLink }) {
   return (
     <div
-      className="inline-flex h-8 items-center gap-2 rounded-full border border-white bg-surface/80 pr-3.5 pl-3 font-mono text-[12px] text-ink-soft shadow-hairline backdrop-blur-md"
+      className="inline-flex h-8 items-center gap-2 rounded-full border border-glass-edge bg-surface/80 pr-3.5 pl-3 font-mono text-[12px] text-ink-soft shadow-hairline backdrop-blur-md"
       title={link.address}
     >
       <RoleDot role={link.role} />

@@ -9,7 +9,7 @@ export function AddressCard({ link }: { link: ChainLink }) {
   return (
     <div
       className={cn(
-        "inline-flex h-9 items-center gap-2 rounded-full border border-white bg-surface/80 pl-3.5 shadow-hairline backdrop-blur-md",
+        "inline-flex h-9 items-center gap-2 rounded-full border border-glass-edge bg-surface/80 pl-3.5 shadow-hairline backdrop-blur-md",
         name ? "pr-1.5" : "pr-3.5",
       )}
     >
@@ -23,7 +23,7 @@ export function AddressCard({ link }: { link: ChainLink }) {
         <span
           className={cn(
             "inline-flex h-6 max-w-[180px] items-center truncate rounded-full px-2.5 text-[12px] font-medium",
-            link.role === "attacker" && "bg-attacker text-white",
+            link.role === "attacker" && "bg-attacker text-on-ink",
             link.role === "victim" && "bg-victim text-victim-ink",
             link.role === "normal" && "bg-subtle text-ink-soft",
           )}

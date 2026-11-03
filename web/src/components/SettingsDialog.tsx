@@ -17,6 +17,7 @@ import {
 } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { ChainDot } from "./ChainPicker";
+import { ThemeSegmented } from "./ThemeToggle";
 
 const EFFORTS: Effort[] = ["low", "medium", "high"];
 
@@ -100,6 +101,13 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
               <X className="size-4" />
               <span className="sr-only">Close</span>
             </Dialog.Close>
+          </div>
+
+          <div className="px-6 pt-5">
+            <span className="mb-2 block text-[13px] font-medium">
+              Appearance
+            </span>
+            <ThemeSegmented />
           </div>
 
           <Tabs.Root
@@ -257,7 +265,7 @@ export function SettingsDialog({ trigger }: { trigger?: ReactNode }) {
               >
                 Reset to defaults
               </button>
-              <Dialog.Close className="h-9 rounded-full bg-ink px-4 text-[13px] font-medium text-white transition-colors hover:bg-ink-soft">
+              <Dialog.Close className="h-9 rounded-full bg-ink px-4 text-[13px] font-medium text-on-ink transition-colors hover:bg-ink-soft">
                 Done
               </Dialog.Close>
             </div>

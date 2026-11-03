@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { currentTheme } from "@/lib/theme";
 import type { KnownLabel } from "@/lib/api";
 import { fmtValue, valueOf, type Prices } from "@/lib/prices";
 import { cn, short } from "@/lib/utils";
@@ -455,7 +456,7 @@ export function CardGlobe({
         }
         const focus = s.lit === ln.b || s.inspected === ln.b;
         trace(ctx, pts);
-        ctx.strokeStyle = `rgba(48,53,62,${(alpha * (0.03 + 0.17 * face) * (focus ? 2.2 : 1)).toFixed(3)})`;
+        ctx.strokeStyle = `rgba(${currentTheme() === "dark" ? "205,211,221" : "48,53,62"},${(alpha * (0.03 + 0.17 * face) * (focus ? 2.2 : 1)).toFixed(3)})`;
         ctx.lineWidth = 1;
         ctx.stroke();
         if (face > 0.75) {
@@ -716,7 +717,7 @@ function NodeCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-white bg-surface/90 shadow-card backdrop-blur-md transition-[box-shadow] duration-200",
+        "rounded-xl border border-glass-edge bg-surface/90 shadow-card backdrop-blur-md transition-[box-shadow] duration-200",
         active ? "px-3 py-2" : "px-2.5 py-1.5",
         (active || inspected) && "ring-2 ring-ink/10",
         linked && "border-ion-400/70",

@@ -161,7 +161,7 @@ export function Dock({
   return (
     <motion.section
       aria-label="Transfers"
-      className="@container absolute bottom-3 left-0 z-10 flex flex-col overflow-hidden rounded-[22px] border border-white bg-white/80 shadow-console backdrop-blur-xl"
+      className="@container absolute bottom-3 left-0 z-10 flex flex-col overflow-hidden rounded-[22px] border border-glass-edge bg-glass/80 shadow-console backdrop-blur-xl"
       initial={false}
       animate={{
         width,
@@ -558,7 +558,7 @@ function Chips({
               placeholder="e.g. 1000"
               className="h-8 w-32 rounded-lg border border-line bg-surface px-2.5 text-[13px] outline-none focus:border-ion-400"
             />
-            <button className="h-8 rounded-lg bg-ink px-3 text-[12.5px] font-medium text-white">
+            <button className="h-8 rounded-lg bg-ink px-3 text-[12.5px] font-medium text-on-ink">
               Apply
             </button>
           </form>
@@ -758,7 +758,7 @@ function Notice({
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mt-2 flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[12px] font-medium text-white"
+          className="mt-2 flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-[12px] font-medium text-on-ink"
         >
           <RotateCw className="size-3" /> Retry
         </button>

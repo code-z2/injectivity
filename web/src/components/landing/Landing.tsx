@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/lib/theme";
 import { ORB_R, WordmarkSequence } from "@/components/brand/WordmarkSequence";
 import { Aurora, type AuroraSky } from "./Aurora";
 import { Spotlight, type SpotlightStage } from "./Spotlight";
@@ -11,7 +12,7 @@ import { usePeekLens } from "./usePeekLens";
 // Hidden in the aurora is line art of the on-chain world (blocks, locks,
 // graphs, exploit code); it surfaces softly around the cursor and fades
 // out with no edge, so the visitor feels they are peeking beneath.
-// `?sky=night` keeps the dark aurora for reference.
+// The dark theme (or `?sky=night`) uses the night aurora.
 
 const HOLD = 700; // read the wordmark before it starts moving
 const ORB_TO_FIELD = 450; // orb settles, then the field opens
@@ -36,7 +37,10 @@ function useViewport(): { w: number; h: number } {
 }
 
 export function Landing() {
+  // Dark theme gets the night sky; `?sky=night` still forces it.
+  const theme = useTheme();
   const sky: AuroraSky =
+    theme === "dark" ||
     new URLSearchParams(window.location.search).get("sky") === "night"
       ? "night"
       : "pearl";
@@ -90,7 +94,7 @@ export function Landing() {
           around the cursor (hidden until the pointer moves). */}
       <div
         ref={artRef}
-        className="pointer-events-none absolute inset-0 opacity-75 mix-blend-multiply"
+        className="pointer-events-none absolute inset-0 opacity-75 mix-blend-multiply dark:mix-blend-screen"
         style={{
           maskImage: "linear-gradient(transparent, transparent)",
           WebkitMaskImage: "linear-gradient(transparent, transparent)",

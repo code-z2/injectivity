@@ -56,7 +56,7 @@ export function Trace({ chain, target }: { chain: Chain; target: string }) {
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            "radial-gradient(rgb(11 13 18 / 0.06) 1px, transparent 1px)",
+            "radial-gradient(var(--color-dot) 1px, transparent 1px)",
           backgroundSize: "18px 18px",
         }}
       />

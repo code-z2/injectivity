@@ -8,6 +8,7 @@ import { probeRpc } from '@/alchemy';
 import { CHAIN_BASE, chainBase } from '@/constants/chains';
 import { createAddressRoutes } from '@/routes/address';
 import { createAgentRoutes } from '@/routes/agent';
+import { createExploitsRoutes } from '@/routes/exploits';
 import { createInvestigateRoutes } from '@/routes/investigate';
 import { createModelsRoutes } from '@/routes/models';
 import { createReportsRoutes } from '@/routes/reports';
@@ -42,6 +43,7 @@ export function createApp(options: CreateAppOptions = {}) {
   );
   app.route('/', createReportsRoutes(options.alchemy));
   app.route('/', createModelsRoutes(options.modelFetch));
+  app.route('/', createExploitsRoutes());
   app.route('/', createAgentRoutes({ client: options.alchemy, modelFetch: options.modelFetch }));
 
   app.notFound((c) =>

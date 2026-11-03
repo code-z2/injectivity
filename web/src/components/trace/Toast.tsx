@@ -46,7 +46,7 @@ export function Toast({
               filter: "blur(2px)",
               transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
             }}
-            className="pointer-events-auto flex h-10 items-center gap-3 rounded-full bg-ink pr-1.5 pl-4 text-[13px] text-white shadow-float"
+            className="pointer-events-auto flex h-10 items-center gap-3 rounded-full bg-ink pr-1.5 pl-4 text-[13px] text-on-ink shadow-float"
           >
             {toast.text}
             {toast.action ? (
@@ -55,7 +55,7 @@ export function Toast({
                   toast.action?.run();
                   onDone();
                 }}
-                className="h-7 rounded-full bg-white/12 px-3 text-[12.5px] font-medium transition-colors hover:bg-white/20"
+                className="h-7 rounded-full bg-on-ink/12 px-3 text-[12.5px] font-medium transition-colors hover:bg-on-ink/20"
               >
                 {toast.action.label}
               </button>

@@ -24,7 +24,7 @@ export function FilterChip({
           "flex h-7 shrink-0 items-center gap-1 rounded-full border px-2.5 text-[12px] transition-colors duration-150",
           active
             ? "border-ink/10 bg-ink/[0.04] text-ink"
-            : "border-white bg-surface/70 text-muted shadow-hairline hover:text-ink-soft",
+            : "border-glass-edge bg-surface/70 text-muted shadow-hairline hover:text-ink-soft",
           "data-[state=open]:border-ink/15 data-[state=open]:text-ink",
         )}
       >

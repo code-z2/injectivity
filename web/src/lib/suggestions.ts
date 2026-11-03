@@ -12,6 +12,12 @@ export interface Suggestion {
 
 export const SUGGESTIONS: Suggestion[] = [
   {
+    label: "Binance exploiter",
+    address: "0x5227f603c1ee34ce3c06efe6477003bdfccb2f8c",
+    chain: "ethereum",
+    seedId: "Binance 2026-10-29",
+  },
+  {
     label: "Bybit exploiter",
     address: "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
     chain: "ethereum",

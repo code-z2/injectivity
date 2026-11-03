@@ -317,3 +317,24 @@ export async function fetchLabels(
 export function tokenLogoUrl(chain: string, contract: string): string {
   return `${BASE}/v1/token-logo/${chain}/${contract}`;
 }
+
+export interface ExploitMatch {
+  id: string;
+  protocol: string;
+  date: string;
+  lossUsd: number;
+  chains: string[];
+  attackers: { address: string; chain: string; role: string }[];
+}
+
+/** Curated exploits matching a name, technique, address or tx. */
+export async function searchExploits(
+  q: string,
+  signal?: AbortSignal,
+): Promise<ExploitMatch[]> {
+  const res = await fetch(`${BASE}/v1/exploits?q=${encodeURIComponent(q)}`, {
+    signal,
+  });
+  if (!res.ok) throw new Error(`api-${res.status}`);
+  return ((await res.json()) as { results: ExploitMatch[] }).results;
+}

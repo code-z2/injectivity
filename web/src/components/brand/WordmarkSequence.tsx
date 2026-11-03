@@ -1,4 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { currentTheme } from "@/lib/theme";
 import { ORB } from "./orb";
 
 // "Intel Terminal" → orb, pure SVG, driven by ONE master clock (rAF) so
@@ -34,7 +35,9 @@ const W = 200;
 const H = 40;
 const MID = 20;
 const BASELINE = 28;
-const INK: Rgb = [11, 13, 18];
+// Ink follows the theme: near-black on light, near-white on dark.
+const inkRgb = (): Rgb =>
+  currentTheme() === "dark" ? [238, 240, 244] : [11, 13, 18];
 const DOT_R = 2.6;
 const GAP = 7;
 const RING_R = 8;
@@ -202,7 +205,10 @@ export function WordmarkSequence({
       dot.setAttribute("cx", x.toFixed(2));
       dot.setAttribute("cy", y.toFixed(2));
       dot.setAttribute("r", r.toFixed(2));
-      dot.setAttribute("fill", rgb(mixRgb(INK, gradientAt(k / (n - 1)), c)));
+      dot.setAttribute(
+        "fill",
+        rgb(mixRgb(inkRgb(), gradientAt(k / (n - 1)), c)),
+      );
       dot.setAttribute(
         "opacity",
         String((1 - fold) * (1 - smooth(seg(t, 4450, 4900)))),
@@ -331,7 +337,7 @@ export function WordmarkSequence({
               cy={MID + ORB_R + 3}
               rx={ORB_R * 0.8}
               ry={2.4}
-              fill="#0b0d12"
+              fill="var(--color-ink)"
               fillOpacity={ORB.shadowAlpha}
               filter={`url(#${id}-blur-sm)`}
               opacity={0}
@@ -341,7 +347,7 @@ export function WordmarkSequence({
               cx={orbCx}
               cy={MID}
               r={ORB_R + 2}
-              fill="#0b0d12"
+              fill="var(--color-ink)"
               fillOpacity={ORB.haloAlpha}
               filter={`url(#${id}-blur-lg)`}
               opacity={0}
@@ -360,7 +366,7 @@ export function WordmarkSequence({
             fontSize={FONT}
             fontStyle={g.italic ? "italic" : "normal"}
             className="font-brand"
-            fill={rgb(INK)}
+            fill={rgb(inkRgb())}
           >
             {g.ch}
           </text>
@@ -375,7 +381,7 @@ export function WordmarkSequence({
             cx={g.cx}
             cy={g.cy}
             r={0}
-            fill={rgb(INK)}
+            fill={rgb(inkRgb())}
           />
         ))}
 

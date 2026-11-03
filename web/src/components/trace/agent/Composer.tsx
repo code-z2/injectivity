@@ -2,6 +2,7 @@ import { BorderBeam } from "border-beam";
 import { ArrowUp, FileText } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
+import { useTheme } from "@/lib/theme";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,7 @@ export function Composer({
   onGenerate: () => void;
 }) {
   const [value, setValue] = useState("");
+  const theme = useTheme();
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 40,
     maxHeight: 160,
@@ -53,11 +55,11 @@ export function Composer({
       colorVariant="colorful"
       size="md"
       strength={0.85}
-      theme="light"
+      theme={theme}
     >
       {/* biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: pointer shortcut to focus the field; the field and buttons are keyboard reachable */}
       <div
-        className="cursor-text rounded-[20px] bg-white px-2 pt-1.5 pb-2 shadow-[inset_0_0_0_1px_rgb(11_13_18/0.08),0_1px_2px_rgb(11_13_18/0.04)]"
+        className="cursor-text rounded-[20px] bg-glass px-2 pt-1.5 pb-2 shadow-[inset_0_0_0_1px_var(--color-line),0_1px_2px_rgb(0_0_0/0.04)]"
         onClick={(e) => {
           if (!(e.target as Element).closest("button"))
             textareaRef.current?.focus();
@@ -109,7 +111,7 @@ export function Composer({
             className={cn(
               "flex size-7 items-center justify-center rounded-full transition-colors",
               running || canAsk
-                ? "bg-ink text-white hover:bg-ink-soft"
+                ? "bg-ink text-on-ink hover:bg-ink-soft"
                 : "bg-subtle text-faint shadow-[inset_0_0_0_1px_rgb(11_13_18/0.06)]",
             )}
             disabled={!running && !canAsk}

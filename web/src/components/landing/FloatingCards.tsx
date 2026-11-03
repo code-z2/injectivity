@@ -19,7 +19,7 @@ const CARDS = [
     pos: "right-[3.5%] top-[36%]",
     dark: true,
     icon: GitFork,
-    iconCls: "bg-white/10 text-ion-400",
+    iconCls: "bg-on-ink/10 text-ion-400",
     title: "Trace complete",
     sub: "41 wallets · 2 hops · 3 flagged",
     delay: 0.65,
@@ -64,7 +64,7 @@ export function FloatingCards() {
             className={cn(
               "flex animate-float items-center gap-3 rounded-2xl py-2.5 pr-5 pl-2.5",
               c.dark
-                ? "bg-ink text-white shadow-float"
+                ? "bg-ink text-on-ink shadow-float"
                 : "text-ink shadow-float glass",
             )}
             style={{ animationDelay: c.float }}
@@ -84,7 +84,7 @@ export function FloatingCards() {
               <span
                 className={cn(
                   "block text-[12px]",
-                  c.dark ? "text-white/55" : "text-muted",
+                  c.dark ? "text-on-ink/55" : "text-muted",
                 )}
               >
                 {c.sub}

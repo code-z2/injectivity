@@ -21,6 +21,7 @@ import { getAgentWidth, setAgentWidth, useAgentWidth } from "@/lib/agentDock";
 import { rememberReport } from "@/lib/reports";
 import { cn } from "@/lib/utils";
 import type { AddressRole, ChainLink } from "../types";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Answer, type OnPreview } from "./Answer";
 import { Composer } from "./Composer";
 import { SummaryStrip } from "./NodeBrief";
@@ -267,7 +268,7 @@ export function AgentPanel({
     <motion.section
       animate={{ height: open ? vh - GAP * 2 : HEADER_H }}
       aria-label="Agent"
-      className="absolute top-3 right-3 z-20 flex flex-col overflow-hidden rounded-[22px] border border-white bg-white/80 shadow-console backdrop-blur-xl"
+      className="absolute top-3 right-3 z-20 flex flex-col overflow-hidden rounded-[22px] border border-glass-edge bg-glass/80 shadow-console backdrop-blur-xl"
       style={{ width }}
       initial={false}
       transition={reduce ? { duration: 0 } : { duration: 0.5, ease: EASE }}
@@ -282,6 +283,7 @@ export function AgentPanel({
           <h2 className="text-[13.5px] font-medium text-ink">Agent</h2>
           <p className="truncate text-[11.5px] text-faint">{status}</p>
         </div>
+        <ThemeToggle className="hover:bg-ink/5" />
         <button
           aria-expanded={open}
           aria-label={open ? "Collapse" : "Expand"}

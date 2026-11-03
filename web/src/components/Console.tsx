@@ -184,7 +184,7 @@ export function Console({
               ? "h-12 px-3.5 text-[15px] sm:pr-4 sm:pl-5"
               : "h-10 px-3 text-[14px] sm:pr-3.5 sm:pl-4",
             valid && !busy
-              ? "bg-ink text-white hover:bg-ink-soft active:scale-[0.97]"
+              ? "bg-ink text-on-ink hover:bg-ink-soft active:scale-[0.97]"
               : "bg-subtle text-faint",
           )}
         >

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Answer, type OnPreview } from "@/components/trace/agent/Answer";
 import { type Reveal, SideCard } from "@/components/trace/agent/SideCard";
 import { SourcePreview } from "@/components/trace/agent/SourcePreview";
@@ -74,7 +75,7 @@ export function ReportPage({ reportKey }: { reportKey: string }) {
         className="pointer-events-none fixed inset-0"
         style={{
           backgroundImage:
-            "radial-gradient(rgb(11 13 18 / 0.06) 1px, transparent 1px)",
+            "radial-gradient(var(--color-dot) 1px, transparent 1px)",
           backgroundSize: "18px 18px",
         }}
       />
@@ -108,7 +109,7 @@ function Gate({
             be shared.
           </p>
           <a
-            className="mt-5 flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[13px] font-medium text-white hover:bg-ink-soft"
+            className="mt-5 flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[13px] font-medium text-on-ink hover:bg-ink-soft"
             href={reportPdfUrl(reportKey)}
             rel="noopener noreferrer"
             target="_blank"
@@ -432,6 +433,7 @@ function Header({
         <span />
       )}
       <div className="flex-1" />
+      <ThemeToggle className="size-9 bg-surface/80 shadow-hairline backdrop-blur-xl" />
       <button
         className="flex h-9 items-center gap-2 rounded-full bg-surface/80 px-3.5 text-[13px] text-ink-soft shadow-hairline backdrop-blur-xl hover:text-ink"
         onClick={copy}
@@ -445,7 +447,7 @@ function Header({
         {copied ? "Copied" : "Copy PDF link"}
       </button>
       <a
-        className="flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[13px] font-medium text-white hover:bg-ink-soft"
+        className="flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[13px] font-medium text-on-ink hover:bg-ink-soft"
         href={reportPdfUrl(reportKey)}
         rel="noopener noreferrer"
         target="_blank"

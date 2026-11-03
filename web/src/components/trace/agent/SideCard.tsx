@@ -63,7 +63,7 @@ export function SideCard({
           }}
         >
           <div
-            className="max-h-[calc(100svh-24px)] overflow-hidden rounded-2xl border border-white bg-white/90 p-1 shadow-console backdrop-blur-xl"
+            className="max-h-[calc(100svh-24px)] overflow-hidden rounded-2xl border border-glass-edge bg-glass/90 p-1 shadow-console backdrop-blur-xl"
             ref={card}
           >
             <AnimatePresence initial={false} mode="popLayout">

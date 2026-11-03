@@ -10,8 +10,8 @@
 @import "@fontsource/instrument-serif/400.css";
 @import "@fontsource/instrument-serif/400-italic.css";
 
-/* Light-only app: dark: utilities (from vendor components) apply only under
-   an explicit .dark class, never from the OS theme. */
+/* Dark theme is a .dark class on <html> (light, dark or system; see
+   lib/theme.ts), so dark: utilities follow the app's choice, not the OS. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -30,6 +30,13 @@
   --color-ink-soft: #3b414b;
   --color-muted: #69707c;
   --color-faint: #9aa1ac;
+
+  /* Glass panels (docks, cards), their hairline edge, text on ink
+     buttons, and the canvas dot pattern. */
+  --color-glass: #ffffff;
+  --color-glass-edge: #ffffff;
+  --color-on-ink: #ffffff;
+  --color-dot: rgb(11 13 18 / 0.06);
 
   /* Brand: Ion */
   --color-ion-50: #eef2ff;
@@ -89,6 +96,8 @@
 
 :root {
   color-scheme: light;
+  --underlay-ink: rgb(11 13 18 / 0.5);
+  --underlay-ink-soft: rgb(11 13 18 / 0.28);
   --duration-stagger: 40ms;
   --duration-micro: 80ms;
   --duration-quick: 150ms;
@@ -96,6 +105,54 @@
   --duration-medium: 350ms;
   --duration-slow: 400ms;
   --duration-very-slow: 500ms;
+}
+
+:root.dark {
+  color-scheme: dark;
+  --underlay-ink: rgb(220 226 236 / 0.42);
+  --underlay-ink-soft: rgb(220 226 236 / 0.22);
+  --color-canvas: #0b0d12;
+  --color-surface: #14171e;
+  --color-subtle: #1b1f27;
+  --color-line: #262b34;
+  --color-line-strong: #353b46;
+  --color-ink: #eef0f4;
+  --color-ink-soft: #c3c8d1;
+  --color-muted: #8e96a3;
+  --color-faint: #636b78;
+
+  --color-glass: #161a21;
+  --color-glass-edge: rgb(255 255 255 / 0.07);
+  --color-on-ink: #0b0d12;
+  --color-dot: rgb(255 255 255 / 0.055);
+
+  --color-ion-50: #151c33;
+  --color-ion-100: #1c2546;
+  --color-ion-200: #2a3870;
+  --color-ion-800: #c5d2ff;
+
+  --color-verified-soft: #3a1618;
+  --color-inferred-soft: #3a2a12;
+  --color-clean-soft: #0f2e25;
+
+  /* Attacker flips to white so it stays the strongest mark on dark. */
+  --color-attacker: #f2f4f8;
+  --color-victim-ink: #f3c63f;
+  --color-victim-soft: #3a3214;
+  --color-normal: #6b7280;
+  --color-rope: #3a404b;
+
+  --shadow-hairline: 0 0 0 1px rgb(255 255 255 / 0.06);
+  --shadow-card:
+    0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.3),
+    0 4px 12px -4px rgb(0 0 0 / 0.4);
+  --shadow-float:
+    0 0 0 1px rgb(255 255 255 / 0.06), 0 2px 4px rgb(0 0 0 / 0.3),
+    0 12px 32px -8px rgb(0 0 0 / 0.5);
+  --shadow-console:
+    0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.3),
+    0 10px 30px -10px rgb(0 0 0 / 0.5), 0 30px 80px -24px rgb(47 91 255 / 0.12);
+  --shadow-focus: 0 0 0 4px rgb(109 140 255 / 0.22);
 }
 
 @layer base {

@@ -2,14 +2,15 @@ import { memo, useMemo } from "react";
 
 // What lies beneath the aurora: a technical underlay of the on-chain world,
 // drawn as fine ink line art with no background of its own (it sits over
-// the aurora with multiply, so it takes the sky's tint). Chains of blocks, locks, keys,
+// the aurora with multiply on light and screen on dark, so it takes the sky's tint). Chains of blocks, locks, keys,
 // shields, Merkle trees, fund-flow graphs, the ether diamond, circuit
 // traces, hashes and exploit-flavoured code. Generated once per viewport
 // size from a fixed seed, so it is stable across renders. Purely
 // decorative (aria-hidden); revealed only through the cursor lens.
 
-const INK = "rgb(11 13 18 / 0.5)";
-const INK_SOFT = "rgb(11 13 18 / 0.28)";
+// Ink follows the theme (styles.css: --underlay-ink*).
+const INK = "var(--underlay-ink)";
+const INK_SOFT = "var(--underlay-ink-soft)";
 const RED = "rgb(229 72 77 / 0.75)";
 const ION = "rgb(47 91 255 / 0.7)";
 const CELL = 190;

@@ -9,10 +9,11 @@ import {
   ORB_SPEC_CSS,
 } from "@/components/brand/orb";
 import { SettingsDialog } from "@/components/SettingsDialog";
+import { ThemeToggle } from "../ThemeToggle";
 import { CHAIN_META } from "@/lib/chains";
 import { looksLikeEns } from "@/lib/ens";
 import { lookupErrorMessage, preloadInvestigation } from "@/lib/preload";
-import type { Chain } from "@/lib/api";
+import { CHAINS, type Chain, searchExploits } from "@/lib/api";
 import { saveSettings, useSettings } from "@/lib/settings";
 import { SUGGESTIONS, type Suggestion } from "@/lib/suggestions";
 import { ADDRESS_RE, cn, short } from "@/lib/utils";
@@ -57,6 +58,7 @@ export function Spotlight({
   const [query, setQuery] = useState("");
   const [think, setThink] = useState<ThinkingPhase>("off");
   const [error, setError] = useState("");
+  const matches = useExploitSearch(query);
   const after = useRef<() => void>(() => {});
   const inputRef = useRef<HTMLInputElement>(null);
   const shake = useAnimationControls();
@@ -90,6 +92,10 @@ export function Spotlight({
     const v = query.trim();
     if (!v) {
       inputRef.current?.focus();
+      return;
+    }
+    if (!ADDRESS_RE.test(v) && !looksLikeEns(v) && matches?.[0]) {
+      pick(matches[0]);
       return;
     }
     if (!ADDRESS_RE.test(v) && !looksLikeEns(v)) {
@@ -154,7 +160,7 @@ export function Spotlight({
       >
         {/* The field: opens from the orb's footprint. */}
         <motion.div
-          className="absolute rounded-full border border-white/80 bg-white/75 shadow-console backdrop-blur-xl"
+          className="absolute rounded-full border border-glass-edge/80 bg-glass/75 shadow-console backdrop-blur-xl"
           initial={false}
           animate={
             open
@@ -179,13 +185,13 @@ export function Spotlight({
             disabled={!ready || busy}
             placeholder={
               compact
-                ? "Wallet address or ENS name"
-                : "Enter a wallet address or an ENS name"
+                ? "Address, ENS or exploit"
+                : "Enter a wallet address, ENS name or exploit"
             }
             spellCheck={false}
             autoComplete="off"
             autoCapitalize="off"
-            aria-label="Wallet address or ENS name"
+            aria-label="Wallet address, ENS name or exploit"
             initial={false}
             animate={{ opacity: ready ? 1 : 0 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
@@ -289,16 +295,17 @@ export function Spotlight({
           </Chip>
         </div>
         <motion.div
-          className="pr-2"
+          className="flex items-center gap-1.5 pr-2"
           initial={false}
           animate={ready ? shown : hiddenChip}
           transition={{ ...chipTransition, delay: ready ? 0.22 : 0 }}
         >
+          <ThemeToggle className="border border-glass-edge/70 bg-glass/55 shadow-hairline backdrop-blur-md hover:bg-glass/80" />
           <SettingsDialog
             trigger={
               <button
                 aria-label="Settings"
-                className="flex size-8 items-center justify-center rounded-full border border-white/70 bg-white/55 text-ink-soft shadow-hairline backdrop-blur-md transition-colors hover:bg-white/80 hover:text-ink"
+                className="flex size-8 items-center justify-center rounded-full border border-glass-edge/70 bg-glass/55 text-ink-soft shadow-hairline backdrop-blur-md transition-colors hover:bg-glass/80 hover:text-ink"
               >
                 <Settings2 className="size-4" />
               </button>
@@ -321,21 +328,25 @@ export function Spotlight({
       >
         <div
           className={cn(
-            "rounded-2xl border border-white/70 bg-white/50 p-1.5 shadow-hairline backdrop-blur-md transition-opacity duration-300",
+            "rounded-2xl border border-glass-edge/70 bg-glass/50 p-1.5 shadow-hairline backdrop-blur-md transition-opacity duration-300",
             busy && "opacity-50",
           )}
         >
           <p className="px-3 pt-1.5 pb-1 text-[11.5px] text-faint">
-            Start from a known exploit
+            {matches === null
+              ? "Start from a known exploit"
+              : matches.length
+                ? "Matches in our exploit data"
+                : "No match in our exploit data"}
           </p>
           <ul>
-            {SUGGESTIONS.slice(0, compact ? 3 : SUGGESTIONS.length).map((s) => (
-              <li key={s.address}>
+            {(matches ?? SUGGESTIONS).slice(0, compact ? 3 : 6).map((s) => (
+              <li key={`${s.chain}:${s.address}`}>
                 <button
                   type="button"
                   onClick={() => pick(s)}
                   disabled={!ready || busy}
-                  className="flex h-9 w-full items-center gap-2.5 rounded-xl px-3 text-left transition-colors hover:bg-white/80 disabled:pointer-events-none"
+                  className="flex h-9 w-full items-center gap-2.5 rounded-xl px-3 text-left transition-colors hover:bg-glass/80 disabled:pointer-events-none"
                 >
                   <span className="size-2 shrink-0 rounded-full bg-attacker" />
                   <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
@@ -377,7 +388,7 @@ function Chip({
       initial={false}
       animate={show ? shown : hiddenChip}
       transition={{ ...chipTransition, delay: show ? 0.06 + i * 0.08 : 0 }}
-      className="flex h-8 items-center gap-1.5 rounded-full border border-white/70 bg-white/55 px-3 text-[12.5px] text-ink-soft shadow-hairline backdrop-blur-md"
+      className="flex h-8 items-center gap-1.5 rounded-full border border-glass-edge/70 bg-glass/55 px-3 text-[12.5px] text-ink-soft shadow-hairline backdrop-blur-md"
     >
       {children}
     </motion.span>
@@ -432,4 +443,45 @@ function OrbFace({ solid, shadow }: { solid: boolean; shadow: boolean }) {
       </span>
     </span>
   );
+}
+
+/**
+ * The quick list's search: anything that isn't an address or ENS name is
+ * looked up in the curated exploits (debounced), and each attacker address
+ * becomes a row. null means not searching (show the starting points).
+ */
+function useExploitSearch(query: string): Suggestion[] | null {
+  const q = query.trim();
+  const searching = q.length >= 2 && !ADDRESS_RE.test(q) && !looksLikeEns(q);
+  const [rows, setRows] = useState<Suggestion[] | null>(null);
+  useEffect(() => {
+    if (!searching) {
+      setRows(null);
+      return;
+    }
+    const ctl = new AbortController();
+    const t = setTimeout(() => {
+      searchExploits(q, ctl.signal)
+        .then((results) =>
+          setRows(
+            results.flatMap((e) =>
+              e.attackers
+                .filter((a) => (CHAINS as string[]).includes(a.chain))
+                .map((a) => ({
+                  label: `${e.protocol} · ${a.role}`,
+                  address: a.address,
+                  chain: a.chain as Chain,
+                  seedId: `${e.protocol} ${e.date}`,
+                })),
+            ),
+          ),
+        )
+        .catch(() => !ctl.signal.aborted && setRows([]));
+    }, 220);
+    return () => {
+      clearTimeout(t);
+      ctl.abort();
+    };
+  }, [q, searching]);
+  return searching ? rows : null;
 }

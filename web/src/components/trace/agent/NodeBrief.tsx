@@ -1,6 +1,7 @@
 import { BorderBeam } from "border-beam";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/lib/theme";
 import { type NodeSummary, type Source, streamSummary } from "@/lib/agent";
 import type { Chain } from "@/lib/api";
 import { cn, short } from "@/lib/utils";
@@ -50,6 +51,7 @@ export function SummaryStrip({
   onReveal: (r: Reveal | null) => void;
 }) {
   const key = address ? `${chain}:${address}` : "";
+  const theme = useTheme();
   const [summary, setSummary] = useState<NodeSummary | null>(null);
   const [failed, setFailed] = useState(false);
   const strip = useRef<HTMLButtonElement>(null);
@@ -133,12 +135,12 @@ export function SummaryStrip({
       borderRadius={20}
       colorVariant="colorful"
       size="line"
-      theme="light"
+      theme={theme}
     >
       <button
         aria-label={state === "ready" ? `${label}: hover to read` : label}
         className={cn(
-          "flex h-10 w-full items-center gap-2 rounded-[20px] bg-white px-3.5 text-left text-[12px] shadow-[inset_0_0_0_1px_rgb(11_13_18/0.08),0_1px_2px_rgb(11_13_18/0.04)] outline-none",
+          "flex h-10 w-full items-center gap-2 rounded-[20px] bg-glass px-3.5 text-left text-[12px] shadow-[inset_0_0_0_1px_var(--color-line),0_1px_2px_rgb(0_0_0/0.04)] outline-none",
           state === "ready" ? "cursor-help" : "cursor-default",
         )}
         onBlur={() => {
