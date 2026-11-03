@@ -1,168 +1,162 @@
 # Intel Terminal
 
-Intel Terminal investigates EVM wallets and tells you, with evidence, whether
-a wallet is connected to something malicious and how confident you should be.
+> [!IMPORTANT]
+> **Disclaimer.** Intel Terminal is an investigative aid, not an authority.
+>
+> - **Not advice.** Nothing it shows is financial, legal, investment or
+>   compliance advice, and it does not certify any address as safe or
+>   sanctioned. Do your own verification before acting.
+> - **Labels and links are not accusations.** An address that transacted with
+>   an exploiter is not an exploiter. Exchanges, routers and bridges touch
+>   everyone. Attributions come from public sources and can be wrong or out of
+>   date.
+> - **AI can be wrong.** Answers and reports are written by an AI model
+>   (Meta's Muse by default). Every claim is checked against the evidence it
+>   cites, but the checks catch unsupported statements, not every mistake.
+>   Read the sources.
+> - **Coverage is partial.** Traces read a bounded window of each wallet's
+>   history on six EVM chains. Funds that leave through a bridge or mixer, or
+>   move to a non-EVM chain, end at that point.
+> - **Use it responsibly.** Don't use it to harass, dox or make public
+>   accusations against individuals. It is provided as is, without warranty,
+>   under the [MIT License](LICENSE).
 
-You start with an address or an ENS name. You trace where its funds have
-flowed, check every counterparty against sanctions lists and a curated
-dataset of DeFi exploits, explore the wallet network on an interactive graph,
-and question a conversational agent that backs every claim with citations.
-When you are done, you keep the investigation as a report you can share as a
-PDF.
+Intel Terminal is an on-chain security investigation workspace. You give it a
+wallet, an ENS name or a known exploit. It traces where the money went, names
+the protocols it moved through, and works alongside you with an AI researcher
+that cites every claim. When you're done, it writes the post-mortem.
 
-The live product is at [intel-terminal.pages.dev](https://intel-terminal.pages.dev).
+**Live:** [intel-terminal.pages.dev](https://intel-terminal.pages.dev)
 
-## Know before you start
+## Why it exists
 
-Intel Terminal covers six EVM chains: Ethereum, Base, BSC, Polygon,
-Arbitrum, and Optimism. Anything else is rejected with an `unsupported chain`
-error.
+When an exploit happens, the facts are scattered across block explorers,
+sanctions lists, protocol docs and incident write-ups. Explorers show one
+address at a time. Forensic platforms are expensive and closed. AI chat tools
+speculate and invent figures. Intel Terminal puts the evidence in one place
+and keeps the AI honest: if a claim can't be traced back to a transaction, a
+dataset entry or a page it read, it doesn't reach you.
 
-Traces are bounded at two hops and a capped number of counterparties per
-step. A clean result means nothing was found inside those bounds. It does not
-certify an address as safe.
+## What you can do
 
-A direct appearance on a sanctions list or in the exploit dataset is marked
-**verified**. A wallet that has only transacted with a verified address is
-marked **inferred**, and inference is never evidence of wrongdoing on its
-own — exchanges, bridges, and widely used services share counterparties with
-countless innocent users every day.
+### Start an investigation
 
-Nothing here connects to a wallet or asks you to sign anything. There is no
-key custody anywhere in the product.
-
-## Trace a wallet
-
-Open the home page and enter an ENS name or wallet address in the field that
-reads *Enter an ENS name or wallet address*. Press **Trace**. The terminal
-resolves the name, loads balances, history, and the risk profile, and opens
-the investigation page.
-
-If you do not have an address yet, search the exploit quick list instead —
-it covers major incidents including Binance — and jump straight to an
-attacker's trail. Try this copy-pasteable example:
+Type a wallet address, an ENS name or the name of an exploit on the home page.
+Typing a name like `binance` or a technique like `flash loan` searches the
+curated exploit dataset, and the attacker addresses appear in the quick list,
+one click away. Every investigation has its own link, for example:
 
 ```text
 https://intel-terminal.pages.dev/investigate/ethereum/vitalik.eth
 ```
 
-Every investigation gets its own link in that form, so you can send someone
-exactly what you are seeing.
+### Follow the money
 
-If the name or address is malformed you get a validation error before
-anything runs. If the chain in the link is not one of the six, the page does
-not render and reports `unsupported chain`.
+The trace page centres on a globe of cards: the wallet you're investigating in
+front, its counterparties around it, theirs around them, three rings deep.
 
-## Follow the money across hops
+- **Ranked by value, not noise.** Each wallet's first 5,000 transfers are read,
+  including internal ETH movements on Ethereum and Polygon. Address-poisoning
+  dust and spoof tokens are set aside, and counterparties are ranked by the
+  dollars they moved.
+- **Balances that mean something.** Wallet cards show their current balance.
+  Shared contracts such as routers and pools show how much moved through them
+  with the traced wallet instead, since their balance belongs to everyone.
+- **Protocols named.** Known DEX routers, aggregators, bridges and mixers are
+  labelled, and verified contracts show their name. These are the end of a
+  trail and aren't expanded; bridges and mixers are marked as exits.
+- **The full ledger.** The dock underneath lists every transfer, with filters
+  for direction, time, token, role, counterparty and amount, and dust hidden by
+  default. Every row links to its transaction on the explorer.
+- **Your trail.** Double-click a card to follow it. The addresses you follow
+  form a chain down the left side, which becomes the investigation's context.
 
-The investigation page maps the wallet's network as a graph you expand hop
-by hop, with a transfer ledger underneath. Transfers arrive ranked by value
-with balances in dollars, known services and routers labeled, and dust,
-spoof tokens, and internal transfers filtered or flagged so noise stays out
-of your way.
+Single-click a card to inspect it: its ledger opens in the dock and a short,
+verified summary appears in the agent panel.
 
-Select wallets to string them into a multi-hop path and open each step's own
-ledger. Select any address to open it on the right block explorer; select any
-transfer to open the transaction itself. A profile view summarizes each
-wallet's top counterparties and current holdings.
+### Ask the agent
 
-If there is nothing cached to trace and no live key is configured, the trace
-controls tell you so instead of rendering an empty graph.
+The agent panel on the right answers plain-language questions about the trace:
+who an address is, where funds went, how an exploit worked. It researches with
+its own tools: transfers, decoded transactions, balances, contracts, fund
+traces, the exploit and sanctions datasets, PDFs, and the web. Each claim
+carries a citation chip; hover it to see the evidence. Off-topic requests are
+declined.
 
-## Ask the agent about what you see
+### Get the report
 
-The agent panel beside the graph answers plain-language questions about the
-investigation. It thinks out loud while it works, pulls on-chain evidence
-through its tools, and attaches citations to its claims. Short briefs on
-individual wallets stream in as they are written.
+Press **Generate report** to turn the investigation into a post-mortem: summary,
+timeline, how it happened, where the money went, actors, impact, assumptions,
+method and numbered sources. There are no speculative next steps; anything
+uncertain is stated as an assumption with its basis.
 
-For a quicker answer, the one-shot investigation mode returns a single
-validated report without the back-and-forth: a written summary, findings with
-verdicts, confidence levels, and the transaction hashes and list references
-behind them, plus open questions and suggested next checks. Anything the
-evidence cannot support is removed before delivery, and the report states how
-much was removed.
+The report page opens only in the browser that generated it. The PDF link can
+be shared. If a sentence is wrong, flag it: what the agent learned from it is
+removed from its memory.
 
-When the work is done, the agent compiles a post-mortem report. It opens
-only in the browser that generated it; the PDF link can be shared freely.
+### Make it yours
 
-If the model call fails you get a plain failure message, not a partial
-report. If no model key exists anywhere — yours or the service's — the
-investigation tells you a key is required instead of running blind.
+In **Settings**:
 
-## Share what you found
+- **Chain.** Ethereum, Base, BNB Chain, Polygon, Arbitrum or Optimism.
+- **Custom RPC.** Your own endpoint for a chain's lookups (an `https` URL).
+- **Custom model.** Your own model: base URL, model name, API key and reasoning
+  effort. It's checked before use; until it passes, the service model is used.
+  Your key stays in your browser.
+- **Appearance.** Light, dark or follow your system.
 
-One-shot investigations download as structured PDFs covering the graph, the
-fund-flow paths, the verified-versus-inferred risk split, and the findings
-with their sources. Agent post-mortems open as full report pages with PDFs
-of their own, and saved reports can be reopened from your browser later.
+## How it stays grounded
 
-## Bring your own model and RPC
+- **Evidence ledger.** Everything the agent looks up becomes a numbered source.
+  It may only state what it can cite.
+- **Verifier.** Before an answer or report reaches you, every sentence with a
+  figure, address or transaction hash is checked against the sources it cites.
+  Sentences that don't hold up are removed.
+- **Curated memory.** After each report, facts that are verified, new and
+  important are kept for future investigations, each with its sources.
+  Contradictions are queued, not stored.
+- **Curated data.** In `data/seeds/`:
+  - `exploits.json`: 272 EVM exploits with attacker and victim addresses,
+    exploit transactions, loss, technique and sources.
+  - `ofac.json`: 123 OFAC-sanctioned addresses.
+  - `protocols.json`: 24 protocol contracts, each verified on-chain.
 
-Open **Settings** to point the terminal at your own infrastructure:
+## Built with Meta's Muse
 
-- **Chain** — which of the six networks you investigate.
-- **Custom RPC** — your own endpoint for chain reads and name resolution.
-  It must be a valid `https` URL; anything else is rejected with an
-  `x-rpc-url must be a valid https URL` error. The terminal health-checks it
-  live per chain.
-- **Custom model** — your own OpenAI-compatible model: base URL, model name,
-  key, and reasoning effort. All three of base URL, model, and key are
-  required together; a partial entry is rejected with a message saying
-  exactly that. Your model handles research, writing, and summaries; the
-  safety checks always keep running on the service model.
-- **Appearance** — light, dark, or follow your system.
+All of Intel Terminal's AI runs on Meta's **Muse Spark** by default: the scope
+check, the research agent and its web search, node summaries, report writing,
+and memory curation. Anyone can bring their own OpenAI-compatible key instead.
 
-A probe action reports what your custom model supports without ever showing
-the key back to you.
+## Repository
 
-## Where your data comes from
-
-The terminal's judgments rest on its lists. Every exploit row names both
-attacker and victim with complete addresses on a named chain; rows that
-cannot meet that bar stay out of the dataset instead of being approximated
-in. Sanctions data tracks 123 EVM addresses with the upstream source recorded
-per entry, 903 flagged addresses are indexed in total, and well-known
-protocol contracts are checked against their on-chain code. Any match or
-label traces back to where it came from.
-
-On-chain reads happen on demand when you investigate and are cached
-afterwards, so repeat lookups come from cache and nothing polls the chain in
-the background. Model access is bring-your-own-key with a service fallback:
-you are asked for a key only when neither yours nor the service's exists.
-
-## Repository map
-
-| Component | What lives there |
+| Path | What's there |
 | --- | --- |
-| [Web app](web/) | The landing, the investigation page with graph and ledger, the agent panel, report pages, settings, and themes |
-| [Web routes](web/src/routes/) | `/` for the landing, `/investigate/$chain/$target` for shareable investigations, `/report/$key` for private post-mortems |
-| [API Worker](workers/api/) | Routes, chain clients, the trace engine, risk assessment, the agent loop, the investigation pipeline, and PDF export |
-| [Investigative agent](workers/api/src/agent/) | The multi-step loop, its tools, the fact ledger, per-session state, and post-mortem rendering |
-| [Seed data](data/seeds/) | `exploits.json` for curated EVM DeFi hacks, `ofac.json` for sanctioned addresses, `protocols.json` for verified protocol contracts, plus the wider working sets |
-| [API SQL](workers/api/sql/) | `schema.sql` and `seed.sql`, the source of truth, while `migrations/` holds what is already applied remotely |
-| [API tests](workers/api/test/) | Sixty-plus contract and regression tests, run with `bun test` and fully offline by construction |
-| [Design](docs/DESIGN.md) | The scoped work plan across infrastructure, API, language model, UI, integration, and tests |
-| [Build log](docs/system.md) | A running record of what was built, how it was built, and what each piece unlocked |
+| [`web/`](web/) | The app: landing, trace page (globe, dock, address chain), agent panel, report page, settings, themes |
+| [`workers/api/`](workers/api/) | The API on Cloudflare Workers: chain lookups, profiles and balances, risk lists, exploit search, reports, PDF export |
+| [`workers/api/src/agent/`](workers/api/src/agent/) | The agent: research loop, tools, evidence ledger, verifier, scope gate, report writer, memory, sessions |
+| [`workers/api/src/llm/`](workers/api/src/llm/) | Model adapters, per-role configuration and the capability check |
+| [`data/seeds/`](data/seeds/) | The curated datasets |
+| [`docs/system.md`](docs/system.md) | Build log: what was built, how and why |
 
 ## Run it locally
 
-You need [bun](https://bun.sh) and [wrangler](https://developers.cloudflare.com/workers/wrangler/).
-Before anything remote, check that `wrangler whoami` shows the Cloudflare
-account you intend to deploy with.
+You need [bun](https://bun.sh) and
+[wrangler](https://developers.cloudflare.com/workers/wrangler/).
 
-Start the API first. These commands install dependencies, create and seed a
-local database, and serve the API on port 8787:
+Start the API (creates and seeds a local database, serves on port 8787):
 
 ```sh
 cd workers/api
 bun install
 bun run migrate && bun run seed
-printf 'ALCHEMY_API_KEY=...\nMODEL_API_KEY=...\n' > .dev.vars  # gitignored; keys only
+printf 'ALCHEMY_API_KEY=...\nMODEL_API_KEY=...\n' > .dev.vars   # gitignored
 bun run dev
 ```
 
-Then start the web app in a second terminal, pointed at that local API:
+`ALCHEMY_API_KEY` needs the six networks enabled in your Alchemy app.
+`MODEL_API_KEY` is your Muse key.
+
+Then the web app, in a second terminal:
 
 ```sh
 cd web
@@ -170,53 +164,36 @@ bun install
 VITE_API_BASE=http://127.0.0.1:8787 bun run dev
 ```
 
-Open `http://127.0.0.1:5173`. The local database ships with the full set of
-flagged addresses, so risk screening works immediately. Transfer history
-accumulates the first time you look addresses up with a key configured and
-stays cached afterwards. Agent conversations also run locally, so the full
-loop works without remote resources.
+Open `http://127.0.0.1:5173`.
 
-## Check the work
-
-The API suite runs anywhere without secrets:
+## Check it
 
 ```sh
 cd workers/api
-bun run check    # typecheck with tsc
-bun test         # contract and regression tests — no live keys, ever
-bun run int1     # the full end-to-end loop: fixtures, lookup, trace, screen, export
+bun run check   # typecheck
+bun test        # offline tests: no live keys, no network
 ```
-
-Tests use a database built from the committed schema and seed, and they
-reach the network through clients that throw on any live call, so a test
-that accidentally goes live fails instead of passing quietly. Checks against
-real chain and model APIs — including the agent chat and eval scripts — are
-manual-only and sit behind explicit opt-in flags.
-
-For the web app:
 
 ```sh
 cd web
-bun run check    # typecheck with tsc
-bun run build    # production build
+bun run check   # typecheck
+bun run build   # production build
 ```
+
+Live checks against real chains and models are separate scripts you run on
+purpose: `bun run agent`, `bun run chat` and `bun run eval` in `workers/api`.
 
 ## Deploy it
 
-The remote database is created once and its id is recorded in
-`workers/api/wrangler.toml`:
-
 ```sh
 cd workers/api
-wrangler d1 create intel-terminal
-wrangler d1 execute intel-terminal --remote --file=./sql/schema.sql
+wrangler d1 create intel-terminal                        # once; put the id in wrangler.toml
+wrangler d1 migrations apply intel-terminal --remote
 wrangler d1 execute intel-terminal --remote --file=./sql/seed.sql
 wrangler secret put ALCHEMY_API_KEY
 wrangler secret put MODEL_API_KEY
 wrangler deploy
 ```
-
-Then build the web app against the deployed API and publish it:
 
 ```sh
 cd web
@@ -224,8 +201,10 @@ VITE_API_BASE=https://<your-worker>.workers.dev bun run build
 wrangler pages deploy dist --project-name=intel-terminal
 ```
 
-Secrets are set with `wrangler secret put` and never enter source control,
-since `.dev.vars` is gitignored. The seed files contain only public
-attribution data — addresses, transaction hashes, and links to published
-sources — and every risk-list row carries the upstream version it came from,
-so a match seen in production traces back to the list entry behind it.
+Secrets go through `wrangler secret put` and never enter the repository. The
+seed files hold only public attribution data: addresses, transaction hashes
+and links to published sources.
+
+## License
+
+[MIT](LICENSE)
