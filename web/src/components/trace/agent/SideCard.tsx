@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useAgentWidth } from "@/lib/agentDock";
 
 // The side card: one floating card just left of the agent dock, above
 // everything else, lined up with whatever is being hovered in the dock (a
@@ -15,7 +16,6 @@ export interface Reveal {
   anchor: DOMRect;
 }
 
-const DOCK_W = 340;
 const INSET = 12;
 const GAP = 12;
 const WIDTH = 320;
@@ -29,6 +29,7 @@ export function SideCard({
   /** Place the card at this x instead of left of the agent dock. */
   left?: number;
 }) {
+  const dockW = useAgentWidth();
   const card = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
   useLayoutEffect(() => {
@@ -52,7 +53,7 @@ export function SideCard({
           initial={{ opacity: 0, x: 6, top }}
           style={
             left === undefined
-              ? { right: INSET + DOCK_W + GAP, width: WIDTH }
+              ? { right: INSET + dockW + GAP, width: WIDTH }
               : { left, width: WIDTH }
           }
           transition={{

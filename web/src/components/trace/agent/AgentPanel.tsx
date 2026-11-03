@@ -17,6 +17,7 @@ import {
   sessionFor,
   type Workspace,
 } from "@/lib/agent";
+import { getAgentWidth, setAgentWidth, useAgentWidth } from "@/lib/agentDock";
 import { rememberReport } from "@/lib/reports";
 import { cn } from "@/lib/utils";
 import type { AddressRole, ChainLink } from "../types";
@@ -76,6 +77,7 @@ export function AgentPanel({
   openKey: number;
 }) {
   const reduce = useReducedMotion();
+  const width = useAgentWidth();
   const vh = useViewportHeight();
   const [open, setOpenState] = useState(() => {
     try {
@@ -265,10 +267,12 @@ export function AgentPanel({
     <motion.section
       animate={{ height: open ? vh - GAP * 2 : HEADER_H }}
       aria-label="Agent"
-      className="absolute top-3 right-3 z-20 flex w-[340px] flex-col overflow-hidden rounded-[22px] border border-white bg-white/80 shadow-console backdrop-blur-xl"
+      className="absolute top-3 right-3 z-20 flex flex-col overflow-hidden rounded-[22px] border border-white bg-white/80 shadow-console backdrop-blur-xl"
+      style={{ width }}
       initial={false}
       transition={reduce ? { duration: 0 } : { duration: 0.5, ease: EASE }}
     >
+      {open && <ResizeEdge width={width} />}
       <header
         className="flex shrink-0 cursor-pointer items-center gap-3 px-4 select-none"
         onClick={() => setOpen(!open)}
@@ -386,3 +390,38 @@ export function AgentPanel({
 }
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+/**
+ * The dock's left edge, dragged to resize it (300–560px); a grip shows on
+ * hover. Double-click restores the default width.
+ */
+function ResizeEdge({ width }: { width: number }) {
+  const start = useRef<{ x: number; w: number } | null>(null);
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: pointer-only resize; keyboard users keep the default width
+    <div
+      className="group absolute inset-y-0 left-0 z-10 w-2 cursor-ew-resize touch-none"
+      onDoubleClick={() => setAgentWidth(340, true)}
+      onPointerDown={(e) => {
+        start.current = { x: e.clientX, w: width };
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          // Capture is a nicety; the drag still works without it.
+        }
+      }}
+      onPointerMove={(e) => {
+        if (start.current)
+          setAgentWidth(start.current.w + (start.current.x - e.clientX));
+      }}
+      onPointerUp={() => {
+        if (!start.current) return;
+        start.current = null;
+        setAgentWidth(getAgentWidth(), true);
+      }}
+      title="Drag to resize"
+    >
+      <span className="absolute top-1/2 left-1 h-10 w-1 -translate-y-1/2 rounded-full bg-ink/0 transition-colors group-hover:bg-ink/15 group-active:bg-ink/25" />
+    </div>
+  );
+}

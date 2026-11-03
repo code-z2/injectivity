@@ -2,6 +2,7 @@ import { ChevronUp, Maximize2, Minimize2, RotateCw, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { KnownLabel } from "@/lib/api";
+import { useAgentWidth } from "@/lib/agentDock";
 import { cn, short } from "@/lib/utils";
 import { RoleDot } from "../AddressCard";
 import { TokenIcon } from "../TokenIcon";
@@ -36,8 +37,8 @@ import { spoofOf } from "./spoof";
 type Detent = "collapsed" | "half" | "full";
 
 const RAIL_W = 340; // address chain column
-const SIDE_ROOM = 360; // keep clear on both sides (chain left, AI dock right)
-const AGENT_W = 340; // agent dock (right), at the same inset as this dock
+const SIDE_ROOM = 360; // keep clear of the chain (left)
+const AGENT_GAP = 20; // and of the agent dock (right; its width is resizable)
 const MAX_W = 880;
 const MIN_W = 600; // narrowest dock that still fits a full row
 const GAP = 12;
@@ -90,6 +91,7 @@ export function Dock({
 }) {
   const reduce = useReducedMotion();
   const { w: vw, h: vh } = useViewport();
+  const agentW = useAgentWidth();
   // Collapsed by default, floating over the canvas; a node interaction
   // opens it to half (never shrinks it).
   const [detent, setDetent] = useState<Detent>("collapsed");
@@ -117,13 +119,20 @@ export function Dock({
   const full = detent === "full";
   // Between the side columns on wide screens; edge to edge when there is
   // not room for a comfortable row (the chain then sits above it).
-  const between = Math.min(MAX_W, vw - SIDE_ROOM * 2 - 48);
-  const dockW = between >= MIN_W ? between : vw - GAP * 2;
+  const rightRoom = GAP + agentW + AGENT_GAP;
+  const between = Math.min(MAX_W, vw - SIDE_ROOM - rightRoom - 48);
+  const fits = between >= MIN_W;
+  const dockW = fits ? between : vw - GAP * 2;
   const width = full ? vw - GAP * 2 : dockW;
+  // Centred in the room between the chain and the agent dock.
+  const centre = full || !fits ? vw / 2 : (SIDE_ROOM + (vw - rightRoom)) / 2;
   const height = dragH ?? heights[detent];
   const padLeft = full && vw > RAIL_W + 520 ? RAIL_W - GAP : 0;
   // Full, it also slides under the agent dock on the right.
-  const padRight = full && vw > RAIL_W + AGENT_W + 520 ? AGENT_W + GAP : 0;
+  // Edge to edge (full, or too narrow to sit between), its rows stay
+  // clear of the agent dock on the right.
+  const padRight =
+    (full || !fits) && vw > RAIL_W + agentW + 520 ? agentW + GAP : 0;
 
   // Drag the header to resize; release snaps to the nearest detent.
   const drag = useRef<{ y: number; h: number } | null>(null);
@@ -152,11 +161,12 @@ export function Dock({
   return (
     <motion.section
       aria-label="Transfers"
-      className="@container absolute bottom-3 left-1/2 z-10 flex flex-col overflow-hidden rounded-[22px] border border-white bg-white/80 shadow-console backdrop-blur-xl"
+      className="@container absolute bottom-3 left-0 z-10 flex flex-col overflow-hidden rounded-[22px] border border-white bg-white/80 shadow-console backdrop-blur-xl"
       initial={false}
       animate={{
         width,
         height,
+        left: centre,
         x: "-50%",
         paddingLeft: padLeft,
         paddingRight: padRight,
