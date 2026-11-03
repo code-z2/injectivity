@@ -1,0 +1,250 @@
+# CodedVisuals
+
+> CodedVisuals is a library of animated visual compositions: self-contained React components, styled with shadcn/ui tokens and animated with Motion, that drop into marketing websites and landing pages. Each composition is one file with no shared dependencies, themed by your design tokens, and customized through typed props.
+
+CodedVisuals compositions work in any shadcn/ui + React + Tailwind CSS v4 project out of the box. The dependencies to install are Motion (animation), lucide-react (icons), and cn (class merging). Projects without shadcn/ui can add the shadcn token CSS variables and an `@` import alias to use compositions unchanged.
+
+CodedVisuals is a paid product. After purchasing a Solo or Team license and signing in, members install compositions two ways. The first is a private shadcn registry: add the registry to `components.json` with a personal token, then run `npx shadcn@latest add @codedvisuals/{category}-{file}`. The second is in-browser, from any preview page: copy the install command, copy or download the full source, or copy a ready-to-use import and usage snippet for any variation. Browse the public preview pages below to see every composition and its variations.
+
+## Pages
+
+- [Home](https://codedvisuals.com): A library of reusable marketing visuals built directly in code. Drop self-contained, customizable React components into your SaaS and marketing landing pages.
+- [Pricing](https://codedvisuals.com/pricing): Get lifetime access to every CodedVisuals visual. Solo for individuals and freelancers, Team for your whole organization.
+- [Changelog](https://codedvisuals.com/changelog): Notable changes, additions, and fixes to the CodedVisuals library.
+- [License](https://codedvisuals.com/license): How you may use CodedVisuals visual compositions in your personal and commercial projects.
+- [Terms of Service](https://codedvisuals.com/terms): The terms that govern your use of the CodedVisuals website and library.
+- [Privacy Policy](https://codedvisuals.com/privacy): How CodedVisuals collects, uses, and protects your information.
+
+## Visual compositions - Activity
+
+- [Feed](https://codedvisuals.com/visuals/activity/feed): Feed visual composition in the Activity category.
+- [Timeline](https://codedvisuals.com/visuals/activity/timeline): Timeline visual composition in the Activity category.
+
+## Visual compositions - Ai
+
+- [Agent Flow](https://codedvisuals.com/visuals/ai/agent-flow): Agent Flow visual composition in the Ai category.
+- [Model Picker](https://codedvisuals.com/visuals/ai/model-picker): Model Picker visual composition in the Ai category.
+- [Neural Net](https://codedvisuals.com/visuals/ai/neural-net): Neural Net visual composition in the Ai category.
+- [Presence](https://codedvisuals.com/visuals/ai/presence): Presence visual composition in the Ai category.
+- [Prompt Box](https://codedvisuals.com/visuals/ai/prompt-box): Prompt Box visual composition in the Ai category.
+- [Retrieval](https://codedvisuals.com/visuals/ai/retrieval): Retrieval visual composition in the Ai category.
+- [Thinking](https://codedvisuals.com/visuals/ai/thinking): Thinking visual composition in the Ai category.
+- [Tools](https://codedvisuals.com/visuals/ai/tools): Tools visual composition in the Ai category.
+- [Voice](https://codedvisuals.com/visuals/ai/voice): Voice visual composition in the Ai category.
+- [Writer](https://codedvisuals.com/visuals/ai/writer): Writer visual composition in the Ai category.
+
+## Visual compositions - Api
+
+- [Logs](https://codedvisuals.com/visuals/api/logs): Logs visual composition in the Api category.
+- [Rate Limit](https://codedvisuals.com/visuals/api/rate-limit): Rate Limit visual composition in the Api category.
+- [Request](https://codedvisuals.com/visuals/api/request): Request visual composition in the Api category.
+- [Webhook](https://codedvisuals.com/visuals/api/webhook): Webhook visual composition in the Api category.
+
+## Visual compositions - Automations
+
+- [Workflow Builder](https://codedvisuals.com/visuals/automations/workflow-builder): Workflow Builder visual composition in the Automations category.
+
+## Visual compositions - Avatars
+
+- [Grid](https://codedvisuals.com/visuals/avatars/grid): Grid visual composition in the Avatars category.
+- [Stack](https://codedvisuals.com/visuals/avatars/stack): Stack visual composition in the Avatars category.
+- [Profile Card](https://codedvisuals.com/visuals/avatars/profile-card): Profile Card visual composition in the Avatars category.
+
+## Visual compositions - Branding
+
+- [Spotlight](https://codedvisuals.com/visuals/branding/spotlight): Spotlight visual composition in the Branding category.
+
+## Visual compositions - Browser
+
+- [Loading](https://codedvisuals.com/visuals/browser/loading): Loading visual composition in the Browser category.
+- [Simple](https://codedvisuals.com/visuals/browser/simple): Simple visual composition in the Browser category.
+- [Tabs](https://codedvisuals.com/visuals/browser/tabs): Tabs visual composition in the Browser category.
+
+## Visual compositions - Calendar
+
+- [Date Picker](https://codedvisuals.com/visuals/calendar/date-picker): Date Picker visual composition in the Calendar category.
+- [Event List](https://codedvisuals.com/visuals/calendar/event-list): Event List visual composition in the Calendar category.
+- [Month View](https://codedvisuals.com/visuals/calendar/month-view): Month View visual composition in the Calendar category.
+
+## Visual compositions - Charts
+
+- [Bar](https://codedvisuals.com/visuals/charts/bar): Bar visual composition in the Charts category.
+- [Block Stack](https://codedvisuals.com/visuals/charts/block-stack): Block Stack visual composition in the Charts category.
+- [Donut](https://codedvisuals.com/visuals/charts/donut): Donut visual composition in the Charts category.
+- [Funnel](https://codedvisuals.com/visuals/charts/funnel): Funnel visual composition in the Charts category.
+- [Gauge](https://codedvisuals.com/visuals/charts/gauge): Gauge visual composition in the Charts category.
+- [Heatmap](https://codedvisuals.com/visuals/charts/heatmap): Heatmap visual composition in the Charts category.
+- [Line](https://codedvisuals.com/visuals/charts/line): Line visual composition in the Charts category.
+- [Sparkline](https://codedvisuals.com/visuals/charts/sparkline): Sparkline visual composition in the Charts category.
+
+## Visual compositions - Chat
+
+- [Ai Chat](https://codedvisuals.com/visuals/chat/ai-chat): Ai Chat visual composition in the Chat category.
+- [Bubbles](https://codedvisuals.com/visuals/chat/bubbles): Bubbles visual composition in the Chat category.
+- [Thread](https://codedvisuals.com/visuals/chat/thread): Thread visual composition in the Chat category.
+
+## Visual compositions - Code
+
+- [Editor](https://codedvisuals.com/visuals/code/editor): Editor visual composition in the Code category.
+- [Snippet](https://codedvisuals.com/visuals/code/snippet): Snippet visual composition in the Code category.
+- [Terminal](https://codedvisuals.com/visuals/code/terminal): Terminal visual composition in the Code category.
+
+## Visual compositions - Connections
+
+- [Converge](https://codedvisuals.com/visuals/connections/converge): Converge visual composition in the Connections category.
+- [Flow](https://codedvisuals.com/visuals/connections/flow): Flow visual composition in the Connections category.
+- [Layer Stack](https://codedvisuals.com/visuals/connections/layer-stack): Layer Stack visual composition in the Connections category.
+- [Pipeline](https://codedvisuals.com/visuals/connections/pipeline): Pipeline visual composition in the Connections category.
+- [Sync](https://codedvisuals.com/visuals/connections/sync): Sync visual composition in the Connections category.
+
+## Visual compositions - Dashboard
+
+- [Mini Panel](https://codedvisuals.com/visuals/dashboard/mini-panel): Mini Panel visual composition in the Dashboard category.
+- [Widget Grid](https://codedvisuals.com/visuals/dashboard/widget-grid): Widget Grid visual composition in the Dashboard category.
+
+## Visual compositions - Data
+
+- [Filters](https://codedvisuals.com/visuals/data/filters): Filters visual composition in the Data category.
+- [Import](https://codedvisuals.com/visuals/data/import): Import visual composition in the Data category.
+- [Query](https://codedvisuals.com/visuals/data/query): Query visual composition in the Data category.
+- [Table](https://codedvisuals.com/visuals/data/table): Table visual composition in the Data category.
+
+## Visual compositions - Devices
+
+- [Laptop](https://codedvisuals.com/visuals/devices/laptop): Laptop visual composition in the Devices category.
+- [Phone](https://codedvisuals.com/visuals/devices/phone): Phone visual composition in the Devices category.
+- [Tablet](https://codedvisuals.com/visuals/devices/tablet): Tablet visual composition in the Devices category.
+
+## Visual compositions - Email
+
+- [Compose](https://codedvisuals.com/visuals/email/compose): Compose visual composition in the Email category.
+- [Inbox](https://codedvisuals.com/visuals/email/inbox): Inbox visual composition in the Email category.
+
+## Visual compositions - Files
+
+- [Explorer](https://codedvisuals.com/visuals/files/explorer): Explorer visual composition in the Files category.
+- [Simple](https://codedvisuals.com/visuals/files/simple): Simple visual composition in the Files category.
+- [Stacked](https://codedvisuals.com/visuals/files/stacked): Stacked visual composition in the Files category.
+- [Upload](https://codedvisuals.com/visuals/files/upload): Upload visual composition in the Files category.
+
+## Visual compositions - Geo
+
+- [Edge Network](https://codedvisuals.com/visuals/geo/edge-network): Edge Network visual composition in the Geo category.
+- [Geofence](https://codedvisuals.com/visuals/geo/geofence): Geofence visual composition in the Geo category.
+- [Globe](https://codedvisuals.com/visuals/geo/globe): Globe visual composition in the Geo category.
+- [Pin Drop](https://codedvisuals.com/visuals/geo/pin-drop): Pin Drop visual composition in the Geo category.
+- [World Map](https://codedvisuals.com/visuals/geo/world-map): World Map visual composition in the Geo category.
+
+## Visual compositions - Git
+
+- [Branch Graph](https://codedvisuals.com/visuals/git/branch-graph): Branch Graph visual composition in the Git category.
+- [Diff](https://codedvisuals.com/visuals/git/diff): Diff visual composition in the Git category.
+- [Pull Request](https://codedvisuals.com/visuals/git/pull-request): Pull Request visual composition in the Git category.
+
+## Visual compositions - Images
+
+- [Carousel](https://codedvisuals.com/visuals/images/carousel): Carousel visual composition in the Images category.
+- [Gallery](https://codedvisuals.com/visuals/images/gallery): Gallery visual composition in the Images category.
+
+## Visual compositions - Integrations
+
+- [Hub](https://codedvisuals.com/visuals/integrations/hub): Hub visual composition in the Integrations category.
+- [Logo Orbit](https://codedvisuals.com/visuals/integrations/logo-orbit): Logo Orbit visual composition in the Integrations category.
+- [Logo Marquee](https://codedvisuals.com/visuals/integrations/logo-marquee): Logo Marquee visual composition in the Integrations category.
+- [Logo Reel](https://codedvisuals.com/visuals/integrations/logo-reel): Logo Reel visual composition in the Integrations category.
+- [Plugin Slot](https://codedvisuals.com/visuals/integrations/plugin-slot): Plugin Slot visual composition in the Integrations category.
+
+## Visual compositions - Keyboard
+
+- [Half](https://codedvisuals.com/visuals/keyboard/half): Half visual composition in the Keyboard category.
+- [Isometric Keys](https://codedvisuals.com/visuals/keyboard/isometric-keys): Isometric Keys visual composition in the Keyboard category.
+- [Shortcut](https://codedvisuals.com/visuals/keyboard/shortcut): Shortcut visual composition in the Keyboard category.
+
+## Visual compositions - Media
+
+- [Audio Waveform](https://codedvisuals.com/visuals/media/audio-waveform): Audio Waveform visual composition in the Media category.
+- [Video Player](https://codedvisuals.com/visuals/media/video-player): Video Player visual composition in the Media category.
+
+## Visual compositions - Metrics
+
+- [Comparison](https://codedvisuals.com/visuals/metrics/comparison): Comparison visual composition in the Metrics category.
+- [Stat Card](https://codedvisuals.com/visuals/metrics/stat-card): Stat Card visual composition in the Metrics category.
+- [Trend](https://codedvisuals.com/visuals/metrics/trend): Trend visual composition in the Metrics category.
+
+## Visual compositions - Notifications
+
+- [Bell](https://codedvisuals.com/visuals/notifications/bell): Bell visual composition in the Notifications category.
+- [List](https://codedvisuals.com/visuals/notifications/list): List visual composition in the Notifications category.
+- [Toast](https://codedvisuals.com/visuals/notifications/toast): Toast visual composition in the Notifications category.
+
+## Visual compositions - Payments
+
+- [Checkout](https://codedvisuals.com/visuals/payments/checkout): Checkout visual composition in the Payments category.
+- [Credit Card](https://codedvisuals.com/visuals/payments/credit-card): Credit Card visual composition in the Payments category.
+- [Usage Meter](https://codedvisuals.com/visuals/payments/usage-meter): Usage Meter visual composition in the Payments category.
+
+## Visual compositions - Search
+
+- [Command Palette](https://codedvisuals.com/visuals/search/command-palette): Command Palette visual composition in the Search category.
+- [Results](https://codedvisuals.com/visuals/search/results): Results visual composition in the Search category.
+- [Semantic](https://codedvisuals.com/visuals/search/semantic): Semantic visual composition in the Search category.
+
+## Visual compositions - Sections
+
+- [Auth](https://codedvisuals.com/visuals/sections/auth): Auth visual composition in the Sections category.
+- [Backgrounds](https://codedvisuals.com/visuals/sections/backgrounds): Backgrounds visual composition in the Sections category.
+- [Bento](https://codedvisuals.com/visuals/sections/bento): Bento visual composition in the Sections category.
+- [Blog](https://codedvisuals.com/visuals/sections/blog): Blog visual composition in the Sections category.
+- [Blog Post](https://codedvisuals.com/visuals/sections/blog-post): Blog Post visual composition in the Sections category.
+- [Comments](https://codedvisuals.com/visuals/sections/comments): Comments visual composition in the Sections category.
+- [Components](https://codedvisuals.com/visuals/sections/components): Components visual composition in the Sections category.
+- [Contact](https://codedvisuals.com/visuals/sections/contact): Contact visual composition in the Sections category.
+- [Cta](https://codedvisuals.com/visuals/sections/cta): Cta visual composition in the Sections category.
+- [Error](https://codedvisuals.com/visuals/sections/error): Error visual composition in the Sections category.
+- [Faq](https://codedvisuals.com/visuals/sections/faq): Faq visual composition in the Sections category.
+- [Features](https://codedvisuals.com/visuals/sections/features): Features visual composition in the Sections category.
+- [Footers](https://codedvisuals.com/visuals/sections/footers): Footers visual composition in the Sections category.
+- [Headers](https://codedvisuals.com/visuals/sections/headers): Headers visual composition in the Sections category.
+- [Hero](https://codedvisuals.com/visuals/sections/hero): Hero visual composition in the Sections category.
+- [Logos](https://codedvisuals.com/visuals/sections/logos): Logos visual composition in the Sections category.
+- [Newsletter](https://codedvisuals.com/visuals/sections/newsletter): Newsletter visual composition in the Sections category.
+- [Pricing](https://codedvisuals.com/visuals/sections/pricing): Pricing visual composition in the Sections category.
+- [Process](https://codedvisuals.com/visuals/sections/process): Process visual composition in the Sections category.
+- [Stats](https://codedvisuals.com/visuals/sections/stats): Stats visual composition in the Sections category.
+- [Team](https://codedvisuals.com/visuals/sections/team): Team visual composition in the Sections category.
+- [Testimonials](https://codedvisuals.com/visuals/sections/testimonials): Testimonials visual composition in the Sections category.
+- [Timeline](https://codedvisuals.com/visuals/sections/timeline): Timeline visual composition in the Sections category.
+
+## Visual compositions - Security
+
+- [Fingerprint](https://codedvisuals.com/visuals/security/fingerprint): Fingerprint visual composition in the Security category.
+- [Lock](https://codedvisuals.com/visuals/security/lock): Lock visual composition in the Security category.
+- [Shield](https://codedvisuals.com/visuals/security/shield): Shield visual composition in the Security category.
+- [Two Factor](https://codedvisuals.com/visuals/security/two-factor): Two Factor visual composition in the Security category.
+
+## Visual compositions - States
+
+- [Empty](https://codedvisuals.com/visuals/states/empty): Empty visual composition in the States category.
+- [Error](https://codedvisuals.com/visuals/states/error): Error visual composition in the States category.
+- [Maintenance](https://codedvisuals.com/visuals/states/maintenance): Maintenance visual composition in the States category.
+- [Not Found](https://codedvisuals.com/visuals/states/not-found): Not Found visual composition in the States category.
+
+## Visual compositions - Status
+
+- [Health Check](https://codedvisuals.com/visuals/status/health-check): Health Check visual composition in the Status category.
+- [Resource Monitor](https://codedvisuals.com/visuals/status/resource-monitor): Resource Monitor visual composition in the Status category.
+- [Uptime Bar](https://codedvisuals.com/visuals/status/uptime-bar): Uptime Bar visual composition in the Status category.
+
+## Visual compositions - Tasks
+
+- [Checklist](https://codedvisuals.com/visuals/tasks/checklist): Checklist visual composition in the Tasks category.
+- [Kanban](https://codedvisuals.com/visuals/tasks/kanban): Kanban visual composition in the Tasks category.
+- [Sort Lanes](https://codedvisuals.com/visuals/tasks/sort-lanes): Sort Lanes visual composition in the Tasks category.
+
+## Documentation
+
+- [AI agents](https://codedvisuals.com/docs/ai-agents): Let your AI agent pick, install, and place CodedVisuals compositions with the CodedVisuals skill or the official shadcn MCP server.
+- [Installation](https://codedvisuals.com/docs/installation): Connect the private CodedVisuals registry once, then add any composition to your shadcn/ui project with a single shadcn CLI command.
+- [Introduction](https://codedvisuals.com/docs): CodedVisuals is a library of animated visual compositions you copy straight into your React marketing pages.
+- [Manual setup](https://codedvisuals.com/docs/manual-setup): Configure a React, Tailwind CSS v4, and TypeScript project without shadcn/ui so CodedVisuals compositions work end to end.
+- [Usage](https://codedvisuals.com/docs/usage): Place a visual composition in your layout, control its animation, and customize it through typed props or directly.

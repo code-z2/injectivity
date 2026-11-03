@@ -9,8 +9,8 @@ function seedGraph(db: { prepare(sql: string): { run(...p: unknown[]): void } })
   ] as const;
   for (const [hash, from, to] of rows) {
     db.prepare(
-      `INSERT INTO transfers (tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
-       VALUES (?,?,?,?,?,?,?,?,?)`,
+      `INSERT INTO transfers (uid, tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
+       VALUES (?1,?1,?2,?3,?4,?5,?6,?7,?8,?9)`,
     ).run(
       hash,
       'ethereum',

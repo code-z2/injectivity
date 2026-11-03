@@ -8,8 +8,8 @@ function seedReport(db: {
 }) {
   const hashA = `0x${'a'.repeat(64)}`;
   db.prepare(
-    `INSERT INTO transfers (tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
-     VALUES (?,?,?,?,?,?,?,?,?)`,
+    `INSERT INTO transfers (uid, tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
+     VALUES (?1,?1,?2,?3,?4,?5,?6,?7,?8,?9)`,
   ).run(
     hashA,
     'ethereum',

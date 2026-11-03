@@ -14,6 +14,11 @@ interface OfacSeed {
 interface ExploitSeed {
   meta: { generated: string };
   exploits: {
+    id: string;
+    date: string;
+    chains: string[];
+    loss_usd: number;
+    technique: string;
     protocol: string;
     sources?: string[];
     hacker_addresses: { address: string; chain: string; label: string }[];
@@ -30,6 +35,13 @@ const pyList = (arr: string[]): string => `[${arr.map((s) => JSON.stringify(s)).
 
 const ofac = JSON.parse(readFileSync(join(ROOT, 'data/seeds/ofac.json'), 'utf8')) as OfacSeed;
 const ex = JSON.parse(readFileSync(join(ROOT, 'data/seeds/exploits.json'), 'utf8')) as ExploitSeed;
+interface ProtocolSeed {
+  meta: { generated: string };
+  protocols: { address: string; name: string; kind: string; chain: string }[];
+}
+const proto = JSON.parse(
+  readFileSync(join(ROOT, 'data/seeds/protocols.json'), 'utf8'),
+) as ProtocolSeed;
 const ofacV = ofac.meta.lists_branch_commit;
 const exV = ex.meta.generated;
 
@@ -62,11 +74,30 @@ for (const e of ex.exploits) {
   }
 }
 
+// Protocol contracts (routers, aggregators, bridges, mixers): role = kind.
+const rowsProto = proto.protocols.map(
+  (p) =>
+    `INSERT OR REPLACE INTO risk_lists VALUES ('protocol',${q(p.address)},${q(pyList([p.chain]))},` +
+    `${q(p.kind)},${q(p.name)},'data/seeds/protocols.json',${q(proto.meta.generated)});`,
+);
+
+// Whole exploit records for the agent's search_exploits tool.
+const rowsExploits = ex.exploits.map(
+  (e) =>
+    `INSERT OR REPLACE INTO exploits VALUES (${q(e.id)},${q(e.protocol)},${q(e.date)},` +
+    `${q(pyList(e.chains))},${Number(e.loss_usd) || 0},${q(e.technique ?? '')},${q(JSON.stringify(e))});`,
+);
+
 const out = [
   `INSERT OR REPLACE INTO seed_versions VALUES ('OFAC SDN',${q(ofacV)},${q(ofac.meta.fetched)},${rowsOfac.length});`,
   `INSERT OR REPLACE INTO seed_versions VALUES ('exploit',${q(exV)},${q(exV)},${rowsEx.length});`,
   ...rowsOfac,
+  `INSERT OR REPLACE INTO seed_versions VALUES ('protocol',${q(proto.meta.generated)},${q(proto.meta.generated)},${rowsProto.length});`,
   ...rowsEx,
+  ...rowsProto,
+  ...rowsExploits,
 ];
 writeFileSync(join(ROOT, 'workers/api/sql/seed.sql'), out.join('\n') + '\n');
-console.log(`seed.sql: ${rowsOfac.length} ofac + ${rowsEx.length} exploit rows`);
+console.log(
+  `seed.sql: ${rowsOfac.length} ofac + ${rowsEx.length} exploit rows + ${rowsProto.length} protocols + ${rowsExploits.length} exploits`,
+);

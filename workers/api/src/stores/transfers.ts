@@ -1,5 +1,5 @@
 // transfers cache (Alchemy payloads), freshness-aware.
-import type { Transfer } from '@/alchemy';
+import { normalizeTransfer, type Transfer } from '@/alchemy';
 import type { Env } from '@/types';
 
 export function nowIso(): string {
@@ -32,7 +32,7 @@ export async function cachedTransfers(
         : '(from_addr = ? OR to_addr = ?)';
   const binds = direction === 'both' ? [chain, addr, addr] : [chain, addr];
   const rows = await env.DB.prepare(
-    `SELECT tx_hash, from_addr, to_addr, asset, amount, block_number, fetched_at
+    `SELECT tx_hash, from_addr, to_addr, asset, amount, block_number, raw, fetched_at
      FROM transfers WHERE chain = ? AND ${clause}
      ORDER BY block_number DESC LIMIT 100`,
   )
@@ -44,19 +44,37 @@ export async function cachedTransfers(
       asset: string;
       amount: string;
       block_number: number;
+      raw: string;
       fetched_at: string;
     }>();
   const list = rows.results ?? [];
-  const transfers: Transfer[] = list.map((r) => ({
-    hash: r.tx_hash,
-    from: r.from_addr,
-    to: r.to_addr,
-    asset: r.asset,
-    value: r.amount,
-    blockNum: '0x' + r.block_number.toString(16),
-  }));
+  const transfers: Transfer[] = list.map((r) => {
+    // The stored payload carries token contract, time and category.
+    try {
+      const raw = JSON.parse(r.raw) as Transfer;
+      if (raw && raw.hash) return normalizeTransfer(raw);
+    } catch {
+      // Fall through to the columns.
+    }
+    return {
+      hash: r.tx_hash,
+      from: r.from_addr,
+      to: r.to_addr,
+      asset: r.asset,
+      value: r.amount,
+      blockNum: '0x' + r.block_number.toString(16),
+    };
+  });
   const isFresh = list.length > 0 && list.every((r) => fresh(r.fetched_at, env));
   return { rows: transfers, fresh: isFresh };
+}
+
+/** Row key: Alchemy's uniqueId, else the transfer's own fields (one tx can carry several). */
+export function transferUid(t: Transfer): string {
+  return (
+    t.uniqueId ??
+    `${t.hash}:${t.from.toLowerCase()}:${t.to.toLowerCase()}:${t.contract ?? t.asset ?? ''}:${t.value ?? ''}`
+  );
 }
 
 export async function storeTransfers(
@@ -68,9 +86,10 @@ export async function storeTransfers(
   const stmts = transfers.map((t) =>
     env.DB.prepare(
       `INSERT OR REPLACE INTO transfers
-       (tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
-       VALUES (?,?,?,?,?,?,?,?,?)`,
+       (uid, tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
+       VALUES (?,?,?,?,?,?,?,?,?,?)`,
     ).bind(
+      transferUid(t),
       t.hash,
       chain,
       t.from.toLowerCase(),

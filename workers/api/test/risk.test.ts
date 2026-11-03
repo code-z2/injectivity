@@ -26,8 +26,8 @@ describe('risk match types', () => {
   test('one-hop counterparty is inferred, never verified', async () => {
     const { app, env, db } = makeTestEnv();
     db.prepare(
-      `INSERT INTO transfers (tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
-       VALUES (?,?,?,?,?,?,?,?,?)`,
+      `INSERT INTO transfers (uid, tx_hash, chain, from_addr, to_addr, asset, amount, block_number, raw, fetched_at)
+       VALUES (?1,?1,?2,?3,?4,?5,?6,?7,?8,?9)`,
     ).run(
       `0x${'c'.repeat(64)}`,
       'ethereum',

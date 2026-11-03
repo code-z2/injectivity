@@ -2,7 +2,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { alchemyClient } from '@/alchemy';
+import { alchemyClient, hasLiveRpc } from '@/alchemy';
 import { chainBase } from '@/constants/chains';
 import { nowIso } from '@/stores/transfers';
 import { traceFunds } from '@/stores/trace';
@@ -39,7 +39,7 @@ export function createTraceRoutes(client: AlchemyClient = alchemyClient) {
         address,
         query,
       );
-      if (empty && !c.env.ALCHEMY_API_KEY) {
+      if (empty && !hasLiveRpc(c.env, chain)) {
         return c.json(
           {
             address: address.toLowerCase(),
@@ -47,7 +47,7 @@ export function createTraceRoutes(client: AlchemyClient = alchemyClient) {
             live: false,
             cached: false,
             fetched_at: nowIso(),
-            note: 'no cached transfers and no ALCHEMY_API_KEY: nothing to trace',
+            note: 'no cached transfers and no live RPC: nothing to trace',
           },
           502,
         );

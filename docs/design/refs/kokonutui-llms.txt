@@ -1,0 +1,165 @@
+# Kokonut UI
+
+> Kokonut UI is a free, open-source library of React components built with Tailwind CSS, Motion and shadcn/ui. Install any of them with one command or one prompt.
+
+Components are installed with the shadcn CLI, e.g.
+`npx shadcn@latest add @kokonutui/card-flip`. Each page below links to
+its Markdown source, which includes the install command and the full
+component source code.
+
+To set Kokonut UI up in a project, follow https://kokonutui.com/setup.md.
+
+- [Installation](https://kokonutui.com/docs.md): Install Kokonut UI components in any React or Next.js project with the shadcn CLI, using namespaces or direct registry URLs. No extra setup required.
+- [Agents](https://kokonutui.com/docs/agents.md): Use Kokonut UI with Claude Code, Cursor, VS Code or Codex. Connect the shadcn MCP server, add a rules file, and give your agent the docs as Markdown.
+- [Changelog](https://kokonutui.com/docs/changelog.md): New and updated Kokonut UI components, release by release, with a link to each component and its pull request.
+- [Templates](https://kokonutui.com/docs/templates.md): Full websites built with Kokonut UI, available with Kokonut UI Pro. Open a live preview, or get the source when one fits your project.
+- [Pro components](https://kokonutui.com/docs/pro.md): A look at Kokonut UI Pro, the larger paid collection. Heroes, page sections, app UI, cards, inputs, forms, pricing and full pages, shown as stills.
+
+## Backgrounds
+
+- [Background Components](https://kokonutui.com/docs/backgrounds.md): Free animated React backgrounds and hero sections: dot fields, flow fields, ink, caustics and rain on glass, built with Tailwind CSS, canvas and WebGL.
+- [Dot Field](https://kokonutui.com/docs/backgrounds/dot-field.md): A halftone dot membrane that ripples behind a swipe and rings out from a click, built with React and Canvas.
+- [Background Paths](https://kokonutui.com/docs/backgrounds/background-paths.md): A ribbon of lines in one color that keeps flowing at any size and parts around the cursor.
+- [Shape Hero](https://kokonutui.com/docs/backgrounds/shape-hero.md): A landing hero where shapes drop in, pile up under the headline and can be grabbed and thrown.
+- [Wind](https://kokonutui.com/docs/backgrounds/flow-field.md): Streamlines that part around the cursor, swirl in its wake and scatter on click, built with React and Canvas.
+- [Topo Background](https://kokonutui.com/docs/backgrounds/topo-background.md): A living contour map that drifts, rises under the cursor and ripples on click, built with React and Canvas.
+- [Drape Background](https://kokonutui.com/docs/backgrounds/drape-background.md): A pleated curtain in a breeze that you can push and pull, built with React, WebGL and a cloth simulation.
+- [Halftone Background](https://kokonutui.com/docs/backgrounds/halftone-background.md): Any image, or a lit sphere, printed as a halftone dot screen, with a loupe that looks closer under the cursor, built with React and canvas.
+- [Ink Background](https://kokonutui.com/docs/backgrounds/ink-background.md): A hero written in ink on water. Stir it and the letters bleed, click to drop ink, and the headline gathers itself again. Built with WebGL.
+- [Caustics Background](https://kokonutui.com/docs/backgrounds/caustics-background.md): A hero on the floor of a pool. Light ripples across it, clicks drop rings that bend the light, and the headline's shadow wobbles below.
+- [Rain Glass Background](https://kokonutui.com/docs/backgrounds/rain-glass-background.md): A hero seen through a rainy window. Drops gather and run, each a tiny lens on the view, and dragging wipes the fog off the glass.
+- [Rhythm Hero](https://kokonutui.com/docs/backgrounds/rhythm-hero.md): A health and sleep app hero with hairline rings breathing a 4-7-8 cycle, a week of sleep-stage bars and calm stats. Part of Kokonut UI Pro.
+- [Dither Reveal Hero](https://kokonutui.com/docs/backgrounds/dither-reveal-hero.md): An image generation hero where a drawn scene resolves from coarse dither to full detail as the prompt types. Part of Kokonut UI Pro.
+
+## Cards
+
+- [Card Components](https://kokonutui.com/docs/cards.md): Free React card components: flip cards, card stacks, widget grids, activity rings, receipts and metric cards, animated with Motion and styled with Tailwind CSS.
+- [Flick Card](https://kokonutui.com/docs/cards/card-flip.md): A two-sided card you spin with a drag or a flick, with thickness, light and a floor shadow that follow the angle.
+- [Throw Deck](https://kokonutui.com/docs/cards/card-stack.md): A pile of image cards you drag, flick off the top and send under the deck, with arrow keys and a details view.
+- [Now Playing](https://kokonutui.com/docs/cards/liquid-glass-card.md): Music card with a spinning disc you can grab and turn to scrub, built with React and Tailwind CSS.
+- [Apple Activity Card](https://kokonutui.com/docs/cards/apple-activity-card.md): Activity rings that draw with a count-up, lap past 100% with a shadowed end cap and dim to focus, built with React and Motion.
+- [Widget Grid](https://kokonutui.com/docs/cards/bento-grid.md): Dashboard widgets you lift, drag and resize on a 6-column grid, with spring physics and full keyboard support.
+- [Currency Transfer](https://kokonutui.com/docs/cards/currency-transfer.md): Transfer tracker that converts the amount in place, walks through each step on a filling rail and ends with a copyable reference.
+- [Momentum Rail](https://kokonutui.com/docs/cards/carousel-cards.md): A card rail you flick with momentum, snapping on a spring, with scroll-driven cover-flow depth and parallax.
+- [Notification Stack](https://kokonutui.com/docs/cards/notification-stack.md): Stacked notifications that fan out on hover and swipe away, built with React and Tailwind CSS.
+- [Liquid Gauge](https://kokonutui.com/docs/cards/liquid-gauge.md): A usage meter filled with liquid that sloshes, ripples and bubbles, built with React and a wave simulation.
+- [Activity Terrain](https://kokonutui.com/docs/cards/activity-terrain.md): A contribution heatmap that tilts up into a 3D terrain you can turn, built with React and canvas.
+- [Page Flip](https://kokonutui.com/docs/cards/page-flip.md): A book you turn by the corner. Drag a page over the spine or tap to turn it.
+- [Receipt Printer](https://kokonutui.com/docs/cards/receipt-printer.md): A receipt that prints line by line, then tears off and falls when you pull it, built with React.
+- [Metric Card](https://kokonutui.com/docs/cards/metric-card.md): A revenue KPI card. Scrub a day, drag a range, or pick a segment; the number rolls, the line morphs and the breakdown follows.
+- [Uptime Card](https://kokonutui.com/docs/cards/uptime-card.md): A status page card with 90 days per service that swell under the cursor, and a day you click opens its incident log.
+- [Spending Ring](https://kokonutui.com/docs/cards/spending-ring.md): A spending breakdown you spin like a dial; flick the ring and it settles with a category under the marker.
+- [Boarding Pass](https://kokonutui.com/docs/cards/boarding-pass.md): A boarding pass that keeps itself current. When the gate or times change, only the changed characters roll over, the old value struck through.
+- [Lightbox Grid](https://kokonutui.com/docs/cards/lightbox-grid.md): A photo grid whose thumbnails grow into a full view and fly back to their slot when you drag them down.
+- [Onboarding Checklist](https://kokonutui.com/docs/cards/onboarding-checklist.md): A get-started checklist with a progress ring, steps that collapse as you check them and an all-set state at the end. Part of Kokonut UI Pro.
+
+## Navigation
+
+- [Navigation Components](https://kokonutui.com/docs/navigation.md): Free React navigation components: command palette, account menu, tabs, drawers, marking menus and scroll index, animated with Motion and Tailwind CSS.
+- [Split Nav](https://kokonutui.com/docs/navigation/morphic-navbar.md): Navigation bar that splits around the active link, with drag-to-scrub, flick projection and an optional compact fold.
+- [Tool Dock](https://kokonutui.com/docs/navigation/toolbar.md): An editor tool dock with a sliding selection plate, shortcut tooltips and flyouts that you can throw to any edge.
+- [Swipe Tabs](https://kokonutui.com/docs/navigation/smooth-tab.md): Tabs with a swipeable panel, a drag-tracked indicator and spring physics.
+- [Account Menu](https://kokonutui.com/docs/navigation/profile-dropdown.md): An account card that morphs into its own menu, with account switching, status, theme and hold-to-sign-out.
+- [Command Palette](https://kokonutui.com/docs/navigation/action-search-bar.md): ⌘K command palette with nested pages, fuzzy matching and in-row progress for running actions.
+- [Smooth Drawer](https://kokonutui.com/docs/navigation/smooth-drawer.md): Checkout bottom sheet on Vaul snap points, peeking at the total and dragging up for details.
+- [Marking Menu](https://kokonutui.com/docs/navigation/marking-menu.md): A radial menu you hold to open or flick to pick blind, built with React and Motion.
+- [Scroll Index](https://kokonutui.com/docs/navigation/scroll-index.md): A section rail for long pages, with a tick per heading that you can hover, click or drag to scrub, built with React.
+- [Status Island](https://kokonutui.com/docs/navigation/status-island.md): A pill that reports background work, reshaping as tasks change and opening into a list of everything in flight.
+- [Stack Panel](https://kokonutui.com/docs/navigation/stack-panel.md): A panel that drills into pages like settings on a phone. The tapped row's label flies up into the title, and a swipe right takes you back.
+
+## Inputs
+
+- [Input Components](https://kokonutui.com/docs/inputs.md): Free React input components: file upload, date and slot pickers, wheel picker, signature pad, card field, seat map and sliders, built with Tailwind CSS.
+- [File Upload](https://kokonutui.com/docs/inputs/file-upload.md): A multi-file upload queue with per-file progress, retry and cancel.
+- [Avatar Picker](https://kokonutui.com/docs/inputs/avatar-picker.md): Generated avatars from a name, morphing as you type, on a 3D coin you can flick, tap or shuffle.
+- [Team Selector](https://kokonutui.com/docs/inputs/team-selector.md): Seat picker with a scrubbable number, generated avatars and an optional rolling price line.
+- [Loader](https://kokonutui.com/docs/inputs/loader.md): Animated loading indicator with rotating gradient rings, size variants and customizable title text. Built with React and Tailwind CSS.
+- [Detent Dial](https://kokonutui.com/docs/inputs/detent-dial.md): Rotary knob that clicks from notch to notch and coasts when flicked, built with React and Motion.
+- [Wheel Picker](https://kokonutui.com/docs/inputs/wheel-picker.md): iOS-style 3D drum picker with flick momentum, built with React and Motion.
+- [Liquid Slider](https://kokonutui.com/docs/inputs/liquid-slider.md): A vertical slider you fill like a glass, with a sloshing surface and rising bubbles.
+- [Signature Pad](https://kokonutui.com/docs/inputs/signature-pad.md): A signature field with a sprung pen tip, speed-weighted ink and SVG output.
+- [Time Zone Planner](https://kokonutui.com/docs/inputs/timezone-planner.md): Find a meeting time across time zones. Turn the meeting round a 24-hour dial where each ring is someone's day.
+- [Amount Pad](https://kokonutui.com/docs/inputs/amount-pad.md): A keypad for sending money. Digits spring into place, commas slide them along, and the amount shrinks to fit as it grows.
+- [Seat Map](https://kokonutui.com/docs/inputs/seat-map.md): Pick seats for a show. Drag along a row to take several, and it points out any single seat you'd leave stranded.
+- [Card Field](https://kokonutui.com/docs/inputs/card-field.md): A one-row card input for checkout. The number groups the way the brand prints it, then slides to its last four to make room for expiry and CVC.
+- [Stay Picker](https://kokonutui.com/docs/inputs/stay-picker.md): A date range picker for booking stays. Every night shows its price, sold-out nights are hatched, and your stay is one pill that wraps across weeks.
+- [Slot Picker](https://kokonutui.com/docs/inputs/slot-picker.md): Book a meeting on a day rail. Drag a meeting into a free gap; it hops over existing bookings, resizes in place and shows the host's local time.
+- [Tip Selector](https://kokonutui.com/docs/inputs/tip-selector.md): A tip picker for checkout, set on a tape you drag and flick. The ticks you pass fill in, the amounts roll, and Round up makes the total a whole amount.
+- [Location Picker](https://kokonutui.com/docs/inputs/location-picker.md): Set a pickup point the way ride apps do. Drag the map under a fixed pin; it lifts off its shadow, glides onto the nearest curb, drops, and the street rolls in.
+- [Swatch Fan](https://kokonutui.com/docs/inputs/swatch-fan.md): A color picker shaped like a paint fan deck. Drag it open, pick a hue and a shade, and copy the hex. Part of Kokonut UI Pro.
+- [Price Range](https://kokonutui.com/docs/inputs/price-range.md): A two-handle price filter drawn over a histogram of the results, with a live count. Part of Kokonut UI Pro.
+
+## AI
+
+- [AI Components](https://kokonutui.com/docs/ai.md): Free React components for AI apps: chat inputs with model pickers, tool approvals, citations, diff review, streaming states and more, built with Tailwind CSS.
+- [AI Input Selector](https://kokonutui.com/docs/ai/ai-prompt.md): AI chat input with a model menu, a separate Effort control, file chips you can drop or paste, a / command menu, and Stop while replying.
+- [AI Input Search](https://kokonutui.com/docs/ai/ai-input-search.md): AI composer with a Tools menu (browse, investigate, draft, run code, reason), a model picker and a live trace that stacks each source's avatar as it is read.
+- [AI State Loading](https://kokonutui.com/docs/ai/ai-loading.md): Agent progress as a list of steps with a live log, elapsed time and a summary when done.
+- [AI Text Loading](https://kokonutui.com/docs/ai/ai-text-loading.md): AI thinking text with a soft wave through the letters and words that swap letter by letter.
+- [AI Voice](https://kokonutui.com/docs/ai/ai-voice.md): Voice input with a scrolling waveform, then a take you can play back, discard or send.
+- [AI Tool Approval](https://kokonutui.com/docs/ai/ai-tool-approval.md): Approve or deny an agent's tool calls. Destructive calls need a press and hold, and decided calls fold into a trace with their output.
+- [AI Context Meter](https://kokonutui.com/docs/ai/ai-context-meter.md): How full the context window is, as a ring in the prompt footer that opens a breakdown by source and compacts when it fills.
+- [AI Inline Citations](https://kokonutui.com/docs/ai/ai-citations.md): An answer with source chips beside each claim. One preview glides between chips and lights up the sentence it backs.
+- [AI Diff Review](https://kokonutui.com/docs/ai/ai-diff-review.md): A coding agent's edits streaming in file by file, then reviewed per file with accept, reject and undo.
+- [AI Model Selector](https://kokonutui.com/docs/ai/ai-model-selector.md): Pick a model and how hard it thinks. Effort is a detent track that reshapes for each model and keeps your level when you switch.
+- [AI Token Alternatives](https://kokonutui.com/docs/ai/ai-token-alternatives.md): An answer where every unsure word shows what else the model weighed. Pick another word and the reply writes itself again from there.
+- [AI Conversation Branches](https://kokonutui.com/docs/ai/ai-branches.md): A chat where editing a message starts a new branch. A small tree beside it shows every version, and you can jump between them.
+- [AI Agent Lanes](https://kokonutui.com/docs/ai/ai-agent-lanes.md): A lead agent hands work to sub-agents that run side by side. Each gets a lane of tool calls, and you can scrub through the whole run.
+- [AI Inline Edit](https://kokonutui.com/docs/ai/ai-inline-edit.md): Select text in a document and ask AI to rewrite it. The edit streams in place as a word-level diff you accept, discard or try again.
+- [AI Message Queue](https://kokonutui.com/docs/ai/ai-message-queue.md): Keep typing while the agent works. Follow-ups stack above the composer, where you can reorder, edit or send one now, and go in one by one when the run ends.
+- [AI Redact](https://kokonutui.com/docs/ai/ai-redact.md): Masks names, emails, card numbers and keys as placeholders before a prompt is sent, then fills the real values back into the reply.
+- [AI Memory](https://kokonutui.com/docs/ai/ai-memory.md): An assistant that saves what it learns about you into a memory list. New facts replace the ones they contradict, and you can edit or forget any of them.
+- [AI Autocomplete](https://kokonutui.com/docs/ai/ai-autocomplete.md): A text box that suggests how your sentence ends in grey after the caret. Tab takes it all, the right arrow takes one word, and typing the same letters keeps it.
+- [Slash Command Menu](https://kokonutui.com/docs/ai/slash-command-menu.md): A chat composer with slash commands, a hint bar that spells out each argument and a menu that offers values for it. Part of Kokonut UI Pro.
+- [Image Generation Card](https://kokonutui.com/docs/ai/image-generation-card.md): An AI image panel where Generate resolves the picture from coarse pixel blocks to sharp with a step counter, then four variations land. Part of Kokonut UI Pro.
+
+## Media
+
+- [Media Components](https://kokonutui.com/docs/media.md): Free React media components: clip trimmer, contact sheet, synced transcript, focal point picker and photo straightening, built with Tailwind CSS and Motion.
+- [Clip Trimmer](https://kokonutui.com/docs/media/clip-trimmer.md): A video trim timeline with a filmstrip, handles that snap to whole seconds and a playhead that loops the kept range.
+- [Synced Transcript](https://kokonutui.com/docs/media/synced-transcript.md): A transcript that follows the spoken word, lets you click any word to jump there, and waits when you scroll away.
+- [Focal Point Picker](https://kokonutui.com/docs/media/focal-point-picker.md): Set where a photo's subject is and see every crop follow it live. Hover a crop to see what it cuts.
+- [Photo Straighten](https://kokonutui.com/docs/media/photo-straighten.md): Level a crooked photo on a ruler you drag or flick. The crop grows to hide the corners, and a grid shows while you adjust.
+- [Contact Sheet](https://kokonutui.com/docs/media/contact-sheet.md): Pick from a shoot the way photographers do. Circle a frame in china marker, click again to strike it, and look through a loupe at the detail first.
+- [Audio Player Card](https://kokonutui.com/docs/media/audio-player-card.md): A podcast or voice note player with a scrubbable waveform, chapter tooltips and a speed chip. Part of Kokonut UI Pro.
+
+## Texts
+
+- [Text Animation Components](https://kokonutui.com/docs/texts.md): Free React text animations: typing, split-flap, glitch, marker, spoiler and extruded text for headlines, built with Tailwind CSS and Motion.
+- [Typing Text](https://kokonutui.com/docs/texts/type-writer.md): Typewriter text that makes the odd typo and corrects it, erases by selecting, and blinks its caret only when idle, built with React and Motion.
+- [Dynamic Text](https://kokonutui.com/docs/texts/dynamic-text.md): Morphing text where shared letters travel, old ones fall and new ones land, with decode and cycle modes.
+- [Glitch Text](https://kokonutui.com/docs/texts/glitch-text.md): Flat text that cuts into hard-shifted bands with a thin red/cyan split, on idle, hover or text change.
+- [Extruded Text](https://kokonutui.com/docs/texts/swoosh-text.md): Zinc 3D extruded text lit by your pointer, with letters that press in like keycaps.
+- [Plucked Text](https://kokonutui.com/docs/texts/plucked-text.md): A headline sitting on a string you can pluck, strum and let ring, built with React and real string physics.
+- [Cradle Text](https://kokonutui.com/docs/texts/cradle-text.md): A headline hung like a Newton's cradle, so a knock on one letter clacks through the word, built with React and pendulum physics.
+- [Spoiler Text](https://kokonutui.com/docs/texts/spoiler-text.md): Inline text hidden under drifting specks, like a chat spoiler. A click blows the specks away from the point you touched.
+- [Marker Text](https://kokonutui.com/docs/texts/marker-text.md): Hand-drawn highlights, underlines, circles, boxes and strikes that draw themselves in reading order when the text comes into view.
+- [Shadow Text](https://kokonutui.com/docs/texts/shadow-text.md): A headline that works as a sundial. Each letter casts a long, soft shadow set by the reader's clock, and bringing the pointer close turns it into a lamp.
+- [Split Flap Text](https://kokonutui.com/docs/texts/split-flap-text.md): Departure-board lettering for headlines and status lines. Each tile flips only as far as its new letter, on a hinge, a beat after its neighbour.
+- [Kinetic Type Hero](https://kokonutui.com/docs/texts/kinetic-type-hero.md): A studio hero where an edge-to-edge headline sets itself in and leans away from the cursor. Part of Kokonut UI Pro.
+
+## Buttons
+
+- [Button Components](https://kokonutui.com/docs/buttons.md): Free animated React buttons: hold to confirm, slide to confirm, magnet, particle, undo and save buttons with real feedback, built with Tailwind CSS and Motion.
+- [Particle Button](https://kokonutui.com/docs/buttons/particle-button.md): A status button for async actions, with a spinner, a drawn check and a particle burst on success.
+- [V0 Button](https://kokonutui.com/docs/buttons/v0-button.md): Open in v0 button that sends a component registry JSON to v0.dev for instant editing, built with React, the shadcn Button, and Tailwind CSS.
+- [Gradient Button](https://kokonutui.com/docs/buttons/gradient-button.md): Layered gradient button with emerald, purple and orange variants, a gradient border, a soft inner glow, press feedback and an optional icon.
+- [Magnet Button](https://kokonutui.com/docs/buttons/attract-button.md): A call-to-action button wrapped in a field of iron filings that align to its magnetic field and lean toward your cursor.
+- [Hold Button](https://kokonutui.com/docs/buttons/hold-button.md): Press and hold to confirm, with a fill that drains back on early release and a drawn check on completion.
+- [Command Button](https://kokonutui.com/docs/buttons/command-button.md): A button with its shortcut drawn as keycaps that sink as you press the real keys.
+- [Switch Button](https://kokonutui.com/docs/buttons/switch-button.md): Light and dark theme toggle whose sun folds into a moon while the new theme spreads from the button as a circle.
+- [Slide Text Button](https://kokonutui.com/docs/buttons/slide-text-button.md): Animated link button with a vertical text slide on hover and default and ghost variants, built with React, Next.js Link, and Tailwind CSS.
+- [Pull Cord](https://kokonutui.com/docs/buttons/pull-cord.md): A lamp switch you pull on a swinging cord, built with React and a rope simulation.
+- [Tear Button](https://kokonutui.com/docs/buttons/tear-button.md): A confirm button you tear off like a ticket stub, hole by hole.
+- [Bell Button](https://kokonutui.com/docs/buttons/bell-button.md): A subscribe button whose bell swings and rings, with a clapper that really strikes.
+- [Morph Popover](https://kokonutui.com/docs/buttons/morph-popover.md): A button that grows into the form it opens, with its label sliding up to become the title, then shrinks into a confirmation.
+- [Undo Button](https://kokonutui.com/docs/buttons/undo-button.md): An action button that gives you a few seconds to take it back, with the time left drawn around its own edge.
+- [Slide to Confirm](https://kokonutui.com/docs/buttons/slide-to-confirm.md): A confirm control for payments and other actions you can't take back. Slide the thumb to the end, or flick it.
+- [Save Button](https://kokonutui.com/docs/buttons/save-button.md): A bookmark button that files into collections. Tap to save to the last one, then change it or make a new one from the strip.
+- [Cart Button](https://kokonutui.com/docs/buttons/cart-button.md): An Add button that opens into a quantity stepper in place, with a bin at one and press-and-hold to repeat.
+- [Pay Button](https://kokonutui.com/docs/buttons/pay-button.md): The last button of a checkout, carrying the amount and the card it charges. Part of Kokonut UI Pro.
+
+## Optional
+
+- [Full documentation](https://kokonutui.com/llms-full.txt): Every page concatenated into one file.
+- [Component registry](https://kokonutui.com/r/registry.json): shadcn registry index.

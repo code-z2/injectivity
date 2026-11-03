@@ -35,13 +35,13 @@ const MAX_DIAGRAM_NODES = 14;
 const short = (a: string) => (a.length > 14 ? `${a.slice(0, 6)}..${a.slice(-4)}` : a);
 
 // Standard 14 fonts are WinAnsi-only: strip anything outside Latin-1.
-const win = (s: string) =>
+export const win = (s: string) =>
   s
     .replace(/[^\x20-\xFF]/g, '?')
     .replace(/\s+/g, ' ')
     .trim();
 
-function wrap(s: string, max: number): string[] {
+export function wrap(s: string, max: number): string[] {
   const words = win(s).split(' ');
   const lines: string[] = [];
   let cur = '';
@@ -57,7 +57,7 @@ function wrap(s: string, max: number): string[] {
   return lines.length > 0 ? lines : [''];
 }
 
-class Doc {
+export class Doc {
   doc!: PDFDocument;
   font!: PDFFont;
   bold!: PDFFont;

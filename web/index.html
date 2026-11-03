@@ -3,15 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8fa" />
+    <link rel="icon" href="/mark.svg" type="image/svg+xml" />
     <title>Intel Terminal — on-chain security investigations</title>
-    <style>
-      html {
-        background: #0a0e12;
-      }
-    </style>
+    <script>
+      // Theme before first paint (see src/lib/theme.ts).
+      (function () {
+        try {
+          var m = localStorage.getItem("intel-terminal:theme");
+          var dark =
+            m === "dark" ||
+            (m !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+          if (dark) {
+            document.documentElement.classList.add("dark");
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

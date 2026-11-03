@@ -1,7 +1,7 @@
 // API-2: bounded multi-hop fund-flow tracing (depth <= 2).
 // BFS over cached transfers, live Alchemy per expansion only on cache
 // miss. Shared-counterparty detection lives here, not in the UI.
-import type { Transfer } from '@/alchemy';
+import { hasLiveRpc, type Transfer } from '@/alchemy';
 import type { AlchemyClient, Env } from '@/types';
 import { riskLabels } from '@/stores/risk';
 import { cachedTransfers, fresh, nowIso, storeTransfers } from '@/stores/transfers';
@@ -99,7 +99,7 @@ export async function traceFunds(
   const direction = opts.direction ?? 'both';
   const depth = Math.min(Math.max(opts.depth ?? 2, 1), 2);
   const fanout = Math.min(Math.max(opts.fanout ?? 25, 1), 100);
-  const keyed = Boolean(env.ALCHEMY_API_KEY);
+  const keyed = hasLiveRpc(env, chain);
 
   const nodes = new Map<string, { depth: number }>();
   const edges = new Map<string, TraceEdge>();

@@ -1,18 +1,15 @@
-import stylex from "@stylexjs/unplugin";
-import vue from "@vitejs/plugin-vue";
+import tailwindcss from "@tailwindcss/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-
-const rootDir = new URL(".", import.meta.url).pathname;
 
 export default defineConfig({
   plugins: [
-    stylex.vite({
-      unstable_moduleResolution: {
-        type: "experimental_crossFileParsing",
-        rootDir,
-      },
-    }),
-    vue(),
+    // Router plugin must run before React so generated routes are typed.
+    tanstackRouter({ target: "react", autoCodeSplitting: true }),
+    react(),
+    tailwindcss(),
   ],
+  resolve: { alias: { "@": new URL("./src", import.meta.url).pathname } },
   server: { port: 5173 },
 });

@@ -1,0 +1,153 @@
+{
+ "meta": {
+  "generated": "2026-11-03",
+  "criteria": "Protocol contracts funds commonly pass through (DEX routers, aggregators, bridges, mixers). Each address verified on-chain (code present) on 2026-11-03; Sourcify name recorded where verified.",
+  "chain": "ethereum"
+ },
+ "protocols": [
+  {
+   "address": "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
+   "name": "Uniswap V2 Router",
+   "kind": "dex",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0xe592427a0aece92de3edee1f18e0157c05861564",
+   "name": "Uniswap V3 Router",
+   "kind": "dex",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45",
+   "name": "Uniswap V3 Router 2",
+   "kind": "dex",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+   "name": "Uniswap Universal Router",
+   "kind": "dex",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+   "name": "Uniswap Universal Router (v4)",
+   "kind": "dex",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x1111111254eeb25477b68fb85ed929f73a960582",
+   "name": "1inch Router v5",
+   "kind": "aggregator",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x111111125421ca6dc452d289314280a0f8842a65",
+   "name": "1inch Router v6",
+   "kind": "aggregator",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0xdef1c0ded9bec7f1a1670819833240f027b25eff",
+   "name": "0x Exchange Proxy",
+   "kind": "aggregator",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0xdef171fe48cf0115b1d80b88dc8eab59176fee57",
+   "name": "ParaSwap Augustus v5",
+   "kind": "aggregator",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x6a000f20005980200259b80c5102003040001068",
+   "name": "ParaSwap Augustus v6.2",
+   "kind": "aggregator",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x6bb000067005450704003100632eb93ea00c0000",
+   "name": "ParaSwap Augustus executor",
+   "kind": "aggregator",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+   "name": "CoW Protocol settlement",
+   "kind": "aggregator",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0xba12222222228d8ba445958a75a0704d566bf2c8",
+   "name": "Balancer V2 vault",
+   "kind": "dex",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0xd37bbe5744d730a1d98d8dc97c42f0ca46ad7146",
+   "name": "THORChain router",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x3624525075b88b24ecc29ce226b0cec1ffcb6976",
+   "name": "THORChain router (old)",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x3ee18b2214aff97000d974cf647e7c347e8fa585",
+   "name": "Wormhole token bridge",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x8731d54e9d02c286767d56ac03e8037c07e01e98",
+   "name": "Stargate router",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x5c7bcd6e7de5423a257d81b442095a1a6ced35c5",
+   "name": "Across spoke pool",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x2796317b0ff8538f253012862c06787adfb8ceb6",
+   "name": "Synapse bridge",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x5427fefa711eff984124bfbb1ab6fbf5e3da1820",
+   "name": "Celer cBridge",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x4dbd4fc535ac27206064b68ffcf827b0a60bab3f",
+   "name": "Arbitrum delayed inbox",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x99c9fc46f92e8a1c0dec1b1747d010903e884be1",
+   "name": "Optimism standard bridge",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0x3154cf16ccdb4c6d922629664174b904d80f2c35",
+   "name": "Base standard bridge",
+   "kind": "bridge",
+   "chain": "ethereum"
+  },
+  {
+   "address": "0xfa7093cdd9ee6932b4eb2c9e1cde7ce00b1fa4b9",
+   "name": "Railgun relay",
+   "kind": "mixer",
+   "chain": "ethereum"
+  }
+ ]
+}

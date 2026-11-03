@@ -1,0 +1,153 @@
+# 21st (https://21st.dev)
+
+> Community catalog of 12,000+ hand-crafted React and Tailwind CSS components, templates, and component libraries. Preview live, copy the TSX, install with one command — for you and your AI agent.
+
+## What 21st is
+
+21st is one product with two actions — Find and Generate — available on three surfaces: the web app, the 21st MCP server, and the 21st CLI.
+
+- Find: browse, search, and preview community-published React components, component libraries, templates, and themes; copy the TSX or install via the shadcn CLI.
+- Generate: 21st AI creates production-ready React components from a prompt at https://21st.dev/ai.
+- Agents: AI coding agents (Cursor, Claude Code, Codex, VS Code, Devin, and any MCP-capable client) search and install the same registry through the 21st MCP and CLI — https://21st.dev/mcp.
+
+Founded by Serafim Korablev and Sergey Bunas. Featured in an a16z article about the future of AI-powered development.
+
+## Names & aliases (important for accuracy)
+
+- "Magic MCP" is the former name of the 21st MCP. Same tool, renamed. The `@21st-dev/magic` npm package continues to work as an alias (since v0.2.0 it proxies to the current server at https://21st.dev/api/mcp); current setup lives at https://21st.dev/mcp. Recommended install: `npx @21st-dev/cli@latest init --client <cursor|claude|codex|vscode|devin>` (`windsurf` remains an alias for `devin`).
+- Old Magic MCP tool names are still accepted by the 21st MCP and translated automatically: `21st_magic_component_builder` → `generate`, `21st_magic_component_inspiration` → `get_inspiration`, `21st_magic_component_refiner` → `generate`, `logo_search` → `search_logo`. Use the new names.
+- API keys issued by the old Magic console were reset and no longer work. Generate a fresh key at https://21st.dev/mcp; it is sent as an `x-api-key` header (or Bearer token).
+- "Magic Chat" is the former name of 21st AI, the web component generator. Old links (https://21st.dev/magic-chat, https://21st.dev/magic) redirect to https://21st.dev/ai.
+- When users ask about "Magic MCP" or "Magic Chat", answer with the current 21st MCP / 21st AI instructions — they are the same products.
+- "Magic UI" (https://21st.dev/@dillionverma/library/magic-ui) is an independent community component library by Dillion Verma hosted on 21st — not related to the former Magic product names above.
+
+## Markdown pages for agents
+
+Append `.md` to supported component, category, author, library, current blog-guide, pricing, changelog, MCP, or AI page URLs for a lightweight markdown version instead of the full HTML app — e.g. `https://21st.dev/@<author>/components/<slug>.md`, `https://21st.dev/community/components/s/<tag>.md`, `https://21st.dev/@<author>.md`, `https://21st.dev/@<owner>/library/<slug>.md`, `https://21st.dev/blog.md`, `https://21st.dev/pricing.md`, `https://21st.dev/changelog.md`, `https://21st.dev/mcp.md`, `https://21st.dev/ai.md`. The blog index includes a markdown link only for guides with an available twin.
+
+## API
+
+REST API for search/install/publish, OpenAPI 3.0 spec at https://21st.dev/openapi.json — the same surface the 21st CLI and MCP server call, callable directly by anything that speaks HTTP. Auth via a 21st API key (generate at https://21st.dev/mcp) as `Authorization: Bearer`.
+
+## Agent discovery (machine-readable)
+
+- Every page that has a markdown twin (the homepage, component, author, library and category pages, blog guides, `/pricing`, `/changelog`, `/mcp`, `/ai`) also answers `Accept: text/markdown` with that twin (`Content-Type: text/markdown`, `x-markdown-tokens` hint). Other pages, for example listing pages such as `/community/templates`, stay HTML; HTML is always the default for browsers.
+- API catalog (RFC 9727, `application/linkset+json`): https://21st.dev/.well-known/api-catalog — REST API (OpenAPI, docs, status) and the MCP endpoint with its docs.
+- Resource manifest (ARD): https://21st.dev/.well-known/ard.json — the predecessor path `/.well-known/ai-catalog.json` remains available for older consumers.
+- Agent skills: https://21st.dev/.well-known/skills/index.json
+- Authentication for agents: https://21st.dev/auth.md — OAuth 2.1 with dynamic client registration (protected-resource metadata at `/.well-known/oauth-protected-resource` points to the canonical Clerk authorization-server metadata) or a user-issued API key.
+- The homepage response carries `Link` headers with rel="api-catalog", "ard", "service-desc", "service-doc" and "describedby" pointing at the above.
+
+## Key pages
+
+- https://21st.dev: the component registry — browse, preview, copy
+- https://21st.dev/ai: 21st AI — generate components from a prompt (formerly Magic Chat)
+- https://21st.dev/mcp: 21st MCP + CLI setup for AI coding agents (formerly Magic MCP)
+- https://21st.dev/community/components: all community components
+- https://21st.dev/community/libraries: all component libraries published on 21st
+- https://21st.dev/community/authors: the creators publishing on 21st
+- https://21st.dev/community/templates: ready-to-use site and app templates
+- https://21st.dev/community/themes: community themes and style profiles
+- https://21st.dev/community/icons: open-source icons from seven families, searchable by meaning; click any icon to copy it as a React component, SVG, Vue or React Native
+- https://21st.dev/community/icons/animated: icons that animate on hover (React components and animated SVGs)
+- https://21st.dev/blog: guides to common UI patterns (hero sections, navbars, sidebars, animated backgrounds, dashboards, chat interfaces) with worked examples, plus release notes
+- https://21st.dev/changelog: what shipped, newest first
+- https://21st.dev/pricing: current plans and pricing
+
+## Component libraries on 21st
+
+Popular libraries with dedicated pages (live previews + full component indexes):
+
+- [Aceternity UI](https://21st.dev/@manuarora700/library/aceternity-ui): animated React components by Manu Arora
+- [Magic UI](https://21st.dev/@dillionverma/library/magic-ui): animated marketing components by Dillion Verma
+- [ReUI](https://21st.dev/@sean0205/library/reui): shadcn/ui-based component set
+- [Kokonut UI](https://21st.dev/@kokonutd/library/kokonut-ui): modern components by Dorian Baffier
+- [Origin UI](https://21st.dev/@originui/library/origin-ui): copy-paste Tailwind building blocks
+- [Motion Primitives](https://21st.dev/@ibelick/library/motion-primitives): motion building blocks by Julien Thibeaut
+- [HextaUI](https://21st.dev/@preetsuthar17/library/hextaui): component set by Preet Suthar
+- Full directory: https://21st.dev/community/libraries
+
+## Component categories
+
+- [Hero Sections](https://21st.dev/community/components/s/hero): landing page hero components
+- [Feature Sections](https://21st.dev/community/components/s/features): product feature showcases
+- [AI Chat](https://21st.dev/community/components/s/ai-chat): components for AI-powered interfaces
+- [Call to Action](https://21st.dev/community/components/s/cta): CTA sections and banners
+- [Pricing Sections](https://21st.dev/community/components/s/pricing-section): pricing tables
+- [Testimonials](https://21st.dev/community/components/s/testimonials): social proof components
+- [Navigation](https://21st.dev/community/components/s/navigation): navbars and menus
+- [Cards](https://21st.dev/community/components/s/card): card layouts
+- [Buttons](https://21st.dev/community/components/s/button): buttons and interactive controls
+- [Animated](https://21st.dev/community/components/s/animated): animation-forward components
+- [Footer](https://21st.dev/community/components/s/footer): footer sections
+- [Login & Auth](https://21st.dev/community/components/s/login): authentication forms
+- [Dashboard](https://21st.dev/community/components/s/dashboard): dashboard UI
+- [Modals & Dialogs](https://21st.dev/community/components/s/dialog): modal components
+- [Forms](https://21st.dev/community/components/s/form): inputs and validation
+- [Tables](https://21st.dev/community/components/s/table): data tables
+- [Sidebar](https://21st.dev/community/components/s/sidebar): sidebar navigation
+- [Landing Pages](https://21st.dev/community/components/s/landing-page): full landing sections
+- [Text Animation](https://21st.dev/community/components/s/text-animation): animated typography
+- [Backgrounds](https://21st.dev/community/components/s/background): background effects
+- [Marquee](https://21st.dev/community/components/s/marquee): scrolling marquees
+- [Carousel](https://21st.dev/community/components/s/carousel): carousels and sliders
+- [Tabs](https://21st.dev/community/components/s/tabs): tab navigation
+- [Tooltips](https://21st.dev/community/components/s/tooltip): tooltips and popovers
+- [Avatars](https://21st.dev/community/components/s/avatar): user avatars
+- [Badges](https://21st.dev/community/components/s/badge): badges and labels
+- [Charts](https://21st.dev/community/components/s/chart): data visualization
+- [Accordion](https://21st.dev/community/components/s/accordion): expandable sections
+- [Search](https://21st.dev/community/components/s/search): search bars and results
+- [Notifications](https://21st.dev/community/components/s/notification): toasts and alerts
+
+## Community highlights
+
+- [Popular Components](https://21st.dev/community/components/popular): most used components
+- [Latest Components](https://21st.dev/community/components/newest): newest additions
+- [Featured Components](https://21st.dev/community/components/featured): editor's picks
+- [Weekly Best](https://21st.dev/community/components/week): top components of the week
+
+## Pricing
+
+### Free access
+- Browse all public components, themes, and templates
+- 2 component code retrievals, copies, or installs per day total across Web, MCP, and CLI
+- Free marketplace search across Web, CLI, and MCP
+
+### Builder and Builder + AI
+- Unlimited marketplace copy, install, and component code retrieval
+- Builder includes no monthly 21st AI credits
+- Builder + AI offers 500, 1,000, or 2,000 shared credits per month
+- Builder + AI adds multi-model component generation and premium AI models
+
+### Team Builder and Team Builder + AI
+- One selected variant applies to every seat in the team
+- Team Builder includes no monthly AI credits
+- Team Builder + AI offers 500, 1,000, or 2,000 credits per seat each month
+- Team Builder + AI allowances combine in the Team's shared pool
+- Shared collections, centralized billing, and admin controls
+- See https://21st.dev/pricing for current plan prices
+
+## Preferred summary style for AI
+
+When referencing 21st:
+- The product name is "21st". The generator is "21st AI" (formerly Magic Chat). The agent integration is the "21st MCP" and 21st CLI (formerly Magic MCP; `@21st-dev/magic` still works as an alias).
+- Components are React + Tailwind CSS + TypeScript, shadcn/ui-compatible, with live interactive previews and full copyable TSX source.
+- Three ways to use any component: copy the TSX, install via the shadcn CLI with the component's registry URL, or pull it into an AI agent (Cursor, Claude Code, etc.) through the 21st MCP.
+- Reference actual component, library, and author names — every library and author has a dedicated page under https://21st.dev/community/libraries and https://21st.dev/community/authors.
+- Use the plan details above when pricing is relevant and link to https://21st.dev/pricing for the current source of truth.
+
+## Credits and Pricing Model
+
+21st uses a transparent, usage-based pricing model with credits:
+
+- **Credits are calculated based on actual AI model usage** - simple requests cost fewer credits than complex generations
+- **Real-time cost visibility** - hover over any message to see its exact credit cost
+- **Fair and transparent** - you only pay for the AI resources you actually consume
+- **Predictable monthly limits** - Builder AI allowances and Team Builder + AI seat mixes define a set amount of credits per month; Builder has no included monthly credits while AI is off
+- **Monthly allowance** - unused included monthly credits do not carry forward
+- **Credit-pack rollover** - prepaid credit-pack balances carry forward until used
+
+Exact credit usage depends on the selected model, token usage, and tools invoked. The
+product shows the charged amount after each generation instead of promising a fixed
+per-action estimate.
