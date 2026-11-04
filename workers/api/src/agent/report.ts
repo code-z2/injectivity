@@ -156,7 +156,7 @@ export async function writePostMortem(opts: {
     system: WRITER_PROMPT,
     messages: [{ role: 'user', text: opts.input }],
     schema: SCHEMA,
-    maxTokens: 24000,
+    maxTokens: 32000,
     signal: opts.signal ?? AbortSignal.timeout(10 * 60_000),
   });
   const json = /\{[\s\S]*\}/.exec(turn.text)?.[0];

@@ -238,7 +238,7 @@ export async function investigate(
       format: { type: 'json_schema', name: 'intel_report', strict: true, schema: REPORT_SCHEMA },
     },
     temperature: 0.2,
-    max_output_tokens: 24000,
+    max_output_tokens: 32000,
     store: false,
   };
 
