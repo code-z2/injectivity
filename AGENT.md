@@ -25,6 +25,18 @@ Never push with `--no-verify`.
 `__pycache__/` are gitignored — never force-add them. Commit lockfiles
 (`bun.lock`); never commit two lockfiles for one package.
 
+## Think Before Coding.
+No silent assumptions. State what you're assuming. Surface tradeoffs. Ask before guessing. Push back when a simpler approach exists.
+
+## Simplicity First.
+Minimum code that solves the problem. No speculative features. No abstractions for single-use code. If a senior engineer would call it overcomplicated — simplify.
+
+## Surgical Changes.
+Touch only what you must. Don't "improve" adjacent code, comments, or formatting. Don't refactor what isn't broken. Match existing style.
+
+## Goal-Driven Execution.
+Define success criteria. Loop until verified. Don't tell Claude what steps to follow, tell it what success looks like and let it iterate.
+
 ## Destructive filesystem ops (mv, rm, overwrite)
 
 Post-incident rule, 2026-10-31: an `mv` overwrote the master seed.

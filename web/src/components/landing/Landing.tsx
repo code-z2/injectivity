@@ -6,6 +6,7 @@ import { Spotlight, type SpotlightStage } from "./Spotlight";
 import { StatusBar } from "./StatusBar";
 import { Underlay } from "./Underlay";
 import { usePeekLens } from "./usePeekLens";
+import { Tutorial } from "./Tutorial";
 
 // Landing: the wordmark plays centred on the aurora, its orb becomes the
 // spotlight's send button, then the chips and status arrive last.
@@ -122,6 +123,7 @@ export function Landing() {
       </div>
 
       <StatusBar show={stage === "ready"} />
+      <Tutorial ready={stage === "ready"} />
     </main>
   );
 }

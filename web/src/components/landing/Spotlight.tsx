@@ -176,6 +176,7 @@ export function Spotlight({
           transition={{ duration: 0.9, ease: EASE }}
         >
           <motion.input
+            data-tour="search"
             ref={inputRef}
             value={query}
             onChange={(e) => {
@@ -209,6 +210,7 @@ export function Spotlight({
 
         {/* The orb, then the send button. */}
         <motion.button
+          data-tour="submit"
           type="submit"
           aria-label="Trace"
           className="absolute top-0 left-0 rounded-full outline-offset-4"
@@ -304,6 +306,7 @@ export function Spotlight({
           <SettingsDialog
             trigger={
               <button
+                data-tour="settings"
                 aria-label="Settings"
                 className="flex size-8 items-center justify-center rounded-full border border-glass-edge/70 bg-glass/55 text-ink-soft shadow-hairline backdrop-blur-md transition-colors hover:bg-glass/80 hover:text-ink"
               >
@@ -316,6 +319,7 @@ export function Spotlight({
 
       {/* Suggestions: known exploiter wallets to start from. */}
       <motion.div
+        data-tour="examples"
         className="absolute"
         style={{
           left: -fieldW / 2,
