@@ -671,3 +671,50 @@ Living record of what was built. Update on every completed item.
 - **Importance:** Gives first-time visitors a concrete starting path and makes configuration discoverable without requiring setup or launching an investigation during the tour.
 - **Verified:** Web production build (including TypeScript) passes. In-browser at 1280×720 and 375×667: all five steps, Settings highlight, Back, completion, skip, Escape, replay from step one, and normal Settings dialog after dismissal. Completion survives reload; focus returns to the replay button after replay dismissal. Storage-denied, reduced-motion, and short landscape behavior were not separately exercised. Existing Vite warning about viem/ox node:worker_threads externalization remains.
 - **Status:** Local preview only; no commit or deployment.
+
+## 2026-11-04 — Home tutorial production deployment
+- **What:** Published the approved five-step home tutorial to the existing Cloudflare Pages project `intel-terminal`, production branch `main`, from commit `b7f831f`.
+- **How:** Production web build with `VITE_API_BASE=https://intel-terminal-api.anyaogupeter601.workers.dev`, then Wrangler Pages direct upload. No API deployment or database changes.
+- **Verified:** TypeScript and Vite production build pass. Production homepage responds successfully; published assets contain the versioned tutorial flag, Settings step, Skip control, and production API URL.
+- **Deployment:** https://3765a092.intel-terminal.pages.dev; production https://intel-terminal.pages.dev.
+
+## 2026-11-04 — Product intro motion-design revision
+- **What:** Revised the first-minute demo introduction after the user found the original too slide-like, using their 21.6-second Relative video as the visual reference. User will record the browser walkthrough themselves; no computer or recorder control performed for this revision.
+- **How:** Local, deterministic motion rendering: staggered blur-to-sharp typography, typed search, search-to-globe transition, depth-cued rotating network, selected-wallet and ledger entrance, paced three-hop trail, agent question and source cards, report/PDF sequence, brand resolve. Varied framing replaces the fixed heading/diagram layout. No paid video generation. Original preserved; new output `demo/output/intro-v2-cinematic.mp4`.
+- **Verified:** 60.000 seconds, 1920×1080, 30fps, H.264. Full decode passes; contact sheets and critical transition frames visually checked. Fixed headline ghosting and inappropriate card subtitles during review. Silent visual cut; voiceover remains pending visual/script approval.
+
+## 2026-11-04 — Intro handoff into browser demo
+- **What:** Replaced the final five-second brand outro with a centered “Demo →” transition, since the browser walkthrough follows it.
+- **How:** Updated the final motion scene and joined it to the first 55 seconds of the approved visual cut. Original v2 retained; revised output `demo/output/intro-v3-demo.mp4`.
+- **Verified:** Final frame visually checked; output remains 60 seconds, 1920×1080 at 30fps. User records the long browser take; trimming and joining remain pending receipt of that footage.
+
+## 2026-11-04 — Narrated introduction and sound effects
+- **What:** Added synthetic narration to the approved 60-second intro only; user narrates the live walkthrough. Final Demo → card says “Now, let’s see it in action,” followed by a clean audio handoff.
+- **How:** One HeyGen speech generation using public Janet (Warm & Approachable). Original WAV and word timing metadata preserved. Narration split on supplied chapter boundaries and aligned to scene times with pitch-preserving tempo adjustment. Locally synthesized original soft transition whooshes, keyboard ticks, node/citation tones, and PDF-export accent; effects duck beneath speech. No music bed. Separate narration and SFX stems retained. Approved video stream copied without changing visuals.
+- **Output:** `demo/output/intro-v4-narrated.mp4`, 60 seconds, 1920×1080 at 30fps, stereo AAC 48kHz; standalone mix and stems beside it.
+- **Verified:** Full audio/video decode succeeds. Chapter placement ends speech at 58.29 seconds; effect tail fades before the handoff. Loudness normalization targets -16 LUFS and -1.5 dBTP; final encoded stream measured separately. No browser/computer control used.
+
+## 2026-11-04 — Fresh reviewer film: From noise to evidence
+- **What:** User rejected the previous demo intro and approved a fresh one-minute conceptual product film before their own narrated screen recording. Previous drafts retained but excluded.
+- **How:** New dark spatial network renderer, camera following three wallet hops, a citation expanding into evidence, evidence surface becoming a report, brand resolve and final Demo →. Conceptual visualization labels distinguish illustration from real incident data. New single-call HeyGen voiceover at natural speed, original synthesized score and effects, editable stems and source-to-timeline mappings in `demo/reboot/`.
+- **Output:** `demo/reboot/intel-terminal-one-minute.mp4`.
+- **Verified:** 60.000 seconds in both streams; H.264 1920×1080, 30fps, 1800 frames; stereo AAC 48kHz. Complete decode succeeds. Encoded representative frames inspected, semantic cue timing checked, final audio measured -16.58 LUFS and -1.59 dBTP. Normal-speed visual playback and listening were not available, so subjective review remains with the user.
+- **Status:** Ready for creative review. No browser/recorder control, application changes, commit, or deployment.
+
+## 2026-11-04 — HTML-style product video with clear trace and agent explanation
+- **What:** Followed the user's preferred `product-film.html` visual style for a new finished narrated video: warm gold, dark background, mono typography, simple cards. Removed the incorrect question and verified/inferred sections. Added trace explanation, Meta's Muse Spark agent, node summaries, collaborative investigation, on-chain data/post-mortems/web/explorer sources, evidence-grounded report on request, PDF export, and Demo handoff.
+- **How:** Fresh single-call HeyGen voiceover at natural speed, card animations timed to actual speech, original score/effects. Every outgoing transition follows the last word by at least 0.4 seconds. Final Demo holds through the end. Sources and editable stems are retained in `demo/cards/`; original `product-film.mp4` preserved.
+- **Output:** `product-film-revised.mp4` — 60.000 seconds, 1920×1080, 30fps, H.264 with stereo AAC 48kHz.
+- **Verified:** Complete decode passes; 1800 frames; encoded representative frames and timing guards checked; final mix -16.05 LUFS, -1.93 dBTP. Normal-speed playback/listening unavailable; subjective review remains with the user. No browser control, commit, or deployment.
+
+## 2026-11-04 — Product definition inserted into the existing film
+- **What:** Replaced only the 12–18-second “Start with a wallet” section with “Intel Terminal is an on-chain investigation workspace. Start with a wallet.” Updated matching HTML/source text.
+- **How:** One short narration generation with the same voice. Rendered only the six-second replacement scene, then spliced it into the existing film; all other visual content and timing retained. Audio master samples outside the replaced interval are verified unchanged before final encoding. Original video preserved.
+- **Output:** `product-film-with-definition.mp4`, still 60 seconds, 1080p30, 1800 frames. Last spoken word at 17.332 seconds; fade begins at 17.75, retaining a 0.418-second pause.
+- **Verified:** Replacement frame visually checked and full final decode passes. No full audiovisual playback/listening review available.
+
+## 2026-11-04 — Model API 524 on report generation: root cause + fix
+- **Symptom:** "Generate report" failed with `model API error: http-524`. 524 is Cloudflare's origin-timeout: Meta's edge gives up when the origin does not respond in time.
+- **Root cause:** `responsesAdapter` made one non-streaming POST to `api.meta.ai/v1/responses`. The writer role runs high effort with a 24k-token cap over a large evidence bundle, so first-byte latency regularly crossed the proxy timeout and the whole generation died — no retry, no recovery. Shorter medium-effort calls (one-shot investigate, summary) usually squeak under the wire, which is why only report generation failed.
+- **Fix:** the Responses adapter now sends `stream: true` and consumes the SSE stream (terminal `response.completed` carries the full wire object; deltas are fallback), so bytes flow within seconds and the 524 window never opens. `postModel` (new shared helper in `adapters/types.ts`) retries once on 502/503/504/524, covering the other adapters' transient cases. Plain-JSON endpoints still parse as before.
+- **Verified:** 67/67 tests (2 new: SSE consumption, 524-retry-success). Live one-shot investigate + agent summary probed healthy post-diagnosis. Deploy pending: wrangler OAuth expired ("Not logged in") — needs `wrangler login`, then `wrangler deploy` and a live session-report check.

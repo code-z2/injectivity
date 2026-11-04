@@ -69,29 +69,43 @@ export class ModelError extends Error {
   }
 }
 
-/** POST JSON and parse the reply, mapping transport and HTTP failures to ModelError. */
-export async function postJson(
+// Transient proxy/origin statuses worth one retry: 524 is Cloudflare's
+// origin-timeout, the classic failure of a long non-streaming generation.
+const RETRYABLE = new Set([502, 503, 504, 524]);
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * POST JSON with one retry on transient statuses. Returns the raw Response
+ * so streaming adapters can consume the body themselves; transport and HTTP
+ * failures map to ModelError.
+ */
+export async function postModel(
   fetchImpl: typeof fetch,
   url: string,
   headers: Record<string, string>,
   body: unknown,
   signal?: AbortSignal,
-): Promise<unknown> {
-  let res: Response;
-  try {
-    res = await fetchImpl(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', ...headers },
-      body: JSON.stringify(body),
-      signal: signal ?? AbortSignal.timeout(180_000),
-    });
-  } catch (err) {
-    throw new ModelError(
-      502,
-      `model call failed (${err instanceof Error ? err.message : 'unknown'})`,
-    );
-  }
-  if (!res.ok) {
+): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    let res: Response;
+    try {
+      res = await fetchImpl(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...headers },
+        body: JSON.stringify(body),
+        signal: signal ?? AbortSignal.timeout(180_000),
+      });
+    } catch (err) {
+      throw new ModelError(
+        502,
+        `model call failed (${err instanceof Error ? err.message : 'unknown'})`,
+      );
+    }
+    if (res.ok) return res;
+    if (attempt === 0 && RETRYABLE.has(res.status)) {
+      await sleep(1200);
+      continue;
+    }
     let detail = '';
     try {
       detail = (await res.text()).slice(0, 300);
@@ -103,6 +117,17 @@ export async function postJson(
       `model API error: http-${res.status}${detail ? ` ${detail}` : ''}`,
     );
   }
+}
+
+/** POST JSON and parse the reply, mapping transport and HTTP failures to ModelError. */
+export async function postJson(
+  fetchImpl: typeof fetch,
+  url: string,
+  headers: Record<string, string>,
+  body: unknown,
+  signal?: AbortSignal,
+): Promise<unknown> {
+  const res = await postModel(fetchImpl, url, headers, body, signal);
   try {
     return await res.json();
   } catch {

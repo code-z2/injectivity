@@ -8,9 +8,63 @@ import {
   ModelError,
   type Msg,
   parseArgs,
-  postJson,
+  postModel,
   type ToolCall,
 } from './types';
+
+type Wire = {
+  status?: string;
+  incomplete_details?: { reason?: string };
+  output?: Item[];
+  usage?: { input_tokens?: number; output_tokens?: number };
+};
+
+/**
+ * Consume a Responses SSE stream. The terminal `response.completed` event
+ * carries the full response object; deltas are only a fallback. Streaming
+ * keeps bytes flowing, which is what stops Cloudflare's 524 origin-timeout
+ * from killing long generations.
+ */
+async function readStream(res: Response): Promise<Wire> {
+  const reader = res.body?.getReader();
+  if (!reader) throw new ModelError(502, 'model stream had no body');
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let completed: Wire | null = null;
+  let deltaText = '';
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let cut: number;
+    while ((cut = buffer.indexOf('\n\n')) >= 0) {
+      const block = buffer.slice(0, cut);
+      buffer = buffer.slice(cut + 2);
+      const data = block
+        .split('\n')
+        .filter((l) => l.startsWith('data:'))
+        .map((l) => l.slice(5).trim())
+        .join('');
+      if (!data || data === '[DONE]') continue;
+      let ev: { type?: string; response?: Wire; delta?: string };
+      try {
+        ev = JSON.parse(data);
+      } catch {
+        continue;
+      }
+      if (ev.type === 'response.completed' && ev.response) completed = ev.response;
+      else if (ev.type === 'response.failed' || ev.type === 'response.incomplete')
+        completed = ev.response ?? { status: 'failed' };
+      else if (ev.type === 'response.output_text.delta' && typeof ev.delta === 'string')
+        deltaText += ev.delta;
+    }
+  }
+  if (!completed) throw new ModelError(502, 'model stream ended before completion');
+  if (!completed.output && deltaText) {
+    completed.output = [{ type: 'message', content: [{ type: 'output_text', text: deltaText }] }];
+  }
+  return completed;
+}
 
 type Item = Record<string, unknown>;
 
@@ -71,18 +125,19 @@ export function responsesAdapter(fetchImpl: typeof fetch = fetch): ModelAdapter 
             schema: req.schema.schema,
           },
         };
-      const wire = (await postJson(
+      body.stream = true;
+      const res = await postModel(
         fetchImpl,
         `${cfg.baseUrl.replace(/\/$/, '')}/responses`,
         { authorization: `Bearer ${cfg.key}` },
         body,
         req.signal,
-      )) as {
-        status?: string;
-        incomplete_details?: { reason?: string };
-        output?: Item[];
-        usage?: { input_tokens?: number; output_tokens?: number };
-      };
+      );
+      const wire: Wire = (res.headers.get('content-type') ?? '').includes('text/event-stream')
+        ? await readStream(res)
+        : ((await res.json().catch(() => {
+            throw new ModelError(502, 'model response was not readable JSON');
+          })) as Wire);
       if (wire.status && wire.status !== 'completed') {
         const reason = wire.incomplete_details?.reason;
         throw new ModelError(502, `model response ${wire.status}${reason ? `: ${reason}` : ''}`);

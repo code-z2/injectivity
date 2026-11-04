@@ -99,6 +99,53 @@ describe('responses adapter', () => {
   });
 });
 
+describe('responses adapter streaming + retry', () => {
+  test('consumes SSE and reads the completed response', async () => {
+    const completed = {
+      status: 'completed',
+      output: [{ type: 'message', content: [{ type: 'output_text', text: 'Streamed answer.' }] }],
+      usage: { input_tokens: 7, output_tokens: 3 },
+    };
+    const sse =
+      `event: response.output_text.delta\ndata: ${JSON.stringify({ type: 'response.output_text.delta', delta: 'Streamed ' })}\n\n` +
+      `event: response.completed\ndata: ${JSON.stringify({ type: 'response.completed', response: completed })}\n\n`;
+    const calls: { body: any }[] = [];
+    const fn = (async (_url: string, init: RequestInit) => {
+      calls.push({ body: JSON.parse(String(init.body)) });
+      return new Response(sse, { headers: { 'content-type': 'text/event-stream' } });
+    }) as unknown as typeof fetch;
+    const t = await adapterFor('https://api.meta.ai/v1', fn).run(cfg('https://api.meta.ai/v1'), {
+      system: 'sys',
+      messages: history,
+    });
+    expect(calls[0]!.body.stream).toBe(true);
+    expect(t.text).toBe('Streamed answer.');
+    expect(t.usage).toEqual({ input: 7, output: 3 });
+  });
+
+  test('a 524 is retried once and the retry can succeed', async () => {
+    let n = 0;
+    const fn = (async () => {
+      n++;
+      if (n === 1) return new Response('origin timeout', { status: 524 });
+      return new Response(
+        JSON.stringify({
+          status: 'completed',
+          output: [{ type: 'message', content: [{ type: 'output_text', text: 'recovered' }] }],
+          usage: { input_tokens: 1, output_tokens: 1 },
+        }),
+        { headers: { 'content-type': 'application/json' } },
+      );
+    }) as unknown as typeof fetch;
+    const t = await adapterFor('https://api.meta.ai/v1', fn).run(cfg('https://api.meta.ai/v1'), {
+      system: 'sys',
+      messages: history,
+    });
+    expect(n).toBe(2);
+    expect(t.text).toBe('recovered');
+  });
+});
+
 describe('chat adapter', () => {
   test('OpenAI-compatible shape; search only on OpenRouter', async () => {
     const reply = {
