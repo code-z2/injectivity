@@ -723,3 +723,8 @@ Living record of what was built. Update on every completed item.
 - Caps raised 24000 -> 32000 for the two long-form writers (`agent/report.ts` writer, `llm/investigate.ts` one-shot) so `max_output_tokens` stops being a failure mode; per-turn agent defaults (16000) untouched.
 - Deployed Worker `f39044d5` (streaming + retry + caps). 67/67 tests, tsc clean.
 - **Live proof:** real agent session over WebSocket, `{type:'report'}` -> `REPORT OK`, report #8 ("VITALIK dispersal from distributor contract, October 2026") with key + owner token returned. The exact flow that produced `http-524` now completes.
+
+## 2026-11-04 — Binance row: Arbitrum + Avalanche legs added (remote apply pending auth)
+- **Why they were missing:** `evm-0272` only ever carried the verified Ethereum leg — the incident was watch-only at curation time and ZachXBT's Arbitrum attribution landed after that pass.
+- **Added:** Arbitrum exploiter `0x3E2b...32d5` (Security Council freeze tx cited), `0x5227...2f8c` as collector on Arbitrum + Avalanche (Blockaid), commingling `0x1510...feb7` (ZachXBT, THORChain, ethereum), 3 Arbitrum + 4 Avalanche Binance hot-wallet victims (Blockaid via OAK/Bitquery). Optimism/Base/Polygon legs documented in `loss_note` as drained-but-unpublished pairs — not guessed in, per the strict rule. Chains now [ethereum, arbitrum, avalanche]; local seed regenerated (914 risk rows), 67/67 tests green.
+- **Blocked:** remote D1 re-apply — wrangler OAuth access token expired 16:55Z and non-interactive refresh fails in this sandbox. Needs `wrangler login` or a durable `CLOUDFLARE_API_TOKEN`.
